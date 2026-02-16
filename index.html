@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>중세 마을 경영</title>
+    <!-- Google Fonts - Noto Sans KR -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+    <div id="game-container">
+        <!-- 헤더 -->
+        <header>
+            <h1>🏰 중세 마을 경영</h1>
+            <button id="menu-btn" aria-label="게임 메뉴">⚙️</button>
+        </header>
+
+        <!-- 계절 표시 배너 -->
+        <div id="season-banner" aria-label="현재 계절">
+            <span id="season-name">🌸 봄</span>
+            <div class="season-progress">
+                <div class="season-progress-bar" id="season-progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- 이벤트 배너 -->
+        <div id="event-banner" class="hidden" aria-live="polite" aria-label="이벤트 알림">
+            <div class="event-content">
+                <div class="event-icon"></div>
+                <div class="event-info">
+                    <div class="event-name"></div>
+                    <div class="event-description"></div>
+                </div>
+            </div>
+            <div class="event-progress">
+                <div class="progress-bar"></div>
+            </div>
+        </div>
+
+        <!-- 자원 표시 영역 (티어별 그룹) -->
+        <section id="resources-panel" aria-label="자원 현황">
+            <!-- 1차 자원 (원자재) -->
+            <div class="resource-group" data-tier="1">
+                <h3 class="tier-label">⛏️ 원자재</h3>
+                <div class="resource">
+                    <span class="resource-icon">🪵</span>
+                    <span class="resource-name">목재</span>
+                    <span class="resource-rate" id="wood-rate"></span>
+                    <span class="resource-amount" id="wood-amount">0</span>
+                </div>
+                <div class="resource">
+                    <span class="resource-icon">🪨</span>
+                    <span class="resource-name">석재</span>
+                    <span class="resource-rate" id="stone-rate"></span>
+                    <span class="resource-amount" id="stone-amount">0</span>
+                </div>
+                <div class="resource">
+                    <span class="resource-icon">🌾</span>
+                    <span class="resource-name">식량</span>
+                    <span class="resource-rate" id="food-rate"></span>
+                    <span class="resource-amount" id="food-amount">0</span>
+                </div>
+                <div class="resource">
+                    <span class="resource-icon">💰</span>
+                    <span class="resource-name">금화</span>
+                    <span class="resource-rate" id="gold-rate"></span>
+                    <span class="resource-amount" id="gold-amount">0</span>
+                </div>
+            </div>
+            <!-- 2차 자원 (가공품) - JS 동적 생성 -->
+            <div class="resource-group" data-tier="2" id="tier2-resources" style="display: none;">
+                <h3 class="tier-label">⚙️ 가공품</h3>
+                <!-- 목재(제재소), 빵(제분소), 도구(대장간) 등 -->
+            </div>
+            <!-- 3차 자원 (완제품) - JS 동적 생성 -->
+            <div class="resource-group" data-tier="3" id="tier3-resources" style="display: none;">
+                <h3 class="tier-label">🏷️ 완제품</h3>
+                <!-- 가구, 무기 등 -->
+            </div>
+        </section>
+
+        <!-- 인구 표시 영역 -->
+        <section id="population-panel">
+            <div class="stat">
+                <span>👥 인구:</span>
+                <span id="current-population">0</span> /
+                <span id="max-population">0</span>
+            </div>
+            <div class="stat">
+                <span>💤 유휴:</span>
+                <span id="idle-population">0</span>
+            </div>
+            <div class="stat">
+                <span>⚒️ 고용:</span>
+                <span id="employed-population">0</span>
+            </div>
+        </section>
+
+        <!-- 행복도 표시 영역 -->
+        <section id="happiness-panel" aria-label="행복도">
+            <div class="happiness-header">
+                <span>😊 행복도</span>
+                <span id="happiness-value">50</span>
+            </div>
+            <div class="happiness-bar-container">
+                <div class="happiness-bar" id="happiness-bar" style="width: 50%"></div>
+            </div>
+            <div class="happiness-factors" id="happiness-factors">
+                <!-- JS로 동적 생성 -->
+            </div>
+        </section>
+
+        <!-- 건물 건설 버튼 영역 -->
+        <section id="buildings-panel">
+            <h2 class="panel-toggle" data-target="building-buttons" aria-expanded="true">
+                건물 건설 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="building-buttons" class="collapsible-content">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </section>
+
+        <!-- 건설된 건물 목록 -->
+        <section id="built-buildings-panel">
+            <h2 class="panel-toggle" data-target="built-buildings-list" aria-expanded="true">
+                건설된 건물 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="built-buildings-list" class="collapsible-content">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </section>
+
+        <!-- 교역 패널 -->
+        <section id="trade-panel" class="hidden" aria-label="교역">
+            <h2 class="panel-toggle" data-target="trade-controls" aria-expanded="true">
+                🔄 교역 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="trade-controls" class="collapsible-content">
+                <div class="trade-row">
+                    <label>판매 자원:</label>
+                    <select id="trade-sell-type">
+                        <!-- JavaScript로 동적 생성 -->
+                    </select>
+                    <input type="number" id="trade-sell-amount" value="10" min="1" max="1000">
+                    <div class="trade-quick-btns">
+                        <button class="trade-quick-btn" data-amount="10">10</button>
+                        <button class="trade-quick-btn" data-amount="50">50</button>
+                        <button class="trade-quick-btn" data-amount="100">100</button>
+                    </div>
+                </div>
+                <div class="trade-row">
+                    <label>구매 자원:</label>
+                    <select id="trade-buy-type">
+                        <!-- JavaScript로 동적 생성 -->
+                    </select>
+                </div>
+                <div class="trade-info">
+                    <div class="trade-rate" id="trade-rate">교환 비율: 1:1</div>
+                    <div class="trade-preview" id="trade-preview">획득: 0</div>
+                </div>
+                <button id="trade-execute-btn" class="trade-btn">교환 실행</button>
+            </div>
+        </section>
+
+        <!-- 연구 패널 -->
+        <section id="research-panel" class="hidden" aria-label="연구">
+            <h2 class="panel-toggle" data-target="research-body" aria-expanded="true">
+                📚 연구소 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="research-body" class="collapsible-content">
+                <div class="research-placeholder" id="research-placeholder">
+                    <span>🏫</span>
+                    <p>학교를 건설하면 연구가 가능합니다</p>
+                </div>
+                <div id="research-tree" class="research-grid">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+                <div id="research-progress-bar" class="progress-bar hidden">
+                    <div class="progress-fill" id="research-progress-fill"></div>
+                    <span class="progress-label" id="research-progress-label"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- 업적 패널 -->
+        <section id="achievements-panel" aria-label="업적">
+            <h2 class="panel-toggle" data-target="achievements-list" aria-expanded="true">
+                🏆 업적 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="achievements-list" class="collapsible-content">
+                <!-- JavaScript로 동적 생성 -->
+            </div>
+        </section>
+
+        <!-- 하단 정보 -->
+        <footer>
+            <button id="save-btn" aria-label="게임 저장">💾 저장</button>
+            <button id="load-btn" aria-label="게임 불러오기">📂 불러오기</button>
+            <button id="sound-toggle-btn" aria-label="사운드 토글">🔊</button>
+            <span id="game-time">플레이 시간: 0분 0초</span>
+        </footer>
+    </div>
+
+    <!-- 메시지 표시용 -->
+    <div id="message-box" class="hidden"></div>
+
+    <!-- 튜토리얼 오버레이 -->
+    <div id="tutorial-overlay" class="hidden" aria-live="polite">
+        <div class="tutorial-bubble">
+            <div class="tutorial-icon" id="tutorial-icon">💡</div>
+            <div class="tutorial-text" id="tutorial-text"></div>
+            <button class="tutorial-dismiss" id="tutorial-dismiss">확인</button>
+        </div>
+    </div>
+
+    <!-- 게임 메뉴 모달 -->
+    <div id="menu-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>⚙️ 게임 메뉴</h2>
+            <div class="modal-buttons">
+                <button id="new-game-btn" class="modal-btn danger-btn">🆕 새 게임</button>
+                <button id="close-menu-btn" class="modal-btn">✖ 닫기</button>
+            </div>
+            <!-- 새 게임 확인 패널 -->
+            <div id="new-game-confirm" class="confirm-panel hidden">
+                <p>⚠️ 현재 진행 상황이 모두 삭제됩니다.<br>정말 새 게임을 시작하시겠습니까?</p>
+                <div class="confirm-buttons">
+                    <button id="new-game-confirm-btn" class="modal-btn danger-btn">확인</button>
+                    <button id="new-game-cancel-btn" class="modal-btn">취소</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 건물 철거 확인 모달 -->
+    <div id="demolish-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>🗑️ 건물 철거</h2>
+            <p id="demolish-message"></p>
+            <p id="demolish-refund" class="refund-info"></p>
+            <div class="confirm-buttons">
+                <button id="demolish-confirm-btn" class="modal-btn danger-btn">철거</button>
+                <button id="demolish-cancel-btn" class="modal-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/resources.js"></script>
+    <script src="js/population.js"></script>
+    <script src="js/buildings.js"></script>
+    <script src="js/happiness.js"></script>
+    <script src="js/events.js"></script>
+    <script src="js/seasons.js"></script>
+    <script src="js/trade.js"></script>
+    <script src="js/achievements.js"></script>
+    <script src="js/research.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/production.js"></script>
+    <script src="js/game.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/ui-buildings.js"></script>
+    <script src="js/ui-trade.js"></script>
+    <script src="js/ui-research.js"></script>
+    <script src="js/ui-achievements.js"></script>
+    <script src="js/ui-events.js"></script>
+    <script>
+        // 게임 시작
+        document.addEventListener('DOMContentLoaded', function () {
+            Game.init();
+            UI.init();
+        });
+    </script>
+</body>
+
+</html>
