@@ -61,11 +61,11 @@
   function getElements() {
     return {
       overlay: document.getElementById('vn-overlay'),
-      bg: document.getElementById('vn-bg'),
-      left: document.getElementById('vn-left-char'),
-      right: document.getElementById('vn-right-char'),
-      speaker: document.getElementById('vn-speaker'),
-      text: document.getElementById('vn-text')
+      bg: document.getElementById('vn-background'),
+      left: document.getElementById('vn-char-left'),
+      right: document.getElementById('vn-char-right'),
+      speaker: document.getElementById('vn-speaker-name'),
+      text: document.getElementById('vn-dialogue-text')
     };
   }
 

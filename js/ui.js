@@ -202,7 +202,7 @@
         this._tradeControlsInitialized = false;
 
         this.updateAll();
-        console.log('[UI.init] UI 초기화 완료');
+        
       } catch (error) {
         console.error('[UI.init] UI 초기화 실패:', error);
       }
@@ -1042,7 +1042,7 @@
           }, 5000);
         }
 
-        console.log('[UI.onEventTriggered] 이벤트 배너 표시:', eventData.id);
+        
       } catch (error) {
         console.error('[UI.onEventTriggered] 이벤트 배너 표시 실패:', error);
       }
@@ -1061,7 +1061,7 @@
           this._eventBannerInterval = null;
         }
 
-        console.log('[UI.onEventResolved] 이벤트 배너 숨김');
+        
       } catch (error) {
         console.error('[UI.onEventResolved] 이벤트 배너 숨김 실패:', error);
       }
@@ -1770,7 +1770,7 @@
           this.updateBreadWarning();
         }, 1000);
 
-        console.log('[UI.initGoldSinkButtons] 금화 소비처 버튼 초기화 완료');
+        
       } catch (error) {
         console.error('[UI.initGoldSinkButtons] 금화 소비처 버튼 초기화 실패:', error);
       }

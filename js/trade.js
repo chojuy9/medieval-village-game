@@ -21,9 +21,9 @@
      */
     getTradeableResources() {
       if (!window.Resources || typeof window.Resources.getRegistry !== 'function') {
-        return ['wood', 'stone', 'food'];
+        return ['wood', 'stone', 'food', 'gold'];
       }
-      return Object.keys(window.Resources.getRegistry()).filter((resourceType) => resourceType !== 'gold');
+      return Object.keys(window.Resources.getRegistry());
     },
 
     // 현재 보유량 기반 동적 비율 계산

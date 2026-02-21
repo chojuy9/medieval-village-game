@@ -64,7 +64,7 @@
                     grid.appendChild(card);
                 });
 
-                console.log('[UI.createMercenaryCards] 용병 카드 생성 완료');
+                
             } catch (error) {
                 console.error('[UI.createMercenaryCards] 용병 카드 생성 실패:', error);
             }

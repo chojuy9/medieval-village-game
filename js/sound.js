@@ -13,7 +13,7 @@
     init() {
       try {
         this.ctx = new (window.AudioContext || window.webkitAudioContext)();
-        console.log('[SoundManager] Web Audio API 초기화 완료');
+        
       } catch (e) {
         console.warn('[SoundManager] Web Audio API 미지원:', e);
       }

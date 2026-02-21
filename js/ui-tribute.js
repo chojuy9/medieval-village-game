@@ -30,7 +30,7 @@
                     grid.appendChild(card);
                 });
 
-                console.log('[UI.createTributeCards] 조공 카드 생성 완료');
+                
             } catch (error) {
                 console.error('[UI.createTributeCards] 조공 카드 생성 실패:', error);
             }

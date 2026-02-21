@@ -68,7 +68,7 @@
                     }
                 }
 
-                console.log('[UI.onEventTriggered] 이벤트 배너 표시:', eventData.id);
+                
             } catch (error) {
                 console.error('[UI.onEventTriggered] 이벤트 배너 표시 실패:', error);
             }
@@ -150,7 +150,7 @@
                 }
 
                 this._currentChoiceEvent = null;
-                console.log('[UI.handleEventChoice] 선택 처리 완료:', choiceId, result);
+                
             } catch (error) {
                 console.error('[UI.handleEventChoice] 이벤트 선택 처리 실패:', error);
             }
@@ -169,7 +169,7 @@
                     this._eventBannerInterval = null;
                 }
 
-                console.log('[UI.onEventResolved] 이벤트 배너 숨김');
+                
             } catch (error) {
                 console.error('[UI.onEventResolved] 이벤트 배너 숨김 실패:', error);
             }

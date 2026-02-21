@@ -515,9 +515,10 @@
           }
         ]
       };
-      if (window.VN && typeof window.VN.start === 'function') {
-        window.VN.start('siege_decision');
-      }
+      // 비주얼 노벨 비활성화
+      // if (window.VN && typeof window.VN.start === 'function') {
+      //   window.VN.start('siege_decision');
+      // }
       return;
     }
 
@@ -646,9 +647,9 @@
       eventRuntime.runtimeData = {
         requiresChoice: true,
         choices: [
-          { id: 'gold',       label: '금화 거래',    description: `💰 ${payGold} 지불 → 💰 ${gainAmount * 2} 획득`, canAfford },
-          { id: 'resource',   label: '자원 교환',    description: `💰 ${payGold} 지불 → 자원 ${gainAmount} 획득`,  canAfford },
-          { id: 'decline',    label: '거절',          description: '외교 사절을 돌려보냅니다.',                        canAfford: true }
+          { id: 'gold', label: '금화 거래', description: `💰 ${payGold} 지불 → 💰 ${gainAmount * 2} 획득`, canAfford },
+          { id: 'resource', label: '자원 교환', description: `💰 ${payGold} 지불 → 자원 ${gainAmount} 획득`, canAfford },
+          { id: 'decline', label: '거절', description: '외교 사절을 돌려보냅니다.', canAfford: true }
         ],
         payGold,
         gainAmount
@@ -816,7 +817,7 @@
       try {
         const runtimeEvent = createEventRuntime(eventDefinition);
 
-        console.log('[EventSystem.trigger] 이벤트 발생:', runtimeEvent.id);
+
 
         applyImmediateEffect(runtimeEvent);
         const isChoiceEvent = Boolean(runtimeEvent.runtimeData && runtimeEvent.runtimeData.requiresChoice);
@@ -854,7 +855,7 @@
         }
         syncEventState();
 
-        console.log('[EventSystem.resolve] 이벤트 종료:', resolvedEvent.id);
+
 
         dispatchEvent('eventResolved', {
           event: resolvedEvent
@@ -1068,9 +1069,10 @@
           siegeState.resolved = true;
           siegeState.inProgress = false;
           siegeState.lastChoice = choiceId;
-          if (window.VN && typeof window.VN.start === 'function') {
-            window.VN.start('siege_success');
-          }
+          // 비주얼 노벨 비활성화
+          // if (window.VN && typeof window.VN.start === 'function') {
+          //   window.VN.start('siege_success');
+          // }
         } else {
           state.happiness.current = Math.max(0, (Number(state.happiness && state.happiness.current) || 50) - 15);
           state.population.current = Math.max(0, (Number(state.population.current) || 0) - 2);
@@ -1081,9 +1083,10 @@
           siegeState.resolved = true;
           siegeState.inProgress = false;
           siegeState.lastChoice = choiceId;
-          if (window.VN && typeof window.VN.start === 'function') {
-            window.VN.start('siege_fail');
-          }
+          // 비주얼 노벨 비활성화
+          // if (window.VN && typeof window.VN.start === 'function') {
+          //   window.VN.start('siege_fail');
+          // }
         }
 
         activeEvent = null;

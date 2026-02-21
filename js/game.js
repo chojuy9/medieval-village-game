@@ -912,7 +912,7 @@
 
     init() {
       try {
-        console.log('[Game.init] 게임 초기화 시작');
+
 
         ensureResearchModuleFallback();
 
@@ -931,7 +931,7 @@
         }, GAME_CONFIG.UPDATE_INTERVAL);
 
         dispatchGameStateChanged();
-        console.log('[Game.init] 게임 초기화 완료');
+
       } catch (error) {
         console.error('[Game.init] 초기화 실패:', error);
       }
@@ -1027,9 +1027,10 @@
 
         updateResearch(deltaTime);
 
-        if (window.VN && typeof window.VN.checkTriggers === 'function') {
-          window.VN.checkTriggers(gameState);
-        }
+        // 비주얼 노벨 기능 비활성화
+        // if (window.VN && typeof window.VN.checkTriggers === 'function') {
+        //   window.VN.checkTriggers(gameState);
+        // }
 
         gameState.timers.autoSaveElapsed += deltaTime;
         if (gameState.timers.autoSaveElapsed >= 60) {
@@ -1484,7 +1485,7 @@
           }
         };
         localStorage.setItem(GAME_CONFIG.SAVE_KEY, JSON.stringify(saveData));
-        console.log('[Game.save] 저장 완료');
+
         return true;
       } catch (error) {
         console.error('[Game.save] 저장 실패:', error);
@@ -1518,7 +1519,7 @@
         }
 
         dispatchGameStateChanged();
-        console.log('[Game.load] 불러오기 완료');
+
         return true;
       } catch (error) {
         console.error('[Game.load] 불러오기 실패:', error);
@@ -1550,7 +1551,7 @@
         }, GAME_CONFIG.UPDATE_INTERVAL);
 
         dispatchGameStateChanged();
-        console.log('[Game.reset] 새 게임 시작');
+
         return true;
       } catch (error) {
         console.error('[Game.reset] 초기화 실패:', error);
