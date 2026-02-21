@@ -217,14 +217,20 @@
   // =====================================================
   // 초기화
   // =====================================================
-  document.addEventListener('DOMContentLoaded', () => {
-    if (!window.CloudSave) {
-      console.warn('[UI-Leaderboard] CloudSave 모듈 없음');
-      return;
+  // 수정 코드
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      if (!window.CloudSave) return;
+      initUUIDDisplay();
+      bindEvents();
+      CloudSave.startAutoSync();
+    });
+  } else {
+    // 이미 DOM 로드 완료된 경우 즉시 실행
+    if (window.CloudSave) {
+      initUUIDDisplay();
+      bindEvents();
+      CloudSave.startAutoSync();
     }
-    initUUIDDisplay();
-    bindEvents();
-    CloudSave.startAutoSync();
-    console.log('[UI-Leaderboard] 초기화 완료');
-  });
+  }
 })();
