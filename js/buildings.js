@@ -87,7 +87,7 @@
       id: 'bakery',
       name: '제빵소',
       tier: 2,
-      cost: { wood: 50, stone: 30 },
+      cost: { wood: 30, stone: 20, lumber: 10 },  // 기존: { wood: 50, stone: 30 }
       consumption: { food: 3 },
       production: { bread: 2 },
       workersNeeded: 2,
@@ -98,7 +98,7 @@
       id: 'stonemason',
       name: '석공소',
       tier: 2,
-      cost: { wood: 90, stone: 70, gold: 40 },
+      cost: { wood: 50, stone: 60, lumber: 15, gold: 40 },  // 기존: { wood: 90, stone: 70, gold: 40 }
       consumption: { stone: 2, tools: 0.5 },
       production: { stone: 1.5 },
       workersNeeded: 2,
@@ -123,7 +123,7 @@
       id: 'tavern',
       name: '주점',
       tier: 1,
-      cost: { wood: 60, stone: 30 },
+      cost: { wood: 30, stone: 20, lumber: 20 },  // 기존: { wood: 60, stone: 30 }
       consumption: {},
       production: { gold: 2 },
       workersNeeded: 2,
@@ -136,7 +136,7 @@
       id: 'wall',
       name: '성벽',
       tier: 1,
-      cost: { wood: 100, stone: 200, gold: 50 },
+      cost: { stone: 400, gold: 100 },  // 기존: { wood: 100, stone: 200, gold: 50 }
       consumption: {},
       production: {},
       workersNeeded: 0,
@@ -150,7 +150,7 @@
       id: 'school',
       name: '학교',
       tier: 1,
-      cost: { wood: 150, stone: 100, gold: 80 },
+      cost: { wood: 80, stone: 80, lumber: 30, gold: 80 },  // 기존: { wood: 150, stone: 100, gold: 80 }
       consumption: {},
       production: {},
       workersNeeded: 2,

@@ -35,6 +35,7 @@
       {
         id: 'first_building',
         name: '🏠 첫 발걸음',
+        category: 'building',  // 건물 건설 관련
         description: '첫 건물을 건설했습니다',
         condition: (state) => state.stats.totalBuildingsBuilt >= 1,
         reward: { wood: 20 },
@@ -43,6 +44,7 @@
       {
         id: 'growing_village',
         name: '👥 성장하는 마을',
+        category: 'population',  // 인구 관련
         description: '인구 20명을 달성했습니다',
         condition: (state) => state.population.current >= 20,
         reward: { food: 100 },
@@ -51,6 +53,7 @@
       {
         id: 'fortified',
         name: '🏰 요새화',
+        category: 'building',  // 건물(성벽) 건설 관련
         description: '성벽을 건설했습니다',
         condition: (state) => {
           if (!window.Game || typeof window.Game.getBuildingCount !== 'function') {
@@ -64,6 +67,7 @@
       {
         id: 'wealthy_village',
         name: '💰 부자 마을',
+        category: 'economy',  // 금화 보유 관련
         description: '금화 500을 보유했습니다',
         condition: (state) => (state.resources.gold || 0) >= 500,
         reward: { gold: 50 },
@@ -72,6 +76,7 @@
       {
         id: 'war_hero',
         name: '⚔️ 전쟁 영웅',
+        category: 'survival',  // 도적 방어 관련
         description: '도적 습격을 5회 방어했습니다',
         condition: (state) => (state.stats.raidsDefended || 0) >= 5,
         reward: { defenseBonus: 10 },
@@ -80,6 +85,7 @@
       {
         id: 'eternal_lord',
         name: '🕐 영원한 영주',
+        category: 'special',  // 플레이타임 특수
         description: '1시간 동안 플레이했습니다',
         condition: (state) => state.stats.gameTime >= 3600,
         reward: { productionBonus: 0.05 },
@@ -88,6 +94,7 @@
       {
         id: 'first_processed',
         name: '가공의 시작',
+        category: 'building',  // 생산 건물 관련
         description: '2차 가공품을 처음 생산했습니다',
         condition: (state) => (Number(state.stats && state.stats.producedByTier && state.stats.producedByTier[2]) || 0) > 0,
         reward: { lumber: 10 },
@@ -96,6 +103,7 @@
       {
         id: 'master_craftsman',
         name: '장인의 길',
+        category: 'building',  // 생산 건물 관련
         description: '3차 완제품을 처음 생산했습니다',
         condition: (state) => (Number(state.stats && state.stats.producedByTier && state.stats.producedByTier[3]) || 0) > 0,
         reward: { furniture: 3 },
@@ -104,6 +112,7 @@
       {
         id: 'first_research',
         name: '학문의 시작',
+        category: 'special',  // 연구 특수
         description: '첫 연구를 완료했습니다',
         condition: (state) => Array.isArray(state.research && state.research.completed)
           && state.research.completed.length >= 1,
@@ -113,6 +122,7 @@
       {
         id: 'production_chain_complete',
         name: '완벽한 공급망',
+        category: 'building',  // 건물 건설 관련
         description: '모든 생산 체인 건물을 1개 이상 보유했습니다',
         condition: () => {
           if (!window.Game || typeof window.Game.getBuildingCount !== 'function') {
@@ -128,6 +138,7 @@
       {
         id: 'village_beginning',
         name: '마을의 시작',
+        category: 'building',  // 건물 건설 관련
         description: '건물 5개를 건설했습니다',
         condition: (state) => (Number(state.stats && state.stats.totalBuildingsBuilt) || 0) >= 5,
         reward: { wood: 50 },
@@ -136,6 +147,7 @@
       {
         id: 'prosperous_city',
         name: '번영의 도시',
+        category: 'building',  // 건물 건설 관련
         description: '건물 20개를 건설했습니다',
         condition: (state) => (Number(state.stats && state.stats.totalBuildingsBuilt) || 0) >= 20,
         reward: { stone: 150 },
@@ -144,6 +156,7 @@
       {
         id: 'master_architect',
         name: '건축왕',
+        category: 'building',  // 건물 건설 관련
         description: '모든 종류의 건물을 1개 이상 보유했습니다',
         condition: () => {
           if (!window.Game || typeof window.Game.getBuildingCount !== 'function' || !window.Buildings) {
@@ -157,6 +170,7 @@
       {
         id: 'rich_person',
         name: '부호',
+        category: 'economy',  // 금화 보유 관련
         description: '금화 5,000을 보유했습니다',
         condition: (state) => (Number(state.resources && state.resources.gold) || 0) >= 5000,
         reward: { gold: 250 },
@@ -165,6 +179,7 @@
       {
         id: 'tycoon',
         name: '재벌',
+        category: 'economy',  // 누적 금화 관련
         description: '누적 금화 획득량이 50,000에 도달했습니다',
         condition: (state) => (Number(state.stats && state.stats.totalGoldEarned) || 0) >= 50000,
         reward: { gold: 1000 },
@@ -173,6 +188,7 @@
       {
         id: 'trade_king',
         name: '교역왕',
+        category: 'economy',  // 교역 관련
         description: '교역을 50회 수행했습니다',
         condition: (state) => (Number(state.stats && state.stats.totalTradeCount) || 0) >= 50,
         reward: { gold: 300 },
@@ -181,6 +197,7 @@
       {
         id: 'first_defense',
         name: '첫 방어',
+        category: 'survival',  // 도적 방어 관련
         description: '습격을 1회 방어했습니다',
         condition: (state) => (Number(state.stats && state.stats.raidsDefended) || 0) >= 1,
         reward: { wood: 80, stone: 80 },
@@ -189,6 +206,7 @@
       {
         id: 'iron_wall',
         name: '철벽 방어',
+        category: 'survival',  // 도적 방어 관련
         description: '습격을 10회 방어했습니다',
         condition: (state) => (Number(state.stats && state.stats.raidsDefended) || 0) >= 10,
         reward: { gold: 500 },
@@ -197,14 +215,37 @@
       {
         id: 'bandit_base_conqueror',
         name: '🏹 도적기지 정복자',
+        category: 'survival',  // 도적기지 침공 관련
         description: '도적기지 침공에 성공했습니다',
         condition: (state) => Boolean(state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success),
         reward: { gold: 200, weapons: 5 },
         icon: '🏹'
       },
       {
+        id: 'bandit_slayer',
+        name: '🗡️ 도적 소탕',
+        category: 'survival',  // 도적기지 침공 성공
+        description: '도적기지 침공에 성공했습니다',
+        condition: (state) => Boolean(state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success),
+        reward: { gold: 100, weapons: 5 },
+        icon: '🗡️'
+      },
+      {
+        id: 'mercenary_commander',
+        name: '💰 용병 사령관',
+        category: 'economy',  // 용병 고용으로 침공 성공
+        description: '용병을 고용하여 도적기지 침공에 성공했습니다',
+        condition: (state) => Boolean(
+          state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success
+          && state.raids.banditBaseSiege.usedMercenaries
+        ),
+        reward: { gold: 50 },
+        icon: '💰'
+      },
+      {
         id: 'plague_survivor',
         name: '역병 극복',
+        category: 'survival',  // 생존 관련
         description: '역병을 3회 겪고 살아남았습니다',
         condition: (state) => (Number(state.stats && state.stats.plaguesSurvived) || 0) >= 3,
         reward: { food: 300 },
@@ -213,6 +254,7 @@
       {
         id: 'harsh_winter',
         name: '혹한의 겨울',
+        category: 'survival',  // 생존 관련
         description: '겨울을 10회 버텼습니다',
         condition: (state) => (Number(state.stats && state.stats.wintersSurvived) || 0) >= 10,
         reward: { food: 400 },
@@ -221,6 +263,7 @@
       {
         id: 'small_town',
         name: '작은 마을',
+        category: 'population',  // 인구 관련
         description: '최대 인구 30명을 달성했습니다',
         condition: (state) => (Number(state.stats && state.stats.maxPopulation) || 0) >= 30,
         reward: { gold: 120 },
@@ -229,6 +272,7 @@
       {
         id: 'urbanization',
         name: '도시화',
+        category: 'population',  // 인구 관련
         description: '최대 인구 50명을 달성했습니다',
         condition: (state) => (Number(state.stats && state.stats.maxPopulation) || 0) >= 50,
         reward: { gold: 250 },
@@ -237,6 +281,7 @@
       {
         id: 'metropolis',
         name: '대도시',
+        category: 'population',  // 인구 관련
         description: '최대 인구 100명을 달성했습니다',
         condition: (state) => (Number(state.stats && state.stats.maxPopulation) || 0) >= 100,
         reward: { gold: 800 },
@@ -245,6 +290,7 @@
       {
         id: 'long_reign',
         name: '장기 집권',
+        category: 'special',  // 플레이타임 특수
         description: '1시간 동안 통치했습니다',
         condition: (state) => (Number(state.stats && state.stats.gameTime) || 0) >= 3600,
         reward: { gold: 200 },
@@ -253,6 +299,7 @@
       {
         id: 'four_seasons',
         name: '사계절',
+        category: 'special',  // 계절 경험 특수
         description: '봄, 여름, 가을, 겨울을 모두 경험했습니다',
         condition: (state) => {
           const seasons = new Set(Array.isArray(state.stats && state.stats.seasonsExperienced)
@@ -266,6 +313,7 @@
       {
         id: 'scholar',
         name: '학자',
+        category: 'special',  // 연구 트리 완성 특수
         description: '모든 연구를 완료했습니다',
         condition: (state) => {
           if (!window.Research || typeof window.Research.getTree !== 'function') {
@@ -283,6 +331,7 @@
       {
         id: 'first_upgrade',
         name: '첫 강화',
+        category: 'building',  // 건물 강화 관련
         description: '건물 하나를 강화했습니다',
         condition: (state) => Array.isArray(state.buildings)
           && state.buildings.some((building) => (Number(building.upgradeLevel) || 0) >= 1),
@@ -292,6 +341,7 @@
       {
         id: 'full_upgrade',
         name: '풀 강화',
+        category: 'building',  // 건물 강화 관련
         description: '건물 하나를 ★5까지 강화했습니다',
         condition: (state) => Array.isArray(state.buildings)
           && state.buildings.some((building) => (Number(building.upgradeLevel) || 0) >= 5),
@@ -301,6 +351,7 @@
       {
         id: 'perfectionist',
         name: '완벽주의자',
+        category: 'special',  // 전업적 달성 특수
         description: '모든 업적을 달성했습니다',
         condition: (state) => {
           const achievedCount = Array.isArray(state.achievements) ? state.achievements.length : 0;

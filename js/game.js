@@ -1187,11 +1187,11 @@
         }
 
         const cost = this.getUpgradeCost(buildingId);
-        if (cost < 0) {
+        if (!cost) {
           return false;
         }
 
-        return window.Resources.hasEnough({ gold: cost });
+        return window.Resources.hasEnough(cost);
       } catch (error) {
         console.error('[Game.canUpgrade] 강화 가능 여부 확인 실패:', error);
         return false;
@@ -1201,19 +1201,19 @@
     /**
      * 건물의 강화 비용 조회
      * @param {string} buildingId - 건물 고유 ID
-     * @returns {number} 금화 비용 (최대 레벨이면 -1)
+     * @returns {{ gold: number, lumber: number } | null} 비용 객체 (최대 레벨이면 null)
      */
     getUpgradeCost(buildingId) {
       try {
         if (!buildingId) {
-          return -1;
+          return null;
         }
 
         const target = Array.isArray(gameState.buildings)
           ? gameState.buildings.find((building) => building.id === buildingId)
           : null;
         if (!target) {
-          return -1;
+          return null;
         }
 
         const config = GAME_CONFIG && GAME_CONFIG.UPGRADE_CONFIG ? GAME_CONFIG.UPGRADE_CONFIG : {};
@@ -1221,13 +1221,16 @@
         const costs = Array.isArray(config.costs) ? config.costs : [];
         const level = Math.max(0, Number(target.upgradeLevel) || 0);
         if (level >= maxLevel) {
-          return -1;
+          return null;
         }
 
-        return Math.max(0, Number(costs[level]) || 0);
+        const cost = {};
+        cost.gold = Math.max(0, Number(costs[level]) || 0);
+        cost.lumber = Math.floor((level + 1) * 5);  // ★1=5, ★2=10, ..., ★5=25
+        return cost;
       } catch (error) {
         console.error('[Game.getUpgradeCost] 강화 비용 조회 실패:', error);
-        return -1;
+        return null;
       }
     },
 
@@ -1248,9 +1251,12 @@
         }
 
         const cost = this.getUpgradeCost(buildingId);
-        if (cost < 0 || !window.Resources.subtract('gold', cost)) {
+        if (!cost || !window.Resources.hasEnough(cost)) {
           return false;
         }
+        Object.entries(cost).forEach(([type, amount]) => {
+          window.Resources.subtract(type, amount);
+        });
 
         target.upgradeLevel = Math.max(0, Number(target.upgradeLevel) || 0) + 1;
 

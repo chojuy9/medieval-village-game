@@ -1249,66 +1249,6 @@
       }
     },
 
-    // 업적 패널 업데이트
-    updateAchievementsPanel() {
-      try {
-        const container = document.getElementById('achievements-list');
-        if (!container) return;
-        container.innerHTML = '';
-
-        if (!window.Achievements || !Achievements.getAll) {
-          return;
-        }
-
-        const allAchievements = Achievements.getAll();
-        allAchievements.forEach((achievement) => {
-          const card = document.createElement('div');
-          card.className = `achievement-card ${achievement.achieved ? 'unlocked' : 'locked'}`;
-
-          const iconDiv = document.createElement('div');
-          iconDiv.className = 'achievement-icon';
-          iconDiv.textContent = achievement.icon || '🏆';
-
-          const infoDiv = document.createElement('div');
-          infoDiv.className = 'achievement-info';
-
-          const nameDiv = document.createElement('div');
-          nameDiv.className = 'achievement-name';
-          nameDiv.textContent = achievement.name;
-
-          const descDiv = document.createElement('div');
-          descDiv.className = 'achievement-desc';
-          descDiv.textContent = achievement.description;
-
-          infoDiv.appendChild(nameDiv);
-          infoDiv.appendChild(descDiv);
-
-          if (achievement.reward) {
-            const rewardDiv = document.createElement('div');
-            rewardDiv.className = 'achievement-reward';
-            const rewardText = Object.entries(achievement.reward)
-              .map(([key, val]) => `${Utils.getResourceIcon(key) || key} ${val}`)
-              .join(', ');
-            rewardDiv.textContent = `보상: ${rewardText}`;
-            card.appendChild(rewardDiv);
-          }
-
-          if (achievement.achieved) {
-            const checkDiv = document.createElement('div');
-            checkDiv.className = 'achievement-check';
-            checkDiv.textContent = '✅';
-            card.appendChild(checkDiv);
-          }
-
-          card.appendChild(iconDiv);
-          card.appendChild(infoDiv);
-          container.appendChild(card);
-        });
-      } catch (error) {
-        console.error('[UI.updateAchievementsPanel] 업적 패널 업데이트 실패:', error);
-      }
-    },
-
     // 업적 달성 알림 표시
     showAchievementNotification(achievement) {
       try {
