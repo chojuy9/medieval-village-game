@@ -187,7 +187,7 @@
         updateBuiltBuildings() {
             try {
                 // 건물 목록이 바뀌지 않으면 DOM 재생성 스킵
-                const cacheKey = Game.state.buildings.map(b => `${b.id}:${b.workers}`).join(',');
+                const cacheKey = Game.state.buildings.map(b => `${b.id}:${b.workers}:${b.upgradeLevel || 0}`).join(',');
                 if (this._buildingsCacheKey === cacheKey) return;
                 this._buildingsCacheKey = cacheKey;
 
@@ -201,12 +201,17 @@
                         buildingCounts[building.type] = {
                             count: 0,
                             totalWorkers: 0,
-                            buildings: []
+                            buildings: [],
+                            maxUpgradeLevel: 0
                         };
                     }
                     buildingCounts[building.type].count++;
                     buildingCounts[building.type].totalWorkers += building.workers || 0;
                     buildingCounts[building.type].buildings.push(building);
+                    const upgradeLevel = building.upgradeLevel || 0;
+                    if (upgradeLevel > buildingCounts[building.type].maxUpgradeLevel) {
+                        buildingCounts[building.type].maxUpgradeLevel = upgradeLevel;
+                    }
                 });
 
                 // 그룹화된 건물 표시
@@ -219,7 +224,11 @@
 
                     const infoDiv = document.createElement('div');
                     infoDiv.className = 'building-info';
-                    infoDiv.textContent = definition.name;
+                    
+                    // 건물 이름과 별 표시 (가장 높은 강화 레벨 기준)
+                    const maxLevel = data.maxUpgradeLevel;
+                    const stars = '★'.repeat(maxLevel) + '☆'.repeat(5 - maxLevel);
+                    infoDiv.innerHTML = `${definition.name} <span class="upgrade-stars">${stars}</span>`;
 
                     const workersDiv = document.createElement('div');
                     workersDiv.className = 'building-workers';
@@ -234,32 +243,63 @@
                     if (definition.workersNeeded > 0) {
                         buildingDiv.appendChild(workersDiv);
 
-                        // 일꾼 토글 버튼 추가
-                        const toggleBtn = document.createElement('button');
-                        toggleBtn.className = 'worker-toggle-btn';
-                        const hasWorkers = data.totalWorkers > 0;
-                        toggleBtn.textContent = hasWorkers ? '⏸ 해제' : '▶ 배치';
-                        toggleBtn.classList.toggle('inactive', !hasWorkers);
-                        toggleBtn.addEventListener('click', (e) => {
+                        // 일꾼 +/- 조절 컨트롤
+                        const workerControl = document.createElement('div');
+                        workerControl.className = 'worker-control';
+
+                        const maxWorkers = definition.workersNeeded * data.count;
+
+                        // − 버튼
+                        const minusBtn = document.createElement('button');
+                        minusBtn.className = 'worker-ctrl-btn worker-minus';
+                        minusBtn.textContent = '−';
+                        minusBtn.disabled = data.totalWorkers <= 0;
+                        minusBtn.addEventListener('click', (e) => {
                             e.stopPropagation();
-                            if (hasWorkers) {
-                                // 해당 타입의 모든 건물에서 일꾼 해제
-                                data.buildings.forEach(b => {
-                                    if (b.workers > 0 && window.Population) {
-                                        Population.unassign(b.id);
-                                    }
-                                });
-                            } else {
-                                // 해당 타입의 건물에 일꾼 배치
-                                if (window.Population) {
-                                    const firstBuilding = data.buildings[0];
-                                    if (firstBuilding) {
-                                        Population.reassign(firstBuilding.id);
-                                    }
+                            if (!window.Population) return;
+                            // 노동자가 있는 건물 중 마지막 것에서 1명 해제
+                            for (let i = data.buildings.length - 1; i >= 0; i--) {
+                                if ((data.buildings[i].workers || 0) > 0) {
+                                    Population.unassignOne(data.buildings[i].id);
+                                    break;
                                 }
                             }
                         });
-                        buildingDiv.appendChild(toggleBtn);
+
+                        // 인원 표시
+                        const workerDisplay = document.createElement('span');
+                        workerDisplay.className = 'worker-display';
+                        workerDisplay.textContent = `${data.totalWorkers}/${maxWorkers}`;
+
+                        // + 버튼
+                        const plusBtn = document.createElement('button');
+                        plusBtn.className = 'worker-ctrl-btn worker-plus';
+                        plusBtn.textContent = '+';
+                        const state = Game.state;
+                        plusBtn.disabled = data.totalWorkers >= maxWorkers || (state && state.population.idle <= 0);
+                        plusBtn.addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            if (!window.Population) return;
+                            // 아직 풀이 아닌 건물 중 첫 번째에 1명 배치
+                            for (let i = 0; i < data.buildings.length; i++) {
+                                const bWorkers = data.buildings[i].workers || 0;
+                                if (bWorkers < definition.workersNeeded) {
+                                    Population.assignOne(data.buildings[i].id);
+                                    break;
+                                }
+                            }
+                        });
+
+                        workerControl.appendChild(minusBtn);
+                        workerControl.appendChild(workerDisplay);
+                        workerControl.appendChild(plusBtn);
+                        buildingDiv.appendChild(workerControl);
+
+                        // 강화 버튼 추가 (생산 건물만)
+                        if (this.canShowUpgradeButton(type, definition)) {
+                            const upgradeBtn = this.createUpgradeButton(data.buildings, type, definition);
+                            buildingDiv.appendChild(upgradeBtn);
+                        }
                     }
 
                     // 철거 버튼 추가
@@ -288,6 +328,127 @@
                 }
             } catch (error) {
                 console.error('[UI.updateBuiltBuildings] 건설된 건물 목록 업데이트 실패:', error);
+            }
+        },
+
+        // 강화 버튼 표시 가능 여부 확인
+        canShowUpgradeButton(type, definition) {
+            // workersNeeded > 0인 생산 건물만 강화 가능
+            return definition.workersNeeded > 0 && typeof Game.getUpgradeCost === 'function';
+        },
+
+        // 강화 버튼 생성
+        createUpgradeButton(buildings, type, definition) {
+            const upgradeBtn = document.createElement('button');
+            upgradeBtn.className = 'upgrade-btn';
+
+            // 가장 낮은 레벨의 건물 찾기
+            let lowestLevelBuilding = buildings[0];
+            for (const building of buildings) {
+                if ((building.upgradeLevel || 0) < (lowestLevelBuilding.upgradeLevel || 0)) {
+                    lowestLevelBuilding = building;
+                }
+            }
+
+            const upgradeLevel = lowestLevelBuilding.upgradeLevel || 0;
+
+            // 강화 비용 확인
+            const cost = typeof Game.getUpgradeCost === 'function' 
+                ? Game.getUpgradeCost(lowestLevelBuilding.id) 
+                : -1;
+
+            if (cost === -1 || upgradeLevel >= 5) {
+                upgradeBtn.textContent = '⬆ MAX';
+                upgradeBtn.disabled = true;
+            } else {
+                upgradeBtn.textContent = `⬆ 💰${cost}`;
+                const canUpgrade = typeof Game.canUpgrade === 'function' 
+                    ? Game.canUpgrade(lowestLevelBuilding.id)
+                    : false;
+                upgradeBtn.disabled = !canUpgrade;
+            }
+
+            upgradeBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                this.showUpgradeConfirm(lowestLevelBuilding, type, definition);
+            });
+
+            return upgradeBtn;
+        },
+
+        // 강화 확인 모달 표시
+        showUpgradeConfirm(building, type, definition) {
+            try {
+                const upgradeLevel = building.upgradeLevel || 0;
+                const cost = typeof Game.getUpgradeCost === 'function' 
+                    ? Game.getUpgradeCost(building.id) 
+                    : -1;
+
+                if (cost === -1 || upgradeLevel >= 5) {
+                    this.showMessage('이미 최대 레벨입니다.', 'warning');
+                    return;
+                }
+
+                const message = document.getElementById('upgrade-message');
+                const costEl = document.getElementById('upgrade-cost');
+                const effectEl = document.getElementById('upgrade-effect');
+
+                if (message) {
+                    message.textContent = `${definition.name} (현재 ★${upgradeLevel})을(를) 강화하시겠습니까?`;
+                }
+                if (costEl) {
+                    costEl.textContent = `비용: 💰 ${cost} 금화`;
+                }
+                if (effectEl) {
+                    const config = window.GAME_CONFIG && window.GAME_CONFIG.UPGRADE_CONFIG ? window.GAME_CONFIG.UPGRADE_CONFIG : {};
+                    const bonuses = Array.isArray(config.bonuses) ? config.bonuses : [];
+                    const nextBonus = bonuses[upgradeLevel] !== undefined ? Math.round(bonuses[upgradeLevel] * 100) : 0;
+                    effectEl.textContent = `효과: 생산량 +${nextBonus}% (다음 레벨 ★${upgradeLevel + 1})`;
+                }
+
+                // 모달 표시
+                document.getElementById('upgrade-modal').classList.remove('hidden');
+
+                // 버튼 이벤트
+                const confirmBtn = document.getElementById('upgrade-confirm-btn');
+                const cancelBtn = document.getElementById('upgrade-cancel-btn');
+
+                // 기존 이벤트 리스너 제거
+                const newConfirmBtn = confirmBtn.cloneNode(true);
+                confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+
+                newConfirmBtn.addEventListener('click', () => {
+                    this.executeUpgrade(building.id, type, definition);
+                    document.getElementById('upgrade-modal').classList.add('hidden');
+                }, { once: true });
+
+                const newCancelBtn = cancelBtn.cloneNode(true);
+                cancelBtn.parentNode.replaceChild(newCancelBtn, cancelBtn);
+                newCancelBtn.addEventListener('click', () => {
+                    document.getElementById('upgrade-modal').classList.add('hidden');
+                }, { once: true });
+            } catch (error) {
+                console.error('[UI.showUpgradeConfirm] 강화 확인 모달 표시 실패:', error);
+            }
+        },
+
+        // 강화 실행
+        executeUpgrade(buildingId, type, definition) {
+            try {
+                if (typeof Game.upgradeBuilding === 'function') {
+                    if (Game.upgradeBuilding(buildingId)) {
+                        // 성공 메시지·사운드는 buildingUpgraded 이벤트 핸들러(ui.js)가 처리
+                        this._buildingsCacheKey = null; // 캐시 무효화
+                        this.updateBuiltBuildings();
+                    } else {
+                        this.showMessage('강화에 실패했습니다.', 'error');
+                    }
+                } else {
+                    this.showMessage('강화 기능이 구현되지 않았습니다.', 'warning');
+                }
+            } catch (error) {
+                console.error('[UI.executeUpgrade] 강화 실행 실패:', error);
+                this.showMessage('강화에 실패했습니다.', 'error');
             }
         },
 

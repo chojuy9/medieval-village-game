@@ -631,29 +631,67 @@ section h2 {
     margin-top: 10px;
 }
 
-/* 일꾼 토글 버튼 */
-.worker-toggle-btn {
-    background: linear-gradient(180deg, #FFE082, #FFC107);
-    border: 2px solid #FFA000;
+/* 일꾼 +/- 조절 컨트롤 */
+.worker-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(139, 69, 19, 0.1);
+    border: 1px solid #CD853F;
     border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 0.8em;
+    padding: 2px 4px;
+}
+
+.worker-ctrl-btn {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #8B4513;
+    border-radius: 5px;
+    font-size: 1.1em;
     font-weight: bold;
-    color: #5D4037;
     cursor: pointer;
-    transition: all 0.2s;
-    min-height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    line-height: 1;
+    padding: 0;
 }
 
-.worker-toggle-btn.inactive {
-    background: linear-gradient(180deg, #BDBDBD, #9E9E9E);
-    border-color: #757575;
-    color: #424242;
+.worker-minus {
+    background: linear-gradient(180deg, #FFCDD2, #EF9A9A);
+    color: #C62828;
+    border-color: #E57373;
 }
 
-.worker-toggle-btn:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+.worker-minus:hover:not(:disabled) {
+    background: linear-gradient(180deg, #EF9A9A, #E57373);
+    transform: scale(1.1);
+}
+
+.worker-plus {
+    background: linear-gradient(180deg, #C8E6C9, #A5D6A7);
+    color: #2E7D32;
+    border-color: #81C784;
+}
+
+.worker-plus:hover:not(:disabled) {
+    background: linear-gradient(180deg, #A5D6A7, #81C784);
+    transform: scale(1.1);
+}
+
+.worker-ctrl-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.worker-display {
+    font-weight: bold;
+    font-size: 0.85em;
+    color: #5D3A1A;
+    min-width: 36px;
+    text-align: center;
 }
 
 /* 푸터 */
@@ -1740,4 +1778,415 @@ footer button:hover {
     max-height: 0;
     opacity: 0;
     margin-top: 0 !important;
+}
+
+/* ============================================
+   v0.3 신규 패널 스타일
+   ============================================ */
+
+/* 강화 버튼 */
+.upgrade-btn {
+    background: linear-gradient(180deg, #FFD54F, #FFB300);
+    border: 2px solid #FF8F00;
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #5D4037;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 32px;
+    min-width: 44px;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+    background: linear-gradient(180deg, #FFE082, #FFD54F);
+    transform: scale(1.05);
+    box-shadow: 0 2px 8px rgba(255, 179, 0, 0.4);
+}
+
+.upgrade-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 별 등급 표시 */
+.upgrade-stars {
+    color: #FFD700;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+}
+
+.upgrade-stars .empty-star {
+    color: #BDBDBD;
+}
+
+/* 강화 확인 모달 */
+.cost-info {
+    color: #FF8F00;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+.effect-info {
+    color: #2E7D32;
+    font-weight: bold;
+    font-size: 1em;
+    margin-top: 8px;
+}
+
+.success-btn {
+    background: linear-gradient(180deg, #66BB6A, #43A047) !important;
+    border-color: #388E3C !important;
+    color: white !important;
+}
+
+.success-btn:hover {
+    background: linear-gradient(180deg, #81C784, #66BB6A) !important;
+}
+
+/* 왕실 조공 패널 */
+#tribute-panel {
+    background: linear-gradient(180deg, #F3E5F5 0%, #E1BEE7 100%);
+}
+
+#tribute-panel.hidden {
+    display: none;
+}
+
+.tribute-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.tribute-card {
+    background: linear-gradient(135deg, #FFF8E1 0%, #FFE0B2 100%);
+    border: 2px solid #FFB74D;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.tribute-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(255, 183, 77, 0.3);
+}
+
+.tribute-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #5D4037;
+    margin-bottom: 8px;
+}
+
+.tribute-cost {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FF8F00;
+    margin-bottom: 5px;
+}
+
+.tribute-reward {
+    font-size: 0.9em;
+    color: #6D4C41;
+    margin-bottom: 12px;
+}
+
+.tribute-btn {
+    background: linear-gradient(180deg, #CE93D8, #AB47BC);
+    border: 2px solid #8E24AA;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 36px;
+    min-width: 44px;
+}
+
+.tribute-btn:hover:not(:disabled) {
+    background: linear-gradient(180deg, #E1BEE7, #CE93D8);
+}
+
+.tribute-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 완료된 일회성 조공 */
+.tribute-card.completed {
+    opacity: 0.5;
+    border-color: #9E9E9E;
+}
+
+.tribute-card.completed .tribute-btn {
+    background: #BDBDBD;
+    border-color: #9E9E9E;
+}
+
+/* 용병 고용 패널 */
+#mercenary-panel {
+    background: linear-gradient(180deg, #FFEBEE 0%, #FFCDD2 100%);
+}
+
+#mercenary-panel.hidden {
+    display: none;
+}
+
+.mercenary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.mercenary-card {
+    background: linear-gradient(135deg, #FBE9E7 0%, #FFCCBC 100%);
+    border: 2px solid #FF8A65;
+    border-radius: 10px;
+    padding: 15px;
+    text-align: center;
+}
+
+.mercenary-icon {
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.mercenary-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #5D4037;
+    margin-bottom: 5px;
+}
+
+.mercenary-desc {
+    font-size: 0.85em;
+    color: #6D4C41;
+    margin-bottom: 8px;
+}
+
+.mercenary-effect {
+    font-size: 0.9em;
+    color: #BF360C;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.mercenary-cost {
+    font-size: 1em;
+    font-weight: bold;
+    color: #FF8F00;
+    margin-bottom: 10px;
+}
+
+.mercenary-btn {
+    background: linear-gradient(180deg, #FF8A65, #FF5722);
+    border: 2px solid #E64A19;
+    border-radius: 8px;
+    padding: 8px 20px;
+    font-weight: bold;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 36px;
+    min-width: 44px;
+}
+
+.mercenary-btn:hover:not(:disabled) {
+    background: linear-gradient(180deg, #FFAB91, #FF8A65);
+}
+
+.mercenary-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.defense-status {
+    background: rgba(139, 69, 19, 0.1);
+    padding: 10px 15px;
+    border-radius: 8px;
+    margin-bottom: 12px;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+.defense-status strong {
+    color: #BF360C;
+}
+
+/* 통계 패널 */
+#stats-panel {
+    background: linear-gradient(180deg, #E8F5E9 0%, #C8E6C9 100%);
+}
+
+#stats-panel.hidden {
+    display: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.7);
+    border: 2px solid #81C784;
+    border-radius: 8px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.85em;
+    color: #6D4C41;
+}
+
+.stat-value {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2E7D32;
+}
+
+/* 이벤트 선택 버튼 */
+.event-choices {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.event-choices.hidden {
+    display: none;
+}
+
+.event-choice-btn {
+    background: linear-gradient(180deg, #FFF8E1, #FFE0B2);
+    border: 2px solid #FFB74D;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-weight: bold;
+    color: #5D4037;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 44px;
+}
+
+.event-choice-btn:hover {
+    background: linear-gradient(180deg, #FFE0B2, #FFCC80);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 183, 77, 0.3);
+}
+
+/* 업적 카테고리 탭 */
+.achievement-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.ach-tab {
+    padding: 6px 14px;
+    border: 2px solid #CD853F;
+    border-radius: 20px;
+    background: #F5DEB3;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 36px;
+}
+
+.ach-tab:hover {
+    background: #DEB887;
+}
+
+.ach-tab.active {
+    background: #8B4513;
+    color: #FFF8DC;
+    border-color: #5D3A1A;
+}
+
+.achievement-list-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 10px;
+}
+
+.achievement-progress {
+    height: 4px;
+    background: #DEB887;
+    border-radius: 2px;
+    margin-top: 6px;
+    overflow: hidden;
+}
+
+.achievement-progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FFD700, #FFA000);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.achievement-progress-text {
+    font-size: 0.75em;
+    color: #8B4513;
+    margin-top: 2px;
+}
+
+.achievement-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 20px;
+    color: #8B4513;
+}
+
+/* ============================================
+   반응형 디자인 - 신규 패널
+   ============================================ */
+
+@media (max-width: 600px) {
+    .tribute-grid,
+    .mercenary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .achievement-tabs {
+        justify-content: center;
+    }
+
+    .ach-tab {
+        padding: 4px 10px;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    .event-choices {
+        flex-direction: column;
+    }
+
+    .event-choice-btn {
+        width: 100%;
+    }
+
+    .upgrade-btn {
+        font-size: 0.75em;
+        padding: 4px 8px;
+    }
+
+    .upgrade-stars {
+        font-size: 0.75em;
+    }
 }

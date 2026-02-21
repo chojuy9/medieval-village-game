@@ -82,6 +82,11 @@
         }
         const nextValue = Math.max(0, (Number(state.resources[resourceType]) || 0) + addAmount);
         state.resources[resourceType] = nextValue;
+
+        if (resourceType === 'gold' && addAmount > 0 && state.stats) {
+          state.stats.totalGoldEarned = (Number(state.stats.totalGoldEarned) || 0) + addAmount;
+        }
+
         return true;
       } catch (error) {
         console.error('[Resources.add] 자원 추가 실패:', error);

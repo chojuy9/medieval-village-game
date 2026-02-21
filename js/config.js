@@ -13,14 +13,24 @@
         TREASURY_MAX_COUNT: 2,
         UPDATE_INTERVAL: 1000,
         SAVE_KEY: 'medievalVillageGameSave',
-        CURRENT_SAVE_VERSION: 3,
+        CURRENT_SAVE_VERSION: 4,
         MAX_OFFLINE_SECONDS: 28800,
         EVENT_CHECK_INTERVAL: 90,
         EVENT_CHANCE: 0.4,
         SEASON_DURATION: 180,
         HAPPINESS_BASE: 50,
         HAPPINESS_CHURCH_BONUS: 10,
-        HAPPINESS_TAVERN_BONUS: 5
+        HAPPINESS_TAVERN_BONUS: 5,
+        UPGRADE_CONFIG: {
+            maxLevel: 5,
+            costs: [100, 300, 700, 1500, 3000],
+            bonuses: [0.10, 0.25, 0.45, 0.70, 1.00]
+        },
+        MERCENARY_CONFIG: {
+            patrol: { cost: 300, duration: 120, defenseBonus: 0.30 },
+            knight: { cost: 1200, charges: 3 },
+            fortify: { cost: 800, defenseBonus: 0.10 }
+        }
     };
 
     // 전역 노출

@@ -40,6 +40,12 @@
             <div class="event-progress">
                 <div class="progress-bar"></div>
             </div>
+            <!-- 이벤트 선택 버튼 (선택형 이벤트용) -->
+            <div class="event-choices hidden" id="event-choices">
+                <button class="event-choice-btn" data-choice="gold">💰 금화</button>
+                <button class="event-choice-btn" data-choice="resource">📦 자원</button>
+                <button class="event-choice-btn" data-choice="population">👥 인구</button>
+            </div>
         </div>
 
         <!-- 자원 표시 영역 (티어별 그룹) -->
@@ -197,6 +203,60 @@
             </div>
         </section>
 
+        <!-- 왕실 조공 패널 -->
+        <section id="tribute-panel" class="hidden" aria-label="왕실 조공">
+            <h2 class="panel-toggle" data-target="tribute-body" aria-expanded="true">
+                👑 왕실 조공 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="tribute-body" class="collapsible-content">
+                <div id="tribute-grid" class="tribute-grid">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 용병 고용 패널 -->
+        <section id="mercenary-panel" class="hidden" aria-label="용병 고용">
+            <h2 class="panel-toggle" data-target="mercenary-body" aria-expanded="true">
+                ⚔️ 용병 고용 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="mercenary-body" class="collapsible-content">
+                <div class="defense-status">
+                    <span>🛡️ 현재 방어력: <strong id="defense-bonus">0%</strong></span>
+                </div>
+                <div id="mercenary-grid" class="mercenary-grid">
+                    <!-- JavaScript로 동적 생성 -->
+                </div>
+            </div>
+        </section>
+
+        <!-- 통계 패널 (Phase 2 준비) -->
+        <section id="stats-panel" class="hidden" aria-label="통계">
+            <h2 class="panel-toggle" data-target="stats-body" aria-expanded="true">
+                📊 마을 통계 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="stats-body" class="collapsible-content">
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <span class="stat-label">총 플레이 시간</span>
+                        <span class="stat-value" id="stat-playtime">0분</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">건설한 건물</span>
+                        <span class="stat-value" id="stat-buildings-built">0개</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">최대 인구</span>
+                        <span class="stat-value" id="stat-max-population">0명</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">달성 업적</span>
+                        <span class="stat-value" id="stat-achievements">0개</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- 하단 정보 -->
         <footer>
             <button id="save-btn" aria-label="게임 저장">💾 저장</button>
@@ -250,6 +310,20 @@
         </div>
     </div>
 
+    <!-- 건물 강화 확인 모달 -->
+    <div id="upgrade-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <h2>⬆️ 건물 강화</h2>
+            <p id="upgrade-message"></p>
+            <p id="upgrade-cost" class="cost-info"></p>
+            <p id="upgrade-effect" class="effect-info"></p>
+            <div class="confirm-buttons">
+                <button id="upgrade-confirm-btn" class="modal-btn success-btn">강화</button>
+                <button id="upgrade-cancel-btn" class="modal-btn">취소</button>
+            </div>
+        </div>
+    </div>
+
     <script src="js/utils.js"></script>
     <script src="js/resources.js"></script>
     <script src="js/population.js"></script>
@@ -260,6 +334,8 @@
     <script src="js/trade.js"></script>
     <script src="js/achievements.js"></script>
     <script src="js/research.js"></script>
+    <script src="js/tribute.js"></script>        <!-- 신규: game.js 전에 로드 -->
+    <script src="js/mercenary.js"></script>      <!-- 신규: game.js 전에 로드 -->
     <script src="js/config.js"></script>
     <script src="js/production.js"></script>
     <script src="js/game.js"></script>
@@ -270,6 +346,8 @@
     <script src="js/ui-research.js"></script>
     <script src="js/ui-achievements.js"></script>
     <script src="js/ui-events.js"></script>
+    <script src="js/ui-tribute.js"></script>
+    <script src="js/ui-mercenary.js"></script>
     <script>
         // 게임 시작
         document.addEventListener('DOMContentLoaded', function () {

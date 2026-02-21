@@ -58,6 +58,11 @@
                 multiplier *= Math.max(0, Number(window.Seasons.getProductionMultiplier(resourceType, gameState.stats.gameTime)) || 1);
             }
 
+            const tributeBonus = Number(gameState.tribute && gameState.tribute.permanentBonus) || 0;
+            if (tributeBonus > 0) {
+                multiplier *= (1 + tributeBonus);
+            }
+
             return Math.max(0, multiplier);
         },
 
@@ -156,7 +161,20 @@
                 Object.keys(definition.production || {}).forEach((resourceType) => {
                     const baseAmount = (Number(definition.production[resourceType]) || 0) * deltaTime;
                     const researchBonus = this.getBuildingResearchBonus(building.type, gameState);
-                    const amount = baseAmount * (1 + researchBonus) * this.getResourceMultiplier(resourceType, gameState);
+                    const level = Math.max(0, Number(building.upgradeLevel) || 0);
+                    const config = window.GAME_CONFIG || {};
+                    const upgradeBonuses = (config.UPGRADE_CONFIG && Array.isArray(config.UPGRADE_CONFIG.bonuses))
+                        ? config.UPGRADE_CONFIG.bonuses
+                        : [];
+                    const upgradeBonus = Number(upgradeBonuses[level - 1]) || 0;
+                    const eventBuildingMultiplier = window.EventSystem && typeof window.EventSystem.getBuildingProductionMultiplier === 'function'
+                        ? Math.max(0, Number(window.EventSystem.getBuildingProductionMultiplier(building.type)) || 1)
+                        : 1;
+                    const amount = baseAmount
+                        * (1 + researchBonus)
+                        * (1 + upgradeBonus)
+                        * this.getResourceMultiplier(resourceType, gameState)
+                        * eventBuildingMultiplier;
                     if (amount > 0) {
                         window.Resources.add(resourceType, amount);
                         gameState.stats.producedByTier[tier] = (Number(gameState.stats.producedByTier[tier]) || 0) + amount;

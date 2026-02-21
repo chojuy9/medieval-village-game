@@ -117,6 +117,10 @@
 
         window.Resources.add(toResource, convertedAmount);
 
+        if (state.stats) {
+          state.stats.totalTradeCount = (Number(state.stats.totalTradeCount) || 0) + 1;
+        }
+
         document.dispatchEvent(new CustomEvent('tradeExecuted', {
           detail: {
             from: fromResource,

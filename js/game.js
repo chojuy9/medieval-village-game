@@ -45,7 +45,13 @@
         totalBuildingsBuilt: 0,
         gameTime: 0,
         raidsDefended: 0,
-        producedByTier: { 1: 0, 2: 0, 3: 0 }
+        producedByTier: { 1: 0, 2: 0, 3: 0 },
+        totalTradeCount: 0,
+        totalGoldEarned: 0,
+        plaguesSurvived: 0,
+        wintersSurvived: 0,
+        seasonsExperienced: [],
+        maxPopulation: 5
       },
       achievements: [],
       happiness: {
@@ -68,6 +74,16 @@
           trade: 0,
           building: {}
         }
+      },
+      tribute: {
+        completed: [],
+        lastTributeTime: {},
+        permanentBonus: 0
+      },
+      mercenaries: {
+        patrol: { active: false, expiresAt: 0 },
+        knight: { charges: 0 },
+        fortification: 0
       },
       productionStatus: {},
       lastUpdate: Date.now(),
@@ -175,6 +191,76 @@
     });
   }
 
+  /**
+   * 건물 강화 상태를 보정합니다.
+   * @param {object} state
+   */
+  function ensureBuildingUpgradeState(state) {
+    if (!Array.isArray(state.buildings)) {
+      state.buildings = [];
+      return;
+    }
+
+    const upgradeConfig = GAME_CONFIG && GAME_CONFIG.UPGRADE_CONFIG ? GAME_CONFIG.UPGRADE_CONFIG : {};
+    const maxLevel = Math.max(0, Number(upgradeConfig.maxLevel) || 5);
+
+    state.buildings.forEach((building) => {
+      building.upgradeLevel = Math.max(0, Math.min(maxLevel, Number(building.upgradeLevel) || 0));
+    });
+  }
+
+  /**
+   * 조공 상태를 보정합니다.
+   * @param {object} state
+   */
+  function ensureTributeState(state) {
+    state.tribute = state.tribute || {};
+    state.tribute.completed = Array.isArray(state.tribute.completed) ? state.tribute.completed : [];
+    state.tribute.lastTributeTime = state.tribute.lastTributeTime && typeof state.tribute.lastTributeTime === 'object'
+      ? state.tribute.lastTributeTime
+      : {};
+    state.tribute.permanentBonus = Math.max(0, Number(state.tribute.permanentBonus) || 0);
+  }
+
+  /**
+   * 용병 상태를 보정합니다.
+   * @param {object} state
+   */
+  function ensureMercenaryState(state) {
+    state.mercenaries = state.mercenaries || {};
+    state.mercenaries.patrol = state.mercenaries.patrol || { active: false, expiresAt: 0 };
+    state.mercenaries.patrol.active = Boolean(state.mercenaries.patrol.active);
+    state.mercenaries.patrol.expiresAt = Math.max(0, Number(state.mercenaries.patrol.expiresAt) || 0);
+
+    state.mercenaries.knight = state.mercenaries.knight || { charges: 0 };
+    state.mercenaries.knight.charges = Math.max(0, Number(state.mercenaries.knight.charges) || 0);
+
+    state.mercenaries.fortification = Math.max(0, Number(state.mercenaries.fortification) || 0);
+  }
+
+  /**
+   * 확장 통계 필드를 보정합니다.
+   * @param {object} state
+   */
+  function ensureStatsState(state) {
+    state.stats = state.stats || {};
+    state.stats.totalBuildingsBuilt = Number(state.stats.totalBuildingsBuilt) || 0;
+    state.stats.gameTime = Number(state.stats.gameTime) || 0;
+    state.stats.raidsDefended = Number(state.stats.raidsDefended) || 0;
+    state.stats.producedByTier = state.stats.producedByTier || { 1: 0, 2: 0, 3: 0 };
+    state.stats.totalTradeCount = Number(state.stats.totalTradeCount) || 0;
+    state.stats.totalGoldEarned = Number(state.stats.totalGoldEarned) || 0;
+    state.stats.plaguesSurvived = Number(state.stats.plaguesSurvived) || 0;
+    state.stats.wintersSurvived = Number(state.stats.wintersSurvived) || 0;
+    state.stats.seasonsExperienced = Array.isArray(state.stats.seasonsExperienced)
+      ? state.stats.seasonsExperienced
+      : [];
+    state.stats.maxPopulation = Math.max(
+      Number(state.population && state.population.current) || 0,
+      Number(state.stats.maxPopulation) || 0
+    );
+  }
+
   function migrateToV2(state) {
     state.happiness = {
       current: Number(state.happiness && state.happiness.current) || 50,
@@ -204,6 +290,22 @@
     return state;
   }
 
+  /**
+   * v3 저장 데이터를 v4 구조로 마이그레이션합니다.
+   * @param {object} state
+   * @returns {object}
+   */
+  function migrateToV4(state) {
+    normalizeResourceState(state);
+    ensureResearchState(state);
+    ensureProductionStatus(state);
+    ensureBuildingUpgradeState(state);
+    ensureTributeState(state);
+    ensureMercenaryState(state);
+    ensureStatsState(state);
+    return state;
+  }
+
   function migrateSave(data) {
     const fallbackState = createInitialState();
     const normalized = data && typeof data === 'object' ? data : { saveVersion: 1, state: fallbackState };
@@ -219,11 +321,13 @@
         migrated.state = migrateToV2(migrated.state);
       } else if (migrated.saveVersion === 2) {
         migrated.state = migrateToV3(migrated.state);
+      } else if (migrated.saveVersion === 3) {
+        migrated.state = migrateToV4(migrated.state);
       }
       migrated.saveVersion += 1;
     }
 
-    migrated.state = migrateToV3(migrated.state);
+    migrated.state = migrateToV4(migrated.state);
     if (!migrated.lastUpdate) {
       migrated.lastUpdate = Number(migrated.state.lastUpdate) || Date.now();
     }
@@ -342,6 +446,29 @@
           : [...fresh.tutorial.seen]
       },
       research: loadedState.research || fresh.research,
+      tribute: {
+        ...fresh.tribute,
+        ...(loadedState.tribute || {}),
+        completed: Array.isArray(loadedState.tribute && loadedState.tribute.completed)
+          ? loadedState.tribute.completed
+          : [...fresh.tribute.completed],
+        lastTributeTime: {
+          ...fresh.tribute.lastTributeTime,
+          ...((loadedState.tribute && loadedState.tribute.lastTributeTime) || {})
+        }
+      },
+      mercenaries: {
+        ...fresh.mercenaries,
+        ...(loadedState.mercenaries || {}),
+        patrol: {
+          ...fresh.mercenaries.patrol,
+          ...((loadedState.mercenaries && loadedState.mercenaries.patrol) || {})
+        },
+        knight: {
+          ...fresh.mercenaries.knight,
+          ...((loadedState.mercenaries && loadedState.mercenaries.knight) || {})
+        }
+      },
       productionStatus: loadedState.productionStatus || {},
       lastUpdate: Number(loadedState.lastUpdate) || Date.now(),
       migration_notices: Array.isArray(loadedState.migration_notices) ? loadedState.migration_notices : []
@@ -350,6 +477,10 @@
     normalizeResourceState(gameState);
     ensureResearchState(gameState);
     ensureProductionStatus(gameState);
+    ensureBuildingUpgradeState(gameState);
+    ensureTributeState(gameState);
+    ensureMercenaryState(gameState);
+    ensureStatsState(gameState);
     recomputeResearchBonuses(gameState);
 
     gameState.population.current = Math.max(0, Math.min(gameState.population.current, gameState.population.max));
@@ -656,11 +787,23 @@
         const previousHappiness = Number(gameState.happiness && gameState.happiness.current) || 50;
         gameState.timers.lastUpdate = now;
 
+        if (previousSeason.season && previousSeason.season.id) {
+          const seasonsExperienced = new Set(Array.isArray(gameState.stats.seasonsExperienced)
+            ? gameState.stats.seasonsExperienced
+            : []);
+          seasonsExperienced.add(previousSeason.season.id);
+          gameState.stats.seasonsExperienced = Array.from(seasonsExperienced);
+        }
+
         gameState.stats.gameTime += deltaTime;
 
         processProductionTier(1, deltaTime);
         processProductionTier(2, deltaTime);
         processProductionTier(3, deltaTime);
+
+        if (window.Mercenary && typeof window.Mercenary.update === 'function') {
+          window.Mercenary.update(deltaTime);
+        }
 
         if (window.Population) {
           window.Population.consume(deltaTime);
@@ -694,8 +837,26 @@
           window.Achievements.check(gameState);
         }
 
+        gameState.stats.maxPopulation = Math.max(
+          Number(gameState.stats.maxPopulation) || 0,
+          Number(gameState.population.current) || 0
+        );
+
         const nextSeason = getCurrentSeasonPayload();
         if (nextSeason.index !== previousSeason.index) {
+          const seasonId = nextSeason.season && nextSeason.season.id;
+          if (seasonId) {
+            const seasonsExperienced = new Set(Array.isArray(gameState.stats.seasonsExperienced)
+              ? gameState.stats.seasonsExperienced
+              : []);
+            seasonsExperienced.add(seasonId);
+            gameState.stats.seasonsExperienced = Array.from(seasonsExperienced);
+          }
+
+          if (seasonId === 'winter') {
+            gameState.stats.wintersSurvived = (Number(gameState.stats.wintersSurvived) || 0) + 1;
+          }
+
           document.dispatchEvent(new CustomEvent('seasonChanged', {
             detail: {
               season: { ...nextSeason.season },
@@ -744,6 +905,116 @@
       });
 
       return adjustedCost;
+    },
+
+    /**
+     * 건물 강화 가능 여부 확인
+     * @param {string} buildingId - 건물 고유 ID
+     * @returns {boolean}
+     */
+    canUpgrade(buildingId) {
+      try {
+        if (!buildingId || !window.Resources) {
+          return false;
+        }
+
+        const target = Array.isArray(gameState.buildings)
+          ? gameState.buildings.find((building) => building.id === buildingId)
+          : null;
+        if (!target) {
+          return false;
+        }
+
+        const config = GAME_CONFIG && GAME_CONFIG.UPGRADE_CONFIG ? GAME_CONFIG.UPGRADE_CONFIG : {};
+        const maxLevel = Math.max(0, Number(config.maxLevel) || 5);
+        const level = Math.max(0, Number(target.upgradeLevel) || 0);
+        if (level >= maxLevel) {
+          return false;
+        }
+
+        const cost = this.getUpgradeCost(buildingId);
+        if (cost < 0) {
+          return false;
+        }
+
+        return window.Resources.hasEnough({ gold: cost });
+      } catch (error) {
+        console.error('[Game.canUpgrade] 강화 가능 여부 확인 실패:', error);
+        return false;
+      }
+    },
+
+    /**
+     * 건물의 강화 비용 조회
+     * @param {string} buildingId - 건물 고유 ID
+     * @returns {number} 금화 비용 (최대 레벨이면 -1)
+     */
+    getUpgradeCost(buildingId) {
+      try {
+        if (!buildingId) {
+          return -1;
+        }
+
+        const target = Array.isArray(gameState.buildings)
+          ? gameState.buildings.find((building) => building.id === buildingId)
+          : null;
+        if (!target) {
+          return -1;
+        }
+
+        const config = GAME_CONFIG && GAME_CONFIG.UPGRADE_CONFIG ? GAME_CONFIG.UPGRADE_CONFIG : {};
+        const maxLevel = Math.max(0, Number(config.maxLevel) || 5);
+        const costs = Array.isArray(config.costs) ? config.costs : [];
+        const level = Math.max(0, Number(target.upgradeLevel) || 0);
+        if (level >= maxLevel) {
+          return -1;
+        }
+
+        return Math.max(0, Number(costs[level]) || 0);
+      } catch (error) {
+        console.error('[Game.getUpgradeCost] 강화 비용 조회 실패:', error);
+        return -1;
+      }
+    },
+
+    /**
+     * 건물 강화 실행
+     * @param {string} buildingId - 건물 고유 ID
+     * @returns {boolean} 성공 여부
+     */
+    upgradeBuilding(buildingId) {
+      try {
+        if (!this.canUpgrade(buildingId) || !window.Resources) {
+          return false;
+        }
+
+        const target = gameState.buildings.find((building) => building.id === buildingId);
+        if (!target) {
+          return false;
+        }
+
+        const cost = this.getUpgradeCost(buildingId);
+        if (cost < 0 || !window.Resources.subtract('gold', cost)) {
+          return false;
+        }
+
+        target.upgradeLevel = Math.max(0, Number(target.upgradeLevel) || 0) + 1;
+
+        document.dispatchEvent(new CustomEvent('buildingUpgraded', {
+          detail: {
+            buildingId,
+            buildingType: target.type,
+            newLevel: target.upgradeLevel,
+            cost
+          }
+        }));
+
+        dispatchGameStateChanged();
+        return true;
+      } catch (error) {
+        console.error('[Game.upgradeBuilding] 건물 강화 실패:', error);
+        return false;
+      }
     },
 
     buildBuilding(buildingType) {
@@ -806,7 +1077,8 @@
         gameState.buildings.push({
           id: buildingId,
           type: buildingType,
-          workers: Number(definition.workersNeeded) || 0
+          workers: Number(definition.workersNeeded) || 0,
+          upgradeLevel: 0
         });
         gameState.productionStatus[buildingId] = { stalled: false };
 
@@ -990,6 +1262,9 @@
         return true;
       } catch (error) {
         console.error('[Game.load] 불러오기 실패:', error);
+        document.dispatchEvent(new CustomEvent('saveLoadFailed', {
+          detail: { error: error.message }
+        }));
         return false;
       }
     },

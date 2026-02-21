@@ -209,6 +209,29 @@
       workersNeeded: 3,
       unlock: { buildings: { sawmill: 1, blacksmith: 1 }, population: 20 },
       description: '목재와 도구로 무기를 생산합니다'
+    },
+    mint: {
+      id: 'mint',
+      name: '왕립 조폐소',
+      tier: 4,
+      cost: { wood: 300, stone: 200, gold: 2000 },
+      consumption: { gold: 1 },
+      production: { gold: 10 },
+      workersNeeded: 4,
+      unlock: { tribute: 'royal' },
+      description: '대량의 금화를 주조합니다'
+    },
+    cathedral: {
+      id: 'cathedral',
+      name: '대성당',
+      tier: 4,
+      cost: { wood: 500, stone: 400, gold: 1500 },
+      consumption: {},
+      production: {},
+      workersNeeded: 3,
+      effect: { happinessBonus: 25, plagueImmunity: true },
+      unlock: { buildings: { church: 3 }, research: ['agriculture'] },
+      description: '마을의 정신적 지주. 역병을 막아줍니다'
     }
   };
 
@@ -280,6 +303,27 @@
 
         if (!buildingsSatisfied) {
           return false;
+        }
+
+        const tributeRequirement = unlock.tribute;
+        if (tributeRequirement) {
+          const completedTributes = Array.isArray(state.tribute && state.tribute.completed)
+            ? state.tribute.completed
+            : [];
+          if (!completedTributes.includes(tributeRequirement)) {
+            return false;
+          }
+        }
+
+        const requiredResearchList = Array.isArray(unlock.research) ? unlock.research : [];
+        if (requiredResearchList.length > 0) {
+          const completedResearch = Array.isArray(state.research && state.research.completed)
+            ? state.research.completed
+            : [];
+          const hasRequiredResearch = requiredResearchList.every((researchId) => completedResearch.includes(researchId));
+          if (!hasRequiredResearch) {
+            return false;
+          }
         }
 
         const requiresResearch = window.Research && typeof window.Research.requiresForBuilding === 'function'

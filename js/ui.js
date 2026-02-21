@@ -75,6 +75,28 @@
           offlineProgressApplied: (e) => {
             const { seconds, resources } = e.detail;
             this.showOfflineReport(seconds, resources);
+          },
+          // v0.3 신규 이벤트
+          buildingUpgraded: (e) => {
+            const { buildingId, newLevel } = e.detail;
+            const building = Game.state.buildings.find(b => b.id === buildingId);
+            const def = building && window.Buildings && window.Buildings.definitions[building.type];
+            const name = def ? def.name : '건물';
+            this.showMessage(`${name} 강화 완료! ★${newLevel}`, 'success');
+            SoundManager.play('upgrade');
+          },
+          tributeExecuted: (e) => {
+            this.updateTributePanel();
+          },
+          mercenaryHired: (e) => {
+            this.updateMercenaryPanel();
+          },
+          mercenaryExpired: (e) => {
+            this.showMessage('순찰병 계약이 만료되었습니다.', 'warning');
+            this.updateMercenaryPanel();
+          },
+          saveLoadFailed: (e) => {
+            this.showMessage('저장 파일이 손상되었습니다. 새 게임을 시작합니다.', 'error');
           }
         };
 
@@ -91,6 +113,14 @@
 
         // 건물 버튼 생성
         this.createBuildingButtons();
+
+        // 조공 / 용병 카드 초기 생성 (ui-tribute.js, ui-mercenary.js에서 UI에 메서드 주입)
+        if (typeof this.createTributeCards === 'function') {
+          this.createTributeCards();
+        }
+        if (typeof this.createMercenaryCards === 'function') {
+          this.createMercenaryCards();
+        }
 
         // 저장 버튼
         document.getElementById('save-btn').addEventListener('click', () => {
@@ -191,7 +221,7 @@
       const saveState = () => {
         try {
           localStorage.setItem(STORAGE_KEY, JSON.stringify(collapsed));
-        } catch (e) {}
+        } catch (e) { }
       };
 
       // 토글 적용 함수
@@ -249,6 +279,10 @@
         this.updateTradePanel();
         this.updateResearchPanel();
         this.updateAchievementsPanel();
+        // v0.3 신규 패널 업데이트
+        this.updateTributePanel();
+        this.updateMercenaryPanel();
+        this.updateStatsPanel();
         this.checkTutorialTriggers();
       } catch (error) {
         console.error('[UI.updateAll] UI 업데이트 실패:', error);
@@ -693,32 +727,57 @@
           if (definition.workersNeeded > 0) {
             buildingDiv.appendChild(workersDiv);
 
-            // 일꾼 토글 버튼 추가
-            const toggleBtn = document.createElement('button');
-            toggleBtn.className = 'worker-toggle-btn';
-            const hasWorkers = data.totalWorkers > 0;
-            toggleBtn.textContent = hasWorkers ? '⏸ 해제' : '▶ 배치';
-            toggleBtn.classList.toggle('inactive', !hasWorkers);
-            toggleBtn.addEventListener('click', (e) => {
+            // 일꾼 +/- 조절 컨트롤
+            const workerControl = document.createElement('div');
+            workerControl.className = 'worker-control';
+
+            const maxWorkers = definition.workersNeeded * data.count;
+
+            // − 버튼
+            const minusBtn = document.createElement('button');
+            minusBtn.className = 'worker-ctrl-btn worker-minus';
+            minusBtn.textContent = '−';
+            minusBtn.disabled = data.totalWorkers <= 0;
+            minusBtn.addEventListener('click', (e) => {
               e.stopPropagation();
-              if (hasWorkers) {
-                // 해당 타입의 모든 건물에서 일꾼 해제
-                data.buildings.forEach(b => {
-                  if (b.workers > 0 && window.Population) {
-                    Population.unassign(b.id);
-                  }
-                });
-              } else {
-                // 해당 타입의 건물에 일꾼 배치
-                if (window.Population) {
-                  const firstBuilding = data.buildings[0];
-                  if (firstBuilding) {
-                    Population.reassign(firstBuilding.id);
-                  }
+              if (!window.Population) return;
+              // 노동자가 있는 건물 중 마지막 것에서 1명 해제
+              for (let i = data.buildings.length - 1; i >= 0; i--) {
+                if ((data.buildings[i].workers || 0) > 0) {
+                  Population.unassignOne(data.buildings[i].id);
+                  break;
                 }
               }
             });
-            buildingDiv.appendChild(toggleBtn);
+
+            // 인원 표시
+            const workerDisplay = document.createElement('span');
+            workerDisplay.className = 'worker-display';
+            workerDisplay.textContent = `${data.totalWorkers}/${maxWorkers}`;
+
+            // + 버튼
+            const plusBtn = document.createElement('button');
+            plusBtn.className = 'worker-ctrl-btn worker-plus';
+            plusBtn.textContent = '+';
+            const state = Game.state;
+            plusBtn.disabled = data.totalWorkers >= maxWorkers || (state && state.population.idle <= 0);
+            plusBtn.addEventListener('click', (e) => {
+              e.stopPropagation();
+              if (!window.Population) return;
+              // 아직 풀이 아닌 건물 중 첫 번째에 1명 배치
+              for (let i = 0; i < data.buildings.length; i++) {
+                const bWorkers = data.buildings[i].workers || 0;
+                if (bWorkers < definition.workersNeeded) {
+                  Population.assignOne(data.buildings[i].id);
+                  break;
+                }
+              }
+            });
+
+            workerControl.appendChild(minusBtn);
+            workerControl.appendChild(workerDisplay);
+            workerControl.appendChild(plusBtn);
+            buildingDiv.appendChild(workerControl);
           }
 
           // 철거 버튼 추가
@@ -1575,6 +1634,92 @@
         `;
       } catch (error) {
         console.error('[UI.showTradePlaceholder] 교역 안내 문구 표시 실패:', error);
+      }
+    },
+
+    // ============================================
+    // v0.3 신규 패널 업데이트 메서드 (기본 구현)
+    // 실제 구현은 ui-tribute.js, ui-mercenary.js에서 Override
+    // ============================================
+
+    // 조공 패널 업데이트 (기본 구현)
+    updateTributePanel() {
+      try {
+        const panel = document.getElementById('tribute-panel');
+        if (!panel || !window.Game) return;
+
+        // 영주관 보유 시 패널 표시
+        const hasManor = Game.getBuildingCount('manor') > 0;
+        panel.classList.toggle('hidden', !hasManor);
+
+        if (hasManor && typeof this.createTributeCards === 'function') {
+          // 최초 1회 카드 생성
+          const grid = document.getElementById('tribute-grid');
+          if (grid && grid.children.length === 0) {
+            this.createTributeCards();
+          }
+        }
+      } catch (error) {
+        console.error('[UI.updateTributePanel] 조공 패널 업데이트 실패:', error);
+      }
+    },
+
+    // 용병 패널 업데이트 (기본 구현)
+    updateMercenaryPanel() {
+      try {
+        const panel = document.getElementById('mercenary-panel');
+        if (!panel || !window.Game) return;
+
+        // 성벽 보유 시 패널 표시
+        const hasWall = Game.getBuildingCount('wall') > 0;
+        panel.classList.toggle('hidden', !hasWall);
+
+        if (hasWall && typeof this.createMercenaryCards === 'function') {
+          // 최초 1회 카드 생성
+          const grid = document.getElementById('mercenary-grid');
+          if (grid && grid.children.length === 0) {
+            this.createMercenaryCards();
+          }
+        }
+      } catch (error) {
+        console.error('[UI.updateMercenaryPanel] 용병 패널 업데이트 실패:', error);
+      }
+    },
+
+    // 통계 패널 업데이트 (Phase 2 준비)
+    updateStatsPanel() {
+      try {
+        const panel = document.getElementById('stats-panel');
+        if (!panel || !window.Game) return;
+
+        // 통계 패널은 항상 표시 (또는 특정 조건에 따라)
+        // Phase 2에서 실제 데이터 바인딩 구현 예정
+        
+        // 기본 통계 업데이트
+        const gameTime = Game.state.stats?.gameTime || 0;
+        const playtimeEl = document.getElementById('stat-playtime');
+        if (playtimeEl) {
+          const minutes = Math.floor(gameTime / 60);
+          playtimeEl.textContent = `${minutes}분`;
+        }
+
+        const buildingsEl = document.getElementById('stat-buildings-built');
+        if (buildingsEl) {
+          buildingsEl.textContent = `${Game.state.buildings.length}개`;
+        }
+
+        const maxPopEl = document.getElementById('stat-max-population');
+        if (maxPopEl) {
+          maxPopEl.textContent = `${Game.state.population.max}명`;
+        }
+
+        const achievementsEl = document.getElementById('stat-achievements');
+        if (achievementsEl && window.Achievements) {
+          const unlocked = Achievements.getAll().filter(a => a.achieved).length;
+          achievementsEl.textContent = `${unlocked}개`;
+        }
+      } catch (error) {
+        console.error('[UI.updateStatsPanel] 통계 패널 업데이트 실패:', error);
       }
     }
   };

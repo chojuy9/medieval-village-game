@@ -294,6 +294,115 @@
         console.error('[Population.reassign] 일꾼 재배치 실패:', error);
         return false;
       }
+    },
+    assignOne(buildingId) {
+      try {
+        const state = window.Utils && typeof window.Utils.getState === 'function'
+          ? window.Utils.getState()
+          : null;
+        if (!state || !Array.isArray(state.buildings) || !window.Buildings || !window.Buildings.definitions) {
+          return false;
+        }
+
+        const target = state.buildings.find((building) => building.id === buildingId);
+        if (!target) {
+          return false;
+        }
+
+        const definition = window.Buildings.definitions[target.type];
+        if (!definition) {
+          return false;
+        }
+
+        const workersNeeded = Math.max(0, Number(definition.workersNeeded) || 0);
+        const currentWorkers = Math.max(0, Number(target.workers) || 0);
+
+        // 이미 최대 인원이면 실패
+        if (currentWorkers >= workersNeeded) {
+          return false;
+        }
+
+        // 유휴 인구가 없으면 실패
+        if (state.population.idle < 1) {
+          return false;
+        }
+
+        target.workers = currentWorkers + 1;
+        state.population.idle -= 1;
+        state.population.employed += 1;
+
+        if (window.Utils && typeof window.Utils.clampPopulation === 'function') {
+          window.Utils.clampPopulation(state);
+        }
+
+        document.dispatchEvent(new CustomEvent('workersReassigned', {
+          detail: { buildingId, workers: target.workers }
+        }));
+
+        document.dispatchEvent(new CustomEvent('populationChanged', {
+          detail: {
+            current: state.population.current,
+            max: state.population.max,
+            idle: state.population.idle,
+            employed: state.population.employed
+          }
+        }));
+
+        return true;
+      } catch (error) {
+        console.error('[Population.assignOne] 일꾼 1명 배치 실패:', error);
+        return false;
+      }
+    },
+
+    // ── 노동자 1명 해제 ──
+    unassignOne(buildingId) {
+      try {
+        const state = window.Utils && typeof window.Utils.getState === 'function'
+          ? window.Utils.getState()
+          : null;
+        if (!state || !Array.isArray(state.buildings)) {
+          return false;
+        }
+
+        const target = state.buildings.find((building) => building.id === buildingId);
+        if (!target) {
+          return false;
+        }
+
+        const currentWorkers = Math.max(0, Number(target.workers) || 0);
+
+        // 이미 0명이면 실패
+        if (currentWorkers <= 0) {
+          return false;
+        }
+
+        target.workers = currentWorkers - 1;
+        state.population.employed -= 1;
+        state.population.idle += 1;
+
+        if (window.Utils && typeof window.Utils.clampPopulation === 'function') {
+          window.Utils.clampPopulation(state);
+        }
+
+        document.dispatchEvent(new CustomEvent('workersReassigned', {
+          detail: { buildingId, workers: target.workers }
+        }));
+
+        document.dispatchEvent(new CustomEvent('populationChanged', {
+          detail: {
+            current: state.population.current,
+            max: state.population.max,
+            idle: state.population.idle,
+            employed: state.population.employed
+          }
+        }));
+
+        return true;
+      } catch (error) {
+        console.error('[Population.unassignOne] 일꾼 1명 해제 실패:', error);
+        return false;
+      }
     }
   };
 
