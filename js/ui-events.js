@@ -31,13 +31,12 @@
                 banner.classList.remove('event-positive', 'event-neutral', 'event-negative', 'hidden');
                 banner.classList.add(`event-${eventData.type || 'neutral'}`, 'show');
 
-                // 선택형 이벤트 처리 (diplomat 등)
+                // 선택형 이벤트 처리
                 const choicesDiv = document.getElementById('event-choices');
-                const isChoiceEvent = eventData.id === 'diplomat' &&
-                    eventData.runtimeData && eventData.runtimeData.requiresChoice;
+                const isChoiceEvent = eventData.runtimeData && eventData.runtimeData.requiresChoice;
                 if (isChoiceEvent) {
                     this._currentChoiceEvent = eventData;
-                    this.showDiplomatChoices(eventData);
+                    this.showEventChoices(eventData);
                 } else if (choicesDiv) {
                     choicesDiv.classList.add('hidden');
                 }
@@ -56,9 +55,7 @@
                     progressDiv.style.display = 'none';
 
                     // 선택형 이벤트(diplomat)가 아닌 경우만 자동 숨김
-                    const isDiplomatChoice = eventData.id === 'diplomat' &&
-                        eventData.runtimeData && eventData.runtimeData.requiresChoice;
-                    if (!isDiplomatChoice) {
+                    if (!isChoiceEvent) {
                         // 즉시 이벤트 배너 5초 후 자동 숨김
                         if (this._immediateBannerTimer) {
                             clearTimeout(this._immediateBannerTimer);
@@ -77,8 +74,8 @@
             }
         },
 
-        // 외교 사절 선택 버튼 표시
-        showDiplomatChoices(eventData) {
+        // 선택형 이벤트 버튼 표시
+        showEventChoices(eventData) {
             try {
                 const choicesDiv = document.getElementById('event-choices');
                 if (!choicesDiv) return;
@@ -98,18 +95,18 @@
                     btn.innerHTML = `<strong>${choice.label}</strong><br><small>${choice.description}</small>`;
 
                     btn.addEventListener('click', () => {
-                        this.handleDiplomatChoice(choice.id);
+                        this.handleEventChoice(choice.id);
                     }, { once: true });
 
                     choicesDiv.appendChild(btn);
                 });
             } catch (error) {
-                console.error('[UI.showDiplomatChoices] 외교 선택 버튼 표시 실패:', error);
+                console.error('[UI.showEventChoices] 선택 버튼 표시 실패:', error);
             }
         },
 
-        // 외교 사절 선택 결과 처리
-        handleDiplomatChoice(choiceId) {
+        // 선택형 이벤트 선택 결과 처리
+        handleEventChoice(choiceId) {
             try {
                 if (!window.EventSystem || typeof EventSystem.resolveChoice !== 'function') {
                     this.showMessage('이벤트 시스템이 초기화되지 않았습니다.', 'error');
@@ -133,8 +130,17 @@
                     return;
                 }
 
+                 if (result.result === 'insufficient_resources') {
+                    this.showMessage('필요 자원이 부족합니다.', 'error');
+                    return;
+                }
+
                 if (result.result === 'declined') {
                     this.showMessage('외교 사절을 돌려보냈습니다.', 'warning');
+                } else if (result.result === 'ignored') {
+                    this.showMessage('도적기지를 당분간 방치했습니다. 습격이 거세질 수 있습니다.', 'warning');
+                } else if (result.eventId === 'bandit_base_siege') {
+                    this.showMessage(result.success ? '🏹 도적기지 침공에 성공했습니다!' : '⚠️ 도적기지 침공에 실패했습니다.', result.success ? 'success' : 'error');
                 } else if (result.goldGain !== undefined) {
                     this.showMessage(`💰 금화 ${result.goldGain}을(를) 획득했습니다!`, 'success');
                 } else if (result.resource !== undefined) {
@@ -144,9 +150,9 @@
                 }
 
                 this._currentChoiceEvent = null;
-                console.log('[UI.handleDiplomatChoice] 선택 처리 완료:', choiceId, result);
+                console.log('[UI.handleEventChoice] 선택 처리 완료:', choiceId, result);
             } catch (error) {
-                console.error('[UI.handleDiplomatChoice] 외교 사절 선택 처리 실패:', error);
+                console.error('[UI.handleEventChoice] 이벤트 선택 처리 실패:', error);
             }
         },
 

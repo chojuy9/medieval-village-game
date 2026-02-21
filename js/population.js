@@ -6,6 +6,9 @@
       FOOD_CONSUMPTION_PER_PERSON: 0.1,
       FOOD_SCALING_THRESHOLD: 25,
       FOOD_CONSUMPTION_SCALED: 0.12,
+      BREAD_CONSUMPTION_PER_PERSON: 0.03,
+      BREAD_GROWTH_THRESHOLD_PER_PERSON: 0.5,
+      BREAD_GROWTH_BONUS_MULTIPLIER: 1.5,
       POPULATION_GROWTH_TIME: 60,
       POPULATION_DECLINE_TIME: 30
     };
@@ -35,8 +38,11 @@
           ? Math.max(0, Number(window.Seasons.getConsumptionMultiplier(state.stats.gameTime)) || 1)
           : 1;
         const consumption = state.population.current * perPersonConsumption * eventMultiplier * seasonMultiplier * dt;
+        const breadConsumptionPerPerson = Number(config.BREAD_CONSUMPTION_PER_PERSON) || 0.03;
+        const breadConsumption = state.population.current * breadConsumptionPerPerson * dt;
 
         state.resources.food = Math.max(0, state.resources.food - consumption);
+        state.resources.bread = Math.max(0, (Number(state.resources.bread) || 0) - breadConsumption);
         return consumption;
       } catch (error) {
         console.error('[Population.consume] 식량 소비 처리 실패:', error);
@@ -61,7 +67,15 @@
         const seasonMultiplier = window.Seasons && typeof window.Seasons.getGrowthMultiplier === 'function'
           ? Math.max(0, Number(window.Seasons.getGrowthMultiplier(state.stats.gameTime)) || 0)
           : 1;
-        const growthMultiplier = happinessMultiplier * seasonMultiplier;
+        const breadThresholdPerPerson = Number(config.BREAD_GROWTH_THRESHOLD_PER_PERSON) || 0.5;
+        const breadGrowthBonusMultiplier = Number(config.BREAD_GROWTH_BONUS_MULTIPLIER) || 1.5;
+        const breadStock = Number(state.resources.bread) || 0;
+        const breadThreshold = (Number(state.population.current) || 0) * breadThresholdPerPerson;
+        const breadBonus = breadStock >= breadThreshold ? breadGrowthBonusMultiplier : 1;
+        const growthMultiplier = happinessMultiplier * seasonMultiplier * breadBonus;
+
+        state.warnings = state.warnings || {};
+        state.warnings.breadShortage = breadStock < breadThreshold;
 
         // 식량이 충분하고 최대 인구 미만일 때만 증가 타이머 진행
         if (state.resources.food > 0 && state.population.current < state.population.max && growthMultiplier > 0) {

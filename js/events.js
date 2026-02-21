@@ -90,6 +90,18 @@
       }
     },
     {
+      id: 'bandit_base_siege',
+      name: '🏹 도적기지 침공',
+      type: 'neutral',
+      description: '도적들의 근거지를 소탕할 기회입니다. 결단을 내려야 합니다.',
+      duration: 0,
+      weight: 1,
+      minGameTime: 900,
+      effect: {
+        immediate: 'bandit_base_siege'
+      }
+    },
+    {
       id: 'famine',
       name: '🥀 흉년',
       type: 'negative',
@@ -286,6 +298,8 @@
       lastCheckTime = Number(state.eventState.lastCheckTime) || 0;
     }
 
+    ensureRaidState(state);
+
     return state;
   }
 
@@ -312,6 +326,21 @@
     }, 0);
   }
 
+  function ensureRaidState(state) {
+    if (!state) {
+      return;
+    }
+
+    state.raids = state.raids || {};
+    state.raids.count = Math.max(0, Number(state.raids.count) || 0);
+    state.raids.enhanced = Boolean(state.raids.enhanced);
+    state.raids.banditBaseSiege = state.raids.banditBaseSiege || {};
+    state.raids.banditBaseSiege.inProgress = Boolean(state.raids.banditBaseSiege.inProgress);
+    state.raids.banditBaseSiege.success = Boolean(state.raids.banditBaseSiege.success);
+    state.raids.banditBaseSiege.resolved = Boolean(state.raids.banditBaseSiege.resolved);
+    state.raids.banditBaseSiege.lastChoice = state.raids.banditBaseSiege.lastChoice || null;
+  }
+
   function dispatchEvent(name, detail) {
     document.dispatchEvent(new CustomEvent(name, { detail }));
   }
@@ -323,14 +352,20 @@
   }
 
   function weightedPick(events) {
-    const totalWeight = events.reduce((sum, event) => sum + (Number(event.weight) || 0), 0);
+    const totalWeight = events.reduce((sum, event) => {
+      const runtimeWeight = Number(event.runtimeWeight);
+      const weight = Number.isFinite(runtimeWeight) ? runtimeWeight : (Number(event.weight) || 0);
+      return sum + weight;
+    }, 0);
     if (totalWeight <= 0) {
       return null;
     }
 
     let roll = Math.random() * totalWeight;
     for (const event of events) {
-      roll -= Number(event.weight) || 0;
+      const runtimeWeight = Number(event.runtimeWeight);
+      const weight = Number.isFinite(runtimeWeight) ? runtimeWeight : (Number(event.weight) || 0);
+      roll -= weight;
       if (roll <= 0) {
         return event;
       }
@@ -387,6 +422,9 @@
     }
 
     if (immediateType === 'resource_raid') {
+      ensureRaidState(state);
+      state.raids.count = (Number(state.raids.count) || 0) + 1;
+
       if (window.Mercenary && state.mercenaries && state.mercenaries.knight
         && (Number(state.mercenaries.knight.charges) || 0) > 0) {
         state.mercenaries.knight.charges -= 1;
@@ -412,7 +450,11 @@
       const mercBonus = window.Mercenary && typeof window.Mercenary.getDefenseBonus === 'function'
         ? Math.max(0, Math.min(0.9, Number(window.Mercenary.getDefenseBonus()) || 0))
         : 0;
-      lossPercent *= (1 - mercBonus);
+      const nightWatchBonus = state.mercenaries && state.mercenaries.nightWatch
+        ? (Number((window.GAME_CONFIG || {}).GOLD_SINK_NIGHTWATCH_DEFENSE_BONUS) || 15) / 100
+        : 0;
+      const totalDefenseBonus = Math.max(0, Math.min(0.9, mercBonus + nightWatchBonus));
+      lossPercent *= (1 - totalDefenseBonus);
 
       const resourceTypes = ['wood', 'stone', 'food', 'gold'];
       const losses = {};
@@ -434,8 +476,48 @@
       eventRuntime.runtimeData = {
         lossPercent: Number(lossPercent.toFixed(1)),
         losses,
-        mercenaryBonus: Number(mercBonus.toFixed(2))
+        mercenaryBonus: Number(totalDefenseBonus.toFixed(2))
       };
+      return;
+    }
+
+    if (immediateType === 'bandit_base_siege') {
+      ensureRaidState(state);
+      state.raids.banditBaseSiege.inProgress = true;
+
+      const defenseScore = EventSystem.getVillageDefenseScore(state);
+      const expeditionSuccessRate = defenseScore >= 40 ? 0.8 : 0.5;
+
+      eventRuntime.runtimeData = {
+        requiresChoice: true,
+        defenseScore,
+        choices: [
+          {
+            id: 'expedition',
+            label: '원정대 파견',
+            description: '⚔️ 무기 20 + 💰 금화 100',
+            successRate: expeditionSuccessRate,
+            canAfford: (Number(state.resources.weapons) || 0) >= 20 && (Number(state.resources.gold) || 0) >= 100
+          },
+          {
+            id: 'mercenary',
+            label: '용병 고용 파견',
+            description: '💰 금화 300',
+            successRate: 0.95,
+            canAfford: (Number(state.resources.gold) || 0) >= 300
+          },
+          {
+            id: 'ignore',
+            label: '무시하기',
+            description: '비용 없음 (이후 도적 습격 빈도 증가)',
+            successRate: 0,
+            canAfford: true
+          }
+        ]
+      };
+      if (window.VN && typeof window.VN.start === 'function') {
+        window.VN.start('siege_decision');
+      }
       return;
     }
 
@@ -617,9 +699,52 @@
     CHECK_INTERVAL: 90,
     EVENT_CHANCE: 0.4,
 
+    getVillageDefenseScore(stateArg) {
+      const state = stateArg || (window.Utils && typeof window.Utils.getState === 'function'
+        ? window.Utils.getState()
+        : null);
+      if (!state) {
+        return 0;
+      }
+
+      const wallDefense = getBuildingCount('wall') * 20;
+      const mercenaryDefense = window.Mercenary && typeof window.Mercenary.getDefenseBonus === 'function'
+        ? (Math.max(0, Number(window.Mercenary.getDefenseBonus()) || 0) * 100)
+        : 0;
+      const nightWatchDefense = state.mercenaries && state.mercenaries.nightWatch
+        ? (Number((window.GAME_CONFIG || {}).GOLD_SINK_NIGHTWATCH_DEFENSE_BONUS) || 15)
+        : 0;
+
+      return Math.max(0, Math.round(wallDefense + mercenaryDefense + nightWatchDefense));
+    },
+
+    canTriggerBanditBaseSiege(gameTime, stateArg) {
+      const state = stateArg || (window.Utils && typeof window.Utils.getState === 'function'
+        ? window.Utils.getState()
+        : null);
+      if (!state) {
+        return false;
+      }
+
+      ensureRaidState(state);
+      const config = window.GAME_CONFIG || {};
+      const minTime = Number(config.BANDIT_BASE_SIEGE_TRIGGER_TIME) || 900;
+      const requiredRaids = Number(config.BANDIT_BASE_SIEGE_REQUIRED_RAIDS) || 3;
+      const nowGameTime = Math.max(0, Number(gameTime) || 0);
+      const hasWall = getBuildingCount('wall') >= 1;
+      const siegeState = state.raids.banditBaseSiege || {};
+
+      return nowGameTime >= minTime
+        && (Number(state.raids.count) || 0) >= requiredRaids
+        && hasWall
+        && !siegeState.inProgress
+        && !siegeState.success
+        && !siegeState.resolved;
+    },
+
     check(gameTime) {
       try {
-        ensureEventState();
+        const state = ensureEventState();
         this.CHECK_INTERVAL = getCheckInterval();
         this.EVENT_CHANCE = getEventChance();
 
@@ -632,6 +757,16 @@
           return false;
         }
 
+        if (this.canTriggerBanditBaseSiege(nowGameTime, state)) {
+          lastCheckTime = nowGameTime;
+          syncEventState();
+          const siegeDef = eventDefinitions.find((eventDef) => eventDef.id === 'bandit_base_siege');
+          if (siegeDef) {
+            this.trigger(siegeDef);
+            return true;
+          }
+        }
+
         // 체크 시점 갱신 (실패/성공 모두 동일 주기 유지)
         lastCheckTime = nowGameTime;
         syncEventState();
@@ -640,9 +775,25 @@
           return false;
         }
 
-        const candidates = eventDefinitions.filter((eventDef) => {
-          return nowGameTime >= (Number(eventDef.minGameTime) || 0);
-        });
+        const candidates = eventDefinitions
+          .filter((eventDef) => eventDef.id !== 'bandit_base_siege')
+          .filter((eventDef) => nowGameTime >= (Number(eventDef.minGameTime) || 0))
+          .map((eventDef) => {
+            let runtimeWeight = Number(eventDef.weight) || 0;
+            if (eventDef.id === 'bandit_raid') {
+              if (state && state.mercenaries && state.mercenaries.nightWatch) {
+                const reduction = Number((window.GAME_CONFIG || {}).GOLD_SINK_NIGHTWATCH_RAID_REDUCTION) || 0.3;
+                runtimeWeight *= Math.max(0, 1 - reduction);
+              }
+              if (state && state.raids && state.raids.enhanced) {
+                runtimeWeight *= 1.3;
+              }
+            }
+            return {
+              ...eventDef,
+              runtimeWeight
+            };
+          });
 
         if (candidates.length === 0) {
           return false;
@@ -667,13 +818,13 @@
 
         console.log('[EventSystem.trigger] 이벤트 발생:', runtimeEvent.id);
 
-        if ((Number(runtimeEvent.duration) || 0) > 0) {
+        applyImmediateEffect(runtimeEvent);
+        const isChoiceEvent = Boolean(runtimeEvent.runtimeData && runtimeEvent.runtimeData.requiresChoice);
+        if ((Number(runtimeEvent.duration) || 0) > 0 || isChoiceEvent) {
           activeEvent = runtimeEvent;
         } else {
           activeEvent = null;
         }
-
-        applyImmediateEffect(runtimeEvent);
         syncEventState();
 
         dispatchEvent('eventTriggered', {
@@ -696,6 +847,11 @@
 
         const resolvedEvent = activeEvent;
         activeEvent = null;
+        const state = ensureEventState();
+        if (state && resolvedEvent && resolvedEvent.id === 'bandit_base_siege') {
+          ensureRaidState(state);
+          state.raids.banditBaseSiege.inProgress = false;
+        }
         syncEventState();
 
         console.log('[EventSystem.resolve] 이벤트 종료:', resolvedEvent.id);
@@ -815,8 +971,8 @@
 
   /**
    * 선택형 이벤트의 선택지를 처리합니다.
-   * @param {string} choiceId - 'gold' | 'resource' | 'decline'
-   * @returns {object|null} 처리 결과
+   * @param {string} choiceId
+   * @returns {object|null}
    */
   EventSystem.resolveChoice = function (choiceId) {
     try {
@@ -828,45 +984,129 @@
       }
 
       const event = activeEvent;
-      if (!event || event.id !== 'diplomat') {
+      if (!event) {
         return null;
       }
 
-      const data = event.runtimeData || {};
-      const payGold = Number(data.payGold) || 100;
-      const gainAmount = Number(data.gainAmount) || 50;
-      const canAfford = (Number(state.resources.gold) || 0) >= payGold;
+      if (event.id === 'diplomat') {
+        const data = event.runtimeData || {};
+        const payGold = Number(data.payGold) || 100;
+        const gainAmount = Number(data.gainAmount) || 50;
+        const canAfford = (Number(state.resources.gold) || 0) >= payGold;
 
-      if (choiceId === 'decline') {
+        if (choiceId === 'decline') {
+          activeEvent = null;
+          syncEventState();
+          dispatchEvent('eventResolved', { event });
+          return { eventId: event.id, choiceId, result: 'declined' };
+        }
+
+        if (!canAfford) {
+          return { eventId: event.id, choiceId, result: 'insufficient_gold' };
+        }
+
+        window.Resources.subtract('gold', payGold);
+
+        let result = {};
+        if (choiceId === 'gold') {
+          const goldGain = gainAmount * 2;
+          window.Resources.add('gold', goldGain);
+          result = { eventId: event.id, choiceId, goldGain };
+        } else if (choiceId === 'resource') {
+          const resourceOptions = ['wood', 'stone', 'food'];
+          const picked = resourceOptions[randomInt(0, resourceOptions.length - 1)];
+          window.Resources.add(picked, gainAmount);
+          result = { eventId: event.id, choiceId, resource: picked, amount: gainAmount };
+        }
+
         activeEvent = null;
         syncEventState();
         dispatchEvent('eventResolved', { event });
-        return { choiceId, result: 'declined' };
+        dispatchEvent('diplomatChoiceResolved', { result });
+        return result;
       }
 
-      if (!canAfford) {
-        return { choiceId, result: 'insufficient_gold' };
+      if (event.id === 'bandit_base_siege') {
+        ensureRaidState(state);
+        const siegeState = state.raids.banditBaseSiege;
+        const defenseScore = this.getVillageDefenseScore(state);
+        let successRate = 0;
+
+        if (choiceId === 'expedition') {
+          if ((Number(state.resources.weapons) || 0) < 20 || (Number(state.resources.gold) || 0) < 100) {
+            return { eventId: event.id, choiceId, result: 'insufficient_resources' };
+          }
+          window.Resources.subtract('weapons', 20);
+          window.Resources.subtract('gold', 100);
+          successRate = defenseScore >= 40 ? 0.8 : 0.5;
+        } else if (choiceId === 'mercenary') {
+          if ((Number(state.resources.gold) || 0) < 300) {
+            return { eventId: event.id, choiceId, result: 'insufficient_gold' };
+          }
+          window.Resources.subtract('gold', 300);
+          successRate = 0.95;
+        } else if (choiceId === 'ignore') {
+          state.raids.enhanced = true;
+          siegeState.inProgress = false;
+          siegeState.success = false;
+          siegeState.resolved = true;
+          siegeState.lastChoice = 'ignore';
+
+          activeEvent = null;
+          syncEventState();
+          dispatchEvent('eventResolved', { event });
+          return { eventId: event.id, choiceId, result: 'ignored' };
+        } else {
+          return { eventId: event.id, choiceId, result: 'invalid_choice' };
+        }
+
+        const success = Math.random() < successRate;
+        if (success) {
+          window.Resources.add('gold', 200);
+          window.Resources.add('weapons', 10);
+          siegeState.success = true;
+          siegeState.resolved = true;
+          siegeState.inProgress = false;
+          siegeState.lastChoice = choiceId;
+          if (window.VN && typeof window.VN.start === 'function') {
+            window.VN.start('siege_success');
+          }
+        } else {
+          state.happiness.current = Math.max(0, (Number(state.happiness && state.happiness.current) || 50) - 15);
+          state.population.current = Math.max(0, (Number(state.population.current) || 0) - 2);
+          if (window.Utils && typeof window.Utils.clampPopulation === 'function') {
+            window.Utils.clampPopulation(state);
+          }
+          siegeState.success = false;
+          siegeState.resolved = true;
+          siegeState.inProgress = false;
+          siegeState.lastChoice = choiceId;
+          if (window.VN && typeof window.VN.start === 'function') {
+            window.VN.start('siege_fail');
+          }
+        }
+
+        activeEvent = null;
+        syncEventState();
+        dispatchEvent('eventResolved', { event });
+        dispatchEvent('banditBaseSiegeResolved', {
+          success,
+          choiceId,
+          successRate,
+          defenseScore
+        });
+
+        return {
+          eventId: event.id,
+          choiceId,
+          success,
+          successRate,
+          defenseScore,
+          result: success ? 'success' : 'fail'
+        };
       }
 
-      window.Resources.subtract('gold', payGold);
-
-      let result = {};
-      if (choiceId === 'gold') {
-        const goldGain = gainAmount * 2;
-        window.Resources.add('gold', goldGain);
-        result = { choiceId, goldGain };
-      } else if (choiceId === 'resource') {
-        const resourceOptions = ['wood', 'stone', 'food'];
-        const picked = resourceOptions[randomInt(0, resourceOptions.length - 1)];
-        window.Resources.add(picked, gainAmount);
-        result = { choiceId, resource: picked, amount: gainAmount };
-      }
-
-      activeEvent = null;
-      syncEventState();
-      dispatchEvent('eventResolved', { event });
-      dispatchEvent('diplomatChoiceResolved', { result });
-      return result;
+      return null;
     } catch (error) {
       console.error('[EventSystem.resolveChoice] 선택 처리 실패:', error);
       return null;

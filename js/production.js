@@ -170,11 +170,16 @@
                     const eventBuildingMultiplier = window.EventSystem && typeof window.EventSystem.getBuildingProductionMultiplier === 'function'
                         ? Math.max(0, Number(window.EventSystem.getBuildingProductionMultiplier(building.type)) || 1)
                         : 1;
+                    const toolPenaltyMultiplier = ((Number(gameState.resources && gameState.resources.tools) || 0) <= 0
+                        && Number(definition.tier) >= 2)
+                        ? Math.max(0, Number((window.GAME_CONFIG || {}).TOOLS_MAINTENANCE_PRODUCTION_MULTIPLIER) || 0.7)
+                        : 1;
                     const amount = baseAmount
                         * (1 + researchBonus)
                         * (1 + upgradeBonus)
                         * this.getResourceMultiplier(resourceType, gameState)
-                        * eventBuildingMultiplier;
+                        * eventBuildingMultiplier
+                        * toolPenaltyMultiplier;
                     if (amount > 0) {
                         window.Resources.add(resourceType, amount);
                         gameState.stats.producedByTier[tier] = (Number(gameState.stats.producedByTier[tier]) || 0) + amount;

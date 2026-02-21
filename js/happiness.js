@@ -62,6 +62,13 @@
         happiness -= 10;
       }
 
+      const feastUntil = Number(state.temporaryEffects && state.temporaryEffects.feastUntil) || 0;
+      if (feastUntil > Date.now()) {
+        const feastBonus = Number((window.GAME_CONFIG || {}).GOLD_SINK_FEAST_HAPPINESS_BONUS) || 25;
+        factors.feast = feastBonus;
+        happiness += feastBonus;
+      }
+
       // 범위 클램핑 0~100
       return {
         current: Math.max(0, Math.min(100, happiness)),

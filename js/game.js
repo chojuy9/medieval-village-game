@@ -83,7 +83,35 @@
       mercenaries: {
         patrol: { active: false, expiresAt: 0 },
         knight: { charges: 0 },
-        fortification: 0
+        fortification: 0,
+        nightWatch: false
+      },
+      cooldowns: {
+        feast: 0,
+        emergencySupply: 0
+      },
+      temporaryEffects: {
+        feastUntil: 0
+      },
+      warnings: {
+        breadShortage: false,
+        nightWatchAutoDisabled: false
+      },
+      raids: {
+        count: 0,
+        enhanced: false,
+        banditBaseSiege: {
+          inProgress: false,
+          success: false,
+          resolved: false,
+          lastChoice: null
+        }
+      },
+      storyFlags: {
+        introShown: false,
+        firstHouseShown: false,
+        banditWarningShown: false,
+        royalTributeShown: false
       },
       productionStatus: {},
       lastUpdate: Date.now(),
@@ -236,6 +264,43 @@
     state.mercenaries.knight.charges = Math.max(0, Number(state.mercenaries.knight.charges) || 0);
 
     state.mercenaries.fortification = Math.max(0, Number(state.mercenaries.fortification) || 0);
+    state.mercenaries.nightWatch = Boolean(state.mercenaries.nightWatch);
+  }
+
+  function ensureCooldownState(state) {
+    state.cooldowns = state.cooldowns || {};
+    state.cooldowns.feast = Math.max(0, Number(state.cooldowns.feast) || 0);
+    state.cooldowns.emergencySupply = Math.max(0, Number(state.cooldowns.emergencySupply) || 0);
+  }
+
+  function ensureTemporaryEffectsState(state) {
+    state.temporaryEffects = state.temporaryEffects || {};
+    state.temporaryEffects.feastUntil = Math.max(0, Number(state.temporaryEffects.feastUntil) || 0);
+  }
+
+  function ensureWarningState(state) {
+    state.warnings = state.warnings || {};
+    state.warnings.breadShortage = Boolean(state.warnings.breadShortage);
+    state.warnings.nightWatchAutoDisabled = Boolean(state.warnings.nightWatchAutoDisabled);
+  }
+
+  function ensureRaidState(state) {
+    state.raids = state.raids || {};
+    state.raids.count = Math.max(0, Number(state.raids.count) || 0);
+    state.raids.enhanced = Boolean(state.raids.enhanced);
+    state.raids.banditBaseSiege = state.raids.banditBaseSiege || {};
+    state.raids.banditBaseSiege.inProgress = Boolean(state.raids.banditBaseSiege.inProgress);
+    state.raids.banditBaseSiege.success = Boolean(state.raids.banditBaseSiege.success);
+    state.raids.banditBaseSiege.resolved = Boolean(state.raids.banditBaseSiege.resolved);
+    state.raids.banditBaseSiege.lastChoice = state.raids.banditBaseSiege.lastChoice || null;
+  }
+
+  function ensureStoryState(state) {
+    state.storyFlags = state.storyFlags || {};
+    state.storyFlags.introShown = Boolean(state.storyFlags.introShown);
+    state.storyFlags.firstHouseShown = Boolean(state.storyFlags.firstHouseShown);
+    state.storyFlags.banditWarningShown = Boolean(state.storyFlags.banditWarningShown);
+    state.storyFlags.royalTributeShown = Boolean(state.storyFlags.royalTributeShown);
   }
 
   /**
@@ -302,6 +367,11 @@
     ensureBuildingUpgradeState(state);
     ensureTributeState(state);
     ensureMercenaryState(state);
+    ensureCooldownState(state);
+    ensureTemporaryEffectsState(state);
+    ensureWarningState(state);
+    ensureRaidState(state);
+    ensureStoryState(state);
     ensureStatsState(state);
     return state;
   }
@@ -469,6 +539,30 @@
           ...((loadedState.mercenaries && loadedState.mercenaries.knight) || {})
         }
       },
+      cooldowns: {
+        ...fresh.cooldowns,
+        ...(loadedState.cooldowns || {})
+      },
+      temporaryEffects: {
+        ...fresh.temporaryEffects,
+        ...(loadedState.temporaryEffects || {})
+      },
+      warnings: {
+        ...fresh.warnings,
+        ...(loadedState.warnings || {})
+      },
+      raids: {
+        ...fresh.raids,
+        ...(loadedState.raids || {}),
+        banditBaseSiege: {
+          ...fresh.raids.banditBaseSiege,
+          ...((loadedState.raids && loadedState.raids.banditBaseSiege) || {})
+        }
+      },
+      storyFlags: {
+        ...fresh.storyFlags,
+        ...(loadedState.storyFlags || {})
+      },
       productionStatus: loadedState.productionStatus || {},
       lastUpdate: Number(loadedState.lastUpdate) || Date.now(),
       migration_notices: Array.isArray(loadedState.migration_notices) ? loadedState.migration_notices : []
@@ -480,6 +574,11 @@
     ensureBuildingUpgradeState(gameState);
     ensureTributeState(gameState);
     ensureMercenaryState(gameState);
+    ensureCooldownState(gameState);
+    ensureTemporaryEffectsState(gameState);
+    ensureWarningState(gameState);
+    ensureRaidState(gameState);
+    ensureStoryState(gameState);
     ensureStatsState(gameState);
     recomputeResearchBonuses(gameState);
 
@@ -494,6 +593,20 @@
       return 0;
     }
     return state.buildings.filter((building) => building.type === buildingType).length;
+  }
+
+  function getTier2PlusBuildingCount(state) {
+    if (!state || !Array.isArray(state.buildings) || !window.Buildings || !window.Buildings.definitions) {
+      return 0;
+    }
+
+    return state.buildings.reduce((count, building) => {
+      const def = window.Buildings.definitions[building.type];
+      if (!def || Number(def.tier) < 2) {
+        return count;
+      }
+      return count + 1;
+    }, 0);
   }
 
   // Note: Production 관련 함수들은 이제 production.js (ProductionUtils)에 있습니다.
@@ -601,7 +714,52 @@
 
     total.food = (total.food || 0) + (Number(state.population.current) || 0) * perPerson;
 
+    const config = GAME_CONFIG || {};
+    const breadPerPerson = Number(config.BREAD_CONSUMPTION_PER_PERSON) || 0.03;
+    const toolMaintenancePerBuilding = Number(config.TOOLS_MAINTENANCE_PER_TIER2_BUILDING) || 0.008;
+    const nightWatchGoldPerSec = Number(config.GOLD_SINK_NIGHTWATCH_GOLD_PER_SEC) || 5;
+
+    total.bread = (total.bread || 0) + (Number(state.population.current) || 0) * breadPerPerson;
+    total.tools = (total.tools || 0) + getTier2PlusBuildingCount(state) * toolMaintenancePerBuilding;
+
+    if (state.mercenaries && state.mercenaries.nightWatch) {
+      total.gold = (total.gold || 0) + nightWatchGoldPerSec;
+    }
+
     return total;
+  }
+
+  function applyGoldSinkUpkeep(deltaTime) {
+    if (!window.Resources || !gameState.mercenaries || !gameState.mercenaries.nightWatch) {
+      return;
+    }
+
+    const dt = Math.max(0, Number(deltaTime) || 0);
+    if (dt <= 0) {
+      return;
+    }
+
+    const config = GAME_CONFIG || {};
+    const goldPerSec = Number(config.GOLD_SINK_NIGHTWATCH_GOLD_PER_SEC) || 5;
+    const requiredGold = goldPerSec * dt;
+    const currentGold = Number(gameState.resources.gold) || 0;
+
+    if (currentGold >= requiredGold) {
+      window.Resources.subtract('gold', requiredGold);
+      gameState.warnings.nightWatchAutoDisabled = false;
+      return;
+    }
+
+    if (currentGold > 0) {
+      window.Resources.subtract('gold', currentGold);
+    }
+
+    gameState.mercenaries.nightWatch = false;
+    gameState.warnings.nightWatchAutoDisabled = true;
+
+    document.dispatchEvent(new CustomEvent('nightWatchAutoDisabled', {
+      detail: { reason: 'gold' }
+    }));
   }
 
   function processOfflineProgress(data) {
@@ -811,6 +969,8 @@
           window.Population.updateDecline(deltaTime);
         }
 
+        applyGoldSinkUpkeep(deltaTime);
+
         if (window.EventSystem) {
           window.EventSystem.check(gameState.stats.gameTime);
           window.EventSystem.update(deltaTime);
@@ -867,6 +1027,10 @@
 
         updateResearch(deltaTime);
 
+        if (window.VN && typeof window.VN.checkTriggers === 'function') {
+          window.VN.checkTriggers(gameState);
+        }
+
         gameState.timers.autoSaveElapsed += deltaTime;
         if (gameState.timers.autoSaveElapsed >= 60) {
           this.save();
@@ -883,6 +1047,96 @@
 
     getBuildingCount(buildingType) {
       return getBuildingCountFromState(gameState, buildingType);
+    },
+
+    getConsumptionRates() {
+      return calculateTotalConsumption(gameState);
+    },
+
+    getCooldownRemaining(cooldownKey) {
+      ensureCooldownState(gameState);
+      const expiresAt = Number(gameState.cooldowns[cooldownKey]) || 0;
+      return Math.max(0, Math.ceil((expiresAt - Date.now()) / 1000));
+    },
+
+    holdFeast() {
+      try {
+        ensureCooldownState(gameState);
+        ensureTemporaryEffectsState(gameState);
+        const config = GAME_CONFIG || {};
+        const cost = Number(config.GOLD_SINK_FEAST_COST) || 80;
+        const durationSec = Number(config.GOLD_SINK_FEAST_DURATION) || 120;
+        const cooldownSec = Number(config.GOLD_SINK_FEAST_COOLDOWN) || 300;
+
+        if ((Number(gameState.resources.gold) || 0) < cost) {
+          return { success: false, reason: 'gold' };
+        }
+
+        if (Date.now() < (Number(gameState.cooldowns.feast) || 0)) {
+          return { success: false, reason: 'cooldown' };
+        }
+
+        if (!window.Resources.subtract('gold', cost)) {
+          return { success: false, reason: 'gold' };
+        }
+
+        gameState.temporaryEffects.feastUntil = Date.now() + durationSec * 1000;
+        gameState.cooldowns.feast = Date.now() + cooldownSec * 1000;
+        return { success: true };
+      } catch (error) {
+        console.error('[Game.holdFeast] 잔치 실행 실패:', error);
+        return { success: false, reason: 'error' };
+      }
+    },
+
+    toggleNightWatch(forceState) {
+      try {
+        ensureMercenaryState(gameState);
+        const nextState = typeof forceState === 'boolean' ? forceState : !gameState.mercenaries.nightWatch;
+
+        if (nextState) {
+          const minCost = Number((GAME_CONFIG || {}).GOLD_SINK_NIGHTWATCH_GOLD_PER_SEC) || 5;
+          if ((Number(gameState.resources.gold) || 0) < minCost) {
+            return { success: false, reason: 'gold', active: gameState.mercenaries.nightWatch };
+          }
+        }
+
+        gameState.mercenaries.nightWatch = nextState;
+        gameState.warnings.nightWatchAutoDisabled = false;
+        return { success: true, active: gameState.mercenaries.nightWatch };
+      } catch (error) {
+        console.error('[Game.toggleNightWatch] 야경대 토글 실패:', error);
+        return { success: false, reason: 'error', active: false };
+      }
+    },
+
+    useEmergencySupply() {
+      try {
+        ensureCooldownState(gameState);
+        const config = GAME_CONFIG || {};
+        const cost = Number(config.GOLD_SINK_EMERGENCY_SUPPLY_COST) || 50;
+        const foodGain = Number(config.GOLD_SINK_EMERGENCY_SUPPLY_FOOD) || 150;
+        const cooldownSec = Number(config.GOLD_SINK_EMERGENCY_SUPPLY_COOLDOWN) || 180;
+
+        if ((Number(gameState.resources.gold) || 0) < cost) {
+          return { success: false, reason: 'gold' };
+        }
+
+        if (Date.now() < (Number(gameState.cooldowns.emergencySupply) || 0)) {
+          return { success: false, reason: 'cooldown' };
+        }
+
+        if (!window.Resources.subtract('gold', cost)) {
+          return { success: false, reason: 'gold' };
+        }
+
+        window.Resources.add('food', foodGain);
+        gameState.cooldowns.emergencySupply = Date.now() + cooldownSec * 1000;
+        return { success: true, foodGain };
+      } catch (error) {
+        console.error('[Game.useEmergencySupply] 긴급 보급 실패:', error);
+        return { success: false, reason: 'error' };
+      }
     },
 
     getBuildingCost(buildingType) {
@@ -933,11 +1187,11 @@
         }
 
         const cost = this.getUpgradeCost(buildingId);
-        if (cost < 0) {
+        if (!cost) {
           return false;
         }
 
-        return window.Resources.hasEnough({ gold: cost });
+        return window.Resources.hasEnough(cost);
       } catch (error) {
         console.error('[Game.canUpgrade] 강화 가능 여부 확인 실패:', error);
         return false;
@@ -947,19 +1201,19 @@
     /**
      * 건물의 강화 비용 조회
      * @param {string} buildingId - 건물 고유 ID
-     * @returns {number} 금화 비용 (최대 레벨이면 -1)
+     * @returns {{ gold: number, lumber: number } | null} 비용 객체 (최대 레벨이면 null)
      */
     getUpgradeCost(buildingId) {
       try {
         if (!buildingId) {
-          return -1;
+          return null;
         }
 
         const target = Array.isArray(gameState.buildings)
           ? gameState.buildings.find((building) => building.id === buildingId)
           : null;
         if (!target) {
-          return -1;
+          return null;
         }
 
         const config = GAME_CONFIG && GAME_CONFIG.UPGRADE_CONFIG ? GAME_CONFIG.UPGRADE_CONFIG : {};
@@ -967,13 +1221,16 @@
         const costs = Array.isArray(config.costs) ? config.costs : [];
         const level = Math.max(0, Number(target.upgradeLevel) || 0);
         if (level >= maxLevel) {
-          return -1;
+          return null;
         }
 
-        return Math.max(0, Number(costs[level]) || 0);
+        const cost = {};
+        cost.gold = Math.max(0, Number(costs[level]) || 0);
+        cost.lumber = Math.floor((level + 1) * 5);  // ★1=5, ★2=10, ..., ★5=25
+        return cost;
       } catch (error) {
         console.error('[Game.getUpgradeCost] 강화 비용 조회 실패:', error);
-        return -1;
+        return null;
       }
     },
 
@@ -994,9 +1251,12 @@
         }
 
         const cost = this.getUpgradeCost(buildingId);
-        if (cost < 0 || !window.Resources.subtract('gold', cost)) {
+        if (!cost || !window.Resources.hasEnough(cost)) {
           return false;
         }
+        Object.entries(cost).forEach(([type, amount]) => {
+          window.Resources.subtract(type, amount);
+        });
 
         target.upgradeLevel = Math.max(0, Number(target.upgradeLevel) || 0) + 1;
 
