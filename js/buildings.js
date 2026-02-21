@@ -460,8 +460,13 @@
             return;
           }
 
+          const toolPenaltyMultiplier = ((Number(state.resources && state.resources.tools) || 0) <= 0
+            && Number(definition.tier) >= 2)
+            ? Math.max(0, Number((window.GAME_CONFIG || {}).TOOLS_MAINTENANCE_PRODUCTION_MULTIPLIER) || 0.7)
+            : 1;
+
           Object.keys(definition.production || {}).forEach((resourceType) => {
-            const amount = Number(definition.production[resourceType]) || 0;
+            const amount = (Number(definition.production[resourceType]) || 0) * toolPenaltyMultiplier;
             total[resourceType] = (total[resourceType] || 0) + amount;
           });
         });

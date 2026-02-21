@@ -390,6 +390,11 @@
     // 자원별 소비량 계산 (건물 소비 + 식량 소비)
     getConsumptionRates() {
       const state = Game.state;
+
+      if (Game && typeof Game.getConsumptionRates === 'function') {
+        return Game.getConsumptionRates();
+      }
+
       const rates = {};
 
       // 건물 소비량 합산
@@ -412,6 +417,24 @@
       const scaledCons = config.FOOD_CONSUMPTION_SCALED || 0.15;
       const perPerson = state.population.current >= threshold ? scaledCons : baseCons;
       rates.food = (rates.food || 0) + state.population.current * perPerson;
+
+      const breadPerPerson = Number(config.BREAD_CONSUMPTION_PER_PERSON) || 0.03;
+      rates.bread = (rates.bread || 0) + state.population.current * breadPerPerson;
+
+      const tier2PlusCount = Array.isArray(state.buildings)
+        ? state.buildings.filter((building) => {
+          const def = window.Buildings && window.Buildings.definitions
+            ? window.Buildings.definitions[building.type]
+            : null;
+          return def && Number(def.tier) >= 2;
+        }).length
+        : 0;
+      const toolMaintenance = Number(config.TOOLS_MAINTENANCE_PER_TIER2_BUILDING) || 0.008;
+      rates.tools = (rates.tools || 0) + tier2PlusCount * toolMaintenance;
+
+      if (state.mercenaries && state.mercenaries.nightWatch) {
+        rates.gold = (rates.gold || 0) + (Number(config.GOLD_SINK_NIGHTWATCH_GOLD_PER_SEC) || 5);
+      }
 
       return rates;
     },
@@ -464,7 +487,8 @@
         tavern: '🍺 주점',
         crowding: '🏠 과밀',
         starvation: '🌾 기아',
-        negativeEvent: '⚠️ 이벤트'
+        negativeEvent: '⚠️ 이벤트',
+        feast: '🎉 잔치'
       };
       return labels[key] || key;
     },

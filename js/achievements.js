@@ -195,6 +195,14 @@
         icon: '🏰'
       },
       {
+        id: 'bandit_base_conqueror',
+        name: '🏹 도적기지 정복자',
+        description: '도적기지 침공에 성공했습니다',
+        condition: (state) => Boolean(state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success),
+        reward: { gold: 200, weapons: 5 },
+        icon: '🏹'
+      },
+      {
         id: 'plague_survivor',
         name: '역병 극복',
         description: '역병을 3회 겪고 살아남았습니다',
