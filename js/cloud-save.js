@@ -2,7 +2,7 @@
   'use strict';
 
   const SUPABASE_URL = 'https://auuoqzyxvrfkrqtxguah.supabase.co';
-  const SUPABASE_KEY = 'sb_publishable_v7w5pTVZ3hXoxRx9LAejJQ_dug_BF8Z';
+  const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImF1dW9xenl4dnJma3JxdHhndWFoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE2NDg3MTksImV4cCI6MjA4NzIyNDcxOX0.Uate8TUkuA1n9ujEPseG4-_imVPw1UufjKYLrgXpvh0';
   const UUID_KEY     = 'medieval_cloud_uuid';
   const SYNC_MS      = 5 * 60 * 1000;
 
