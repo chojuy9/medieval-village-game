@@ -331,6 +331,7 @@
             <div class="modal-buttons">
                 <button type="button" id="new-game-btn" class="modal-btn danger-btn">🆕 새 게임</button>
                 <button type="button" id="cloud-load-btn" class="modal-btn">☁️ 클라우드에서 불러오기</button>
+                <button type="button" id="manual-btn" class="modal-btn">📖 설명서 보기</button>
                 <button id="close-menu-btn" class="modal-btn">✖ 닫기</button>
             </div>
             <!-- 새 게임 확인 패널 -->
@@ -341,6 +342,34 @@
                     <button id="new-game-cancel-btn" class="modal-btn">취소</button>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <!-- 게임 설명서 모달 -->
+    <div id="manual-modal" class="modal-overlay hidden">
+        <div class="manual-container">
+            <div class="manual-header">
+                <h2>📖 게임 설명서</h2>
+                <button id="close-manual-btn" class="manual-close-btn">✖</button>
+            </div>
+            <div class="manual-tabs">
+                <button class="manual-tab active" data-category="overview">📋 개요</button>
+                <button class="manual-tab" data-category="resources">🪵 자원</button>
+                <button class="manual-tab" data-category="buildings">🏗️ 건물</button>
+                <button class="manual-tab" data-category="population">👥 인구</button>
+                <button class="manual-tab" data-category="production">⚙️ 생산</button>
+                <button class="manual-tab" data-category="events">📜 이벤트</button>
+                <button class="manual-tab" data-category="seasons">🌸 계절</button>
+                <button class="manual-tab" data-category="happiness">😊 행복도</button>
+                <button class="manual-tab" data-category="research">🔬 연구</button>
+                <button class="manual-tab" data-category="trade">🏪 교역</button>
+                <button class="manual-tab" data-category="mercenary">⚔️ 용병</button>
+                <button class="manual-tab" data-category="tribute">👑 조공</button>
+                <button class="manual-tab" data-category="achievements">🏆 업적</button>
+                <button class="manual-tab" data-category="goldsink">💰 금화 사용</button>
+                <button class="manual-tab" data-category="tips">💡 팁</button>
+            </div>
+            <div class="manual-content" id="manual-content"></div>
         </div>
     </div>
 
@@ -415,11 +444,13 @@
     <script src="js/ui-tribute.js"></script>
     <script src="js/ui-mercenary.js"></script>
     <script src="js/ui-leaderboard.js"></script>
+    <script src="js/ui-manual.js"></script>
     <script>
         // 게임 시작
         document.addEventListener('DOMContentLoaded', function () {
             Game.init();
             UI.init();
+            ManualUI.init();
         });
     </script>
 </body>
