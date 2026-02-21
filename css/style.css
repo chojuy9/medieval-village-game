@@ -2118,6 +2118,8 @@ footer button:hover {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
     gap: 10px;
+    align-items: start;
+    /* 카드 높이 개별화 */
 }
 
 .achievement-progress {
@@ -2153,6 +2155,7 @@ footer button:hover {
    ============================================ */
 
 @media (max-width: 600px) {
+
     .tribute-grid,
     .mercenary-grid {
         grid-template-columns: 1fr;
@@ -2188,5 +2191,274 @@ footer button:hover {
 
     .upgrade-stars {
         font-size: 0.75em;
+    }
+}
+
+/* ============================================
+   v0.3 AI2 - 업적 카드 높이 수정
+   ============================================ */
+
+.achievement-card {
+    align-self: start;
+    /* 그리드 스트레칭 방지 */
+    height: auto;
+    /* 고정 높이 제거 */
+}
+
+/* ============================================
+   v0.3 AI2 - 금화 소비처 버튼 스타일
+   ============================================ */
+
+.action-btn {
+    padding: 8px 16px;
+    border: 1px solid rgba(255, 215, 0, 0.4);
+    border-radius: 6px;
+    background: linear-gradient(135deg, #2a1f0a, #3d2b10);
+    color: #FFD700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.action-btn:hover {
+    background: linear-gradient(135deg, #3d2b10, #5a3f1a);
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+}
+
+/* 마을 잔치 버튼 */
+.feast-btn {
+    background: linear-gradient(135deg, #2a1f0a, #3d2b10);
+    border: 2px solid rgba(255, 215, 0, 0.5);
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.feast-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #3d2b10, #5a3f1a);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
+}
+
+/* 긴급 보급 버튼 */
+.supply-btn {
+    background: linear-gradient(135deg, #1a2a1a, #2d3d2d);
+    border: 2px solid rgba(76, 175, 80, 0.5);
+    color: #81C784;
+    font-weight: bold;
+}
+
+.supply-btn:hover:not(:disabled) {
+    background: linear-gradient(135deg, #2d3d2d, #3d5a3d);
+    box-shadow: 0 0 10px rgba(76, 175, 80, 0.3);
+}
+
+/* 야경대 토글 컨테이너 */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: linear-gradient(90deg, #2a2a3a, #3a3a4a);
+    border: 2px solid rgba(100, 100, 150, 0.5);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #E0E0E0;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.status-text {
+    font-size: 0.9em;
+    color: #FFD700;
+}
+
+/* ============================================
+   v0.3 AI2 - 빵 부족 경고 메시지
+   ============================================ */
+
+.warning-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: linear-gradient(90deg, rgba(255, 152, 0, 0.2), rgba(255, 193, 7, 0.1));
+    border: 2px solid rgba(255, 152, 0, 0.5);
+    border-radius: 8px;
+    color: #FF9800;
+    font-weight: bold;
+    animation: warningPulse 2s infinite;
+}
+
+@keyframes warningPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        border-color: rgba(255, 152, 0, 0.5);
+    }
+
+    50% {
+        opacity: 0.8;
+        border-color: rgba(255, 152, 0, 0.8);
+    }
+}
+
+/* ============================================
+   v0.3 AI2 - 비주얼 노벨 오버레이
+   ============================================ */
+
+#vn-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+#vn-overlay.vn-hidden {
+    display: none;
+}
+
+#vn-background {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.8;
+}
+
+#vn-characters {
+    position: absolute;
+    bottom: 180px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10%;
+    pointer-events: none;
+}
+
+.vn-char {
+    max-height: 60vh;
+    max-width: 30%;
+    object-fit: contain;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.vn-char.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#vn-textbox {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(30, 20, 10, 0.95), rgba(20, 15, 5, 0.98));
+    border-top: 3px solid rgba(255, 215, 0, 0.6);
+    padding: 20px 30px;
+    min-height: 150px;
+    cursor: pointer;
+}
+
+#vn-speaker-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #FFD700;
+    margin-bottom: 10px;
+    padding: 5px 15px;
+    background: rgba(139, 69, 19, 0.8);
+    border-radius: 5px;
+    display: inline-block;
+}
+
+#vn-dialogue-text {
+    font-size: 1.1em;
+    line-height: 1.8;
+    color: #FFF8DC;
+    min-height: 60px;
+}
+
+#vn-tap-hint {
+    position: absolute;
+    bottom: 15px;
+    right: 30px;
+    font-size: 0.85em;
+    color: rgba(255, 248, 220, 0.6);
+    animation: tapHintBlink 1.5s infinite;
+}
+
+@keyframes tapHintBlink {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* VN 오버레이 모바일 대응 */
+@media (max-width: 600px) {
+    #vn-characters {
+        bottom: 140px;
+        padding: 0 5%;
+    }
+
+    .vn-char {
+        max-width: 35%;
+        max-height: 40vh;
+    }
+
+    #vn-textbox {
+        padding: 15px 20px;
+        min-height: 120px;
+    }
+
+    #vn-speaker-name {
+        font-size: 1em;
+    }
+
+    #vn-dialogue-text {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    #vn-characters {
+        bottom: 120px;
+    }
+
+    .vn-char {
+        max-width: 40%;
+        max-height: 35vh;
+    }
+
+    #vn-textbox {
+        padding: 12px 15px;
+        min-height: 100px;
     }
 }

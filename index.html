@@ -71,6 +71,10 @@
                     <span class="resource-name">식량</span>
                     <span class="resource-rate" id="food-rate"></span>
                     <span class="resource-amount" id="food-amount">0</span>
+                    <!-- v0.3 AI2 - 긴급 보급 버튼 -->
+                    <button id="btn-emergency-supply" class="action-btn supply-btn" title="금화 50 소모 | 식량 +150 즉시 지급">
+                        🚑 긴급 보급
+                    </button>
                 </div>
                 <div class="resource">
                     <span class="resource-icon">💰</span>
@@ -119,6 +123,16 @@
             </div>
             <div class="happiness-factors" id="happiness-factors">
                 <!-- JS로 동적 생성 -->
+            </div>
+            <!-- v0.3 AI2 - 마을 잔치 버튼 -->
+            <div style="margin-top: 12px;">
+                <button id="btn-feast" class="action-btn feast-btn" title="금화 80 소모 | 행복도 +25 (120초 쿨다운)">
+                    🎉 마을 잔치 개최
+                </button>
+            </div>
+            <!-- v0.3 AI2 - 빵 부족 경고 메시지 -->
+            <div class="warning-message" id="bread-warning" style="display:none">
+                🍞 빵 부족 — 인구 성장 속도 감소 중
             </div>
         </section>
 
@@ -246,6 +260,14 @@
                 <div class="defense-status">
                     <span>🛡️ 현재 방어력: <strong id="defense-bonus">0%</strong></span>
                 </div>
+                <!-- v0.3 AI2 - 야경대 토글 -->
+                <div class="toggle-container">
+                    <label class="toggle-label">
+                        <input type="checkbox" id="toggle-nightwatch" />
+                        💂 야경대 고용 (금화 5/초)
+                    </label>
+                    <span id="nightwatch-status" class="status-text"></span>
+                </div>
                 <div id="mercenary-grid" class="mercenary-grid">
                     <!-- JavaScript로 동적 생성 -->
                 </div>
@@ -307,7 +329,7 @@
         <div class="modal-content">
             <h2>⚙️ 게임 메뉴</h2>
             <div class="modal-buttons">
-                <button type="button"id="new-game-btn" class="modal-btn danger-btn">🆕 새 게임</button>
+                <button type="button" id="new-game-btn" class="modal-btn danger-btn">🆕 새 게임</button>
                 <button type="button" id="cloud-load-btn" class="modal-btn">☁️ 클라우드에서 불러오기</button>
                 <button id="close-menu-btn" class="modal-btn">✖ 닫기</button>
             </div>
@@ -349,6 +371,20 @@
         </div>
     </div>
 
+    <!-- v0.3 AI2 - 비주얼 노벨 오버레이 -->
+    <div id="vn-overlay" class="vn-hidden">
+        <div id="vn-background"></div>
+        <div id="vn-characters">
+            <img id="vn-char-left" class="vn-char" />
+            <img id="vn-char-right" class="vn-char" />
+        </div>
+        <div id="vn-textbox">
+            <div id="vn-speaker-name"></div>
+            <div id="vn-dialogue-text"></div>
+            <div id="vn-tap-hint">▼ 탭하여 계속</div>
+        </div>
+    </div>
+
     <script src="js/utils.js"></script>
     <script src="js/resources.js"></script>
     <script src="js/population.js"></script>
@@ -360,8 +396,8 @@
     <script src="js/trade.js"></script>
     <script src="js/achievements.js"></script>
     <script src="js/research.js"></script>
-    <script src="js/tribute.js"></script>        <!-- 신규: game.js 전에 로드 -->
-    <script src="js/mercenary.js"></script>      <!-- 신규: game.js 전에 로드 -->
+    <script src="js/tribute.js"></script> <!-- 신규: game.js 전에 로드 -->
+    <script src="js/mercenary.js"></script> <!-- 신규: game.js 전에 로드 -->
     <script src="js/config.js"></script>
     <script src="js/production.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
