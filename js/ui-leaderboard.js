@@ -145,7 +145,7 @@
           lastUpdate:  Date.now(),
           state:       data.save_data.state || data.save_data,
         };
-        localStorage.setItem('medievalVillageSave', JSON.stringify(saveObj));
+        localStorage.setItem('medievalVillageGameSave', JSON.stringify(saveObj));
         if (window.Game) Game.load();
         if (window.UI) {
           UI._buildingsCacheKey = null;
