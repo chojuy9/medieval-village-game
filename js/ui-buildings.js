@@ -353,16 +353,16 @@
             const upgradeLevel = lowestLevelBuilding.upgradeLevel || 0;
 
             // 강화 비용 확인
-            const cost = typeof Game.getUpgradeCost === 'function' 
-                ? Game.getUpgradeCost(lowestLevelBuilding.id) 
-                : -1;
+            const cost = typeof Game.getUpgradeCost === 'function'
+                ? Game.getUpgradeCost(lowestLevelBuilding.id)
+                : null;
 
-            if (cost === -1 || upgradeLevel >= 5) {
+            if (!cost || upgradeLevel >= 5) {
                 upgradeBtn.textContent = '⬆ MAX';
                 upgradeBtn.disabled = true;
             } else {
-                upgradeBtn.textContent = `⬆ 💰${cost}`;
-                const canUpgrade = typeof Game.canUpgrade === 'function' 
+                upgradeBtn.textContent = `⬆ 💰${cost.gold} 🪵${cost.lumber}`;
+                const canUpgrade = typeof Game.canUpgrade === 'function'
                     ? Game.canUpgrade(lowestLevelBuilding.id)
                     : false;
                 upgradeBtn.disabled = !canUpgrade;
@@ -380,11 +380,11 @@
         showUpgradeConfirm(building, type, definition) {
             try {
                 const upgradeLevel = building.upgradeLevel || 0;
-                const cost = typeof Game.getUpgradeCost === 'function' 
-                    ? Game.getUpgradeCost(building.id) 
-                    : -1;
+                const cost = typeof Game.getUpgradeCost === 'function'
+                    ? Game.getUpgradeCost(building.id)
+                    : null;
 
-                if (cost === -1 || upgradeLevel >= 5) {
+                if (!cost || upgradeLevel >= 5) {
                     this.showMessage('이미 최대 레벨입니다.', 'warning');
                     return;
                 }
@@ -397,7 +397,7 @@
                     message.textContent = `${definition.name} (현재 ★${upgradeLevel})을(를) 강화하시겠습니까?`;
                 }
                 if (costEl) {
-                    costEl.textContent = `비용: 💰 ${cost} 금화`;
+                    costEl.textContent = `비용: 💰 ${cost.gold} 금화, 🪵 ${cost.lumber} 목재`;
                 }
                 if (effectEl) {
                     const config = window.GAME_CONFIG && window.GAME_CONFIG.UPGRADE_CONFIG ? window.GAME_CONFIG.UPGRADE_CONFIG : {};
