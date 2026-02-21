@@ -6,7 +6,15 @@
   const UUID_KEY     = 'medieval_cloud_uuid';
   const SYNC_MS      = 5 * 60 * 1000;
 
-  const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  // 클라이언트를 처음 사용할 때 생성 (로드 타이밍 문제 방지)
+  let _client = null;
+  function getClient() {
+    if (!_client) {
+      if (!window.supabase) throw new Error('Supabase 라이브러리가 로드되지 않았습니다');
+      _client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    }
+    return _client;
+  }
 
   // UUID 관리
   function generateUUID() {
@@ -37,7 +45,7 @@
 
   // 클라우드 저장
   async function cloudSave(state) {
-    const { error } = await client.from('saves').upsert({
+    const { error } = await getClient().from('saves').upsert({
       uuid:       getUUID(),
       save_data:  state,
       updated_at: new Date().toISOString(),
@@ -48,14 +56,14 @@
   // 클라우드 불러오기
   async function cloudLoad(uuid) {
     const id = uuid || getUUID();
-    const { data, error } = await client.from('saves').select('save_data, updated_at').eq('uuid', id).single();
+    const { data, error } = await getClient().from('saves').select('save_data, updated_at').eq('uuid', id).single();
     if (error) throw new Error('저장 데이터 없음');
     return data;
   }
 
   // 순위 계산
   async function getMyRank(score) {
-    const { count } = await client.from('leaderboard').select('uuid', { count: 'exact', head: true }).gt('score', score);
+    const { count } = await getClient().from('leaderboard').select('uuid', { count: 'exact', head: true }).gt('score', score);
     return (count || 0) + 1;
   }
 
@@ -64,11 +72,11 @@
     const uuid  = getUUID();
     const score = calculateScore(state);
 
-    const { data: prev } = await client.from('leaderboard').select('score').eq('uuid', uuid).single();
+    const { data: prev } = await getClient().from('leaderboard').select('score').eq('uuid', uuid).single();
     const prevScore = prev ? prev.score : -1;
 
     if (score > prevScore) {
-      const { error } = await client.from('leaderboard').upsert({
+      const { error } = await getClient().from('leaderboard').upsert({
         uuid,
         nickname:     (nickname || '익명의 영주').slice(0, 30),
         score,
@@ -85,7 +93,7 @@
 
   // 리더보드 조회
   async function fetchLeaderboard(limit = 20) {
-    const { data: entries, error } = await client.from('leaderboard').select('*').order('score', { ascending: false }).limit(limit);
+    const { data: entries, error } = await getClient().from('leaderboard').select('*').order('score', { ascending: false }).limit(limit);
     if (error) throw new Error(error.message);
 
     const myUUID = getUUID();
@@ -95,7 +103,7 @@
       if (myIdx >= 0) {
         my_rank = myIdx + 1;
       } else {
-        const { data: myRow } = await client.from('leaderboard').select('score').eq('uuid', myUUID).single();
+        const { data: myRow } = await getClient().from('leaderboard').select('score').eq('uuid', myUUID).single();
         if (myRow) my_rank = await getMyRank(myRow.score);
       }
     }
