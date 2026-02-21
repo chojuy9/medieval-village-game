@@ -38,7 +38,7 @@
     const buildings = Array.isArray(state.buildings) ? state.buildings.length : 0;
     const gold = Math.floor(((state.resources && state.resources.gold) || 0) / 10);
     const ach = Array.isArray(state.achievements) ? state.achievements.length * 500 : 0;
-    const playtime = (state.stats && state.stats.playtime) || 0;
+    const playtime = (state.stats && state.stats.gameTime) || 0;
     const research = Array.isArray(state.research && state.research.completed) ? state.research.completed.length * 200 : 0;
     return Math.floor(maxPop * 100 + buildings * 50 + gold + ach + playtime + research);
   }
@@ -83,7 +83,7 @@
         village_name: (villageName || '이름없는 마을').slice(0, 50),
         population: (state.population && state.population.current) || 0,
         buildings: Array.isArray(state.buildings) ? state.buildings.length : 0,
-        playtime: (state.stats && state.stats.playtime) || 0,
+        playtime: Math.floor((state.stats && state.stats.gameTime) || 0),
         updated_at: new Date().toISOString(),
       });
       if (error) throw new Error(error.message);

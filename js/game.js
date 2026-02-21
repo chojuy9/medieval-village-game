@@ -397,7 +397,6 @@
       migrated.saveVersion += 1;
     }
 
-    migrated.state = migrateToV4(migrated.state);
     if (!migrated.lastUpdate) {
       migrated.lastUpdate = Number(migrated.state.lastUpdate) || Date.now();
     }

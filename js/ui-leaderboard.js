@@ -58,6 +58,15 @@
     });
   }
 
+  function escapeHtml(str) {
+    return String(str)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
   // =====================================================
   // 리더보드 렌더링
   // =====================================================
@@ -95,8 +104,8 @@
       html += `
         <tr class="${isMe ? 'my-row' : ''} leaderboard-rank-${e.rank}">
           <td>${rankEmoji}</td>
-          <td>${e.nickname}${isMe ? ' 👈' : ''}</td>
-          <td>${e.village_name}</td>
+          <td>${escapeHtml(e.nickname)}${isMe ? ' 👈' : ''}</td>
+          <td>${escapeHtml(e.village_name)}</td>
           <td>${formatScore(e.score)}</td>
           <td>${e.population}명</td>
           <td>${formatTime(e.playtime)}</td>
@@ -141,11 +150,12 @@
         // 로컬스토리지에 덮어쓰고 Game.load() 호출
         const saveObj = {
           saveVersion: data.save_data.saveVersion || 4,
-          savedAt:     Date.now(),
-          lastUpdate:  Date.now(),
-          state:       data.save_data.state || data.save_data,
+          savedAt: Date.now(),
+          lastUpdate: Date.now(),
+          state: data.save_data.state || data.save_data,
         };
-        localStorage.setItem('medievalVillageGameSave', JSON.stringify(saveObj));
+        const saveKey = (window.GAME_CONFIG && window.GAME_CONFIG.SAVE_KEY) || 'medievalVillageGameSave';
+        localStorage.setItem(saveKey, JSON.stringify(saveObj));
         if (window.Game) Game.load();
         if (window.UI) {
           UI._buildingsCacheKey = null;

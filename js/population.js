@@ -105,7 +105,7 @@
           return true;
         }
 
-        state.timers.populationGrowth = 0;
+        // state.timers.populationGrowth = 0;
         return false;
       } catch (error) {
         console.error('[Population.updateGrowth] 인구 증가 처리 실패:', error);
@@ -157,7 +157,7 @@
           return true;
         }
 
-        state.timers.populationDecline = 0;
+        // state.timers.populationDecline = 0;
         return false;
       } catch (error) {
         console.error('[Population.updateDecline] 인구 감소 처리 실패:', error);
