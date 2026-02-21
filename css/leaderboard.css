@@ -1,0 +1,171 @@
+/* =====================================================
+   클라우드 저장 & 리더보드 UI
+   style.css 맨 아래에 추가하세요
+===================================================== */
+
+/* 리더보드 패널 */
+#leaderboard-panel {
+    background: linear-gradient(180deg, #FFF8E1 0%, #FFE0B2 100%);
+    border: 2px solid #FF8F00;
+}
+
+.leaderboard-my-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px;
+    background: rgba(255,255,255,0.5);
+    border-radius: 8px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+    font-size: 0.85em;
+    color: #5D4037;
+}
+
+.leaderboard-my-info code {
+    font-family: monospace;
+    background: #f0e0c0;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.78em;
+    word-break: break-all;
+    color: #3d2914;
+}
+
+.leaderboard-actions {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+#leaderboard-nickname {
+    flex: 1;
+    min-width: 150px;
+    padding: 8px 12px;
+    border: 2px solid #CD853F;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 1em;
+    background: #FFF8DC;
+    color: #3d2914;
+    min-height: 40px;
+}
+
+#leaderboard-nickname:focus {
+    outline: none;
+    border-color: #FF8F00;
+}
+
+.leaderboard-submit-btn {
+    background: linear-gradient(180deg, #FFD700, #FFA000);
+    border: 2px solid #8B4513;
+    border-radius: 8px;
+    padding: 8px 16px;
+    font-weight: bold;
+    font-family: inherit;
+    color: #3d2914;
+    cursor: pointer;
+    min-height: 40px;
+    transition: all 0.2s;
+}
+
+.leaderboard-submit-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+.leaderboard-submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.small-btn {
+    background: #F5DEB3;
+    border: 2px solid #CD853F;
+    border-radius: 8px;
+    padding: 6px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85em;
+    min-height: 36px;
+    transition: background 0.2s;
+}
+
+.small-btn:hover:not(:disabled) { background: #DEB887; }
+.small-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+/* 리더보드 테이블 */
+.leaderboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.88em;
+}
+
+.leaderboard-table th {
+    background: #8B4513;
+    color: #FFF8DC;
+    padding: 8px 6px;
+    text-align: center;
+    font-weight: bold;
+}
+
+.leaderboard-table td {
+    padding: 7px 6px;
+    border-bottom: 1px solid #DEB887;
+    text-align: center;
+    color: #3d2914;
+}
+
+.leaderboard-table tr.my-row td {
+    background: rgba(255, 215, 0, 0.3);
+    font-weight: bold;
+}
+
+.leaderboard-table tr:nth-child(even) td {
+    background: rgba(255,255,255,0.3);
+}
+
+.leaderboard-table tr.my-row td { background: rgba(255,215,0,0.3); }
+
+.leaderboard-rank-1 td:first-child { color: #D4A017; font-size: 1.3em; }
+.leaderboard-rank-2 td:first-child { color: #808080; font-size: 1.15em; }
+.leaderboard-rank-3 td:first-child { color: #8B4513; }
+
+.leaderboard-placeholder {
+    text-align: center;
+    color: #8B4513;
+    padding: 20px;
+}
+
+/* 클라우드 저장 footer 버튼 */
+#cloud-save-btn, #leaderboard-btn {
+    background: linear-gradient(180deg, #E3F2FD, #BBDEFB);
+    border: 2px solid #1565C0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    color: #0D47A1;
+    min-height: 44px;
+    transition: all 0.2s;
+}
+
+#cloud-save-btn:hover, #leaderboard-btn:hover {
+    background: linear-gradient(180deg, #BBDEFB, #90CAF9);
+}
+
+#cloud-save-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* 반응형 */
+@media (max-width: 480px) {
+    .leaderboard-table th:nth-child(4),
+    .leaderboard-table td:nth-child(4) { display: none; } /* 인구 숨김 */
+    .leaderboard-actions { flex-direction: column; }
+    #leaderboard-nickname { width: 100%; }
+}

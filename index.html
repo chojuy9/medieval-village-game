@@ -10,6 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/leaderboard.css">
 </head>
 
 <body>
@@ -203,6 +204,27 @@
             </div>
         </section>
 
+        <section id="leaderboard-panel" aria-label="리더보드">
+            <h2 class="panel-toggle" data-target="leaderboard-body" aria-expanded="true">
+                🏆 리더보드 <span class="toggle-icon">▲</span>
+            </h2>
+            <div id="leaderboard-body" class="collapsible-content">
+                <div class="leaderboard-my-info" id="leaderboard-my-info">
+                    <span>내 UUID: <code id="my-uuid-display">로딩 중...</code></span>
+                    <button id="copy-uuid-btn" class="small-btn">📋 복사</button>
+                    <button id="change-uuid-btn" class="small-btn">🔄 UUID 변경</button>
+                </div>
+                <div class="leaderboard-actions">
+                    <input type="text" id="leaderboard-nickname" placeholder="닉네임 입력 (최대 30자)" maxlength="30">
+                    <button id="submit-score-btn" class="leaderboard-submit-btn">📤 점수 등록</button>
+                    <button id="refresh-leaderboard-btn" class="small-btn">🔄 새로고침</button>
+                </div>
+                <div id="leaderboard-table-container">
+                    <p class="leaderboard-placeholder">점수를 등록하거나 새로고침을 눌러보세요!</p>
+                </div>
+            </div>
+        </section>
+
         <!-- 왕실 조공 패널 -->
         <section id="tribute-panel" class="hidden" aria-label="왕실 조공">
             <h2 class="panel-toggle" data-target="tribute-body" aria-expanded="true">
@@ -262,6 +284,8 @@
             <button id="save-btn" aria-label="게임 저장">💾 저장</button>
             <button id="load-btn" aria-label="게임 불러오기">📂 불러오기</button>
             <button id="sound-toggle-btn" aria-label="사운드 토글">🔊</button>
+            <button id="cloud-save-btn">☁️ 클라우드</button>
+            <button id="leaderboard-btn">🏆 순위표</button>
             <span id="game-time">플레이 시간: 0분 0초</span>
         </footer>
     </div>
@@ -284,6 +308,7 @@
             <h2>⚙️ 게임 메뉴</h2>
             <div class="modal-buttons">
                 <button id="new-game-btn" class="modal-btn danger-btn">🆕 새 게임</button>
+                <button id="cloud-load-btn" class="modal-btn">☁️ 클라우드에서 불러오기</button>
                 <button id="close-menu-btn" class="modal-btn">✖ 닫기</button>
             </div>
             <!-- 새 게임 확인 패널 -->
@@ -338,6 +363,7 @@
     <script src="js/mercenary.js"></script>      <!-- 신규: game.js 전에 로드 -->
     <script src="js/config.js"></script>
     <script src="js/production.js"></script>
+    <script src="js/cloud-save.js"></script>
     <script src="js/game.js"></script>
     <script src="js/sound.js"></script>
     <script src="js/ui.js"></script>
@@ -348,6 +374,7 @@
     <script src="js/ui-events.js"></script>
     <script src="js/ui-tribute.js"></script>
     <script src="js/ui-mercenary.js"></script>
+    <script src="js/ui-leaderboard.js"></script>
     <script>
         // 게임 시작
         document.addEventListener('DOMContentLoaded', function () {
