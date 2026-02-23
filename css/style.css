@@ -469,7 +469,7 @@ section h2 {
 }
 
 .icon-wood::before {
-    content: 'W';
+    content: '🪵';
 }
 
 .icon-stone {
@@ -478,7 +478,7 @@ section h2 {
 }
 
 .icon-stone::before {
-    content: 'S';
+    content: '🪨';
 }
 
 .icon-food {
@@ -487,26 +487,26 @@ section h2 {
 }
 
 .icon-food::before {
-    content: 'F';
+    content: '🌾';
 }
 
 .icon-gold {
     color: #FFD700;
     font-weight: bold;
-}
-
-.icon-gold::before {
-    content: 'G';
     text-shadow: 1px 1px 0 #B8860B;
 }
 
-.icon-iron {
-    color: #708090;
+.icon-gold::before {
+    content: '💰';
+}
+
+.icon-lumber {
+    color: #8B4513;
     font-weight: bold;
 }
 
-.icon-iron::before {
-    content: 'I';
+.icon-lumber::before {
+    content: '🪓';
 }
 
 .icon-bread {
@@ -515,7 +515,7 @@ section h2 {
 }
 
 .icon-bread::before {
-    content: 'B';
+    content: '🍞';
 }
 
 .icon-tools {
@@ -524,26 +524,25 @@ section h2 {
 }
 
 .icon-tools::before {
-    content: 'T';
+    content: '⚒️';
 }
 
-.icon-herbs {
-    color: #228B22;
+.icon-furniture {
+    color: #8B4513;
     font-weight: bold;
 }
 
-.icon-herbs::before {
-    content: 'H';
+.icon-furniture::before {
+    content: '🪑';
 }
 
-.icon-cloth {
-    color: #F5F5DC;
+.icon-weapons {
+    color: #696969;
     font-weight: bold;
-    text-shadow: 1px 1px 0 #ccc;
 }
 
-.icon-cloth::before {
-    content: 'C';
+.icon-weapons::before {
+    content: '⚔️';
 }
 
 .icon-pop {

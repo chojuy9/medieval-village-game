@@ -340,96 +340,60 @@
     // 자원 정보 업데이트
     updateResources() {
       try {
-        // Tier 1 자원 동적 업데이트
-        const tier1Resources = window.Resources ? Resources.getByTier(1) : ['wood', 'stone', 'food', 'gold'];
+        const allResources = window.Resources ? Object.keys(Resources.getRegistry()) : ['wood', 'stone', 'food', 'gold', 'lumber', 'bread', 'tools', 'furniture', 'weapons'];
 
-        tier1Resources.forEach(type => {
+        // 생산량 계산 캐시
+        let production = {};
+        let consumption = {};
+        if (window.Buildings) {
+          production = Buildings.getTotalProduction();
+          consumption = this.getConsumptionRates();
+        }
+
+        allResources.forEach(type => {
+          // 1. 보유량 업데이트
           const amountEl = document.getElementById(`${type}-amount`);
           if (amountEl) {
             amountEl.textContent = Utils.formatNumber(Math.floor(Game.state.resources[type] || 0));
           }
-        });
 
-        // 생산량 표시
-        if (window.Buildings) {
-          const production = Buildings.getTotalProduction();
-          const consumption = this.getConsumptionRates();
-
-          tier1Resources.forEach(type => {
-            const rateEl = document.getElementById(`${type}-rate`);
-            if (!rateEl) return;
+          // 2. 생산/소비량(증감률) 업데이트
+          const rateEl = document.getElementById(`${type}-rate`);
+          if (rateEl) {
             const net = (production[type] || 0) - (consumption[type] || 0);
             const sign = net >= 0 ? '+' : '';
             rateEl.textContent = `${sign}${net.toFixed(1)}/초`;
-            rateEl.className = 'resource-rate ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'neutral');
-          });
-        }
+            rateEl.className = 'res-rate resource-rate ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'neutral');
+          }
 
-        // 2차/3차 자원 동적 표시
-        if (window.Resources && window.Buildings) {
-          const production = Buildings.getTotalProduction();
-          const consumption = this.getConsumptionRates();
+          // 3. (동적 표시) 자원 컨테이너가 숨겨져 있다면 로직에 따라 표시
+          // Phase 1-2 UI 구조에서는 자원이 항상 표시되도록 템플릿화되어 있으나,
+          // 만약 나중에 특정 조건 하에서만(예: 대장간 해금 후) 엘리먼트를 보이게 처리하고 싶다면 여기에서 parentElement의 display 조작 가능
+          if (amountEl) {
+            const parentItem = amountEl.closest('.res-item');
+            if (parentItem) {
+              // 예시: 티어 2 이상의 자원은 건물이 있거나 자원이 1 이상일 때만 표시
+              if (window.Resources) {
+                const registry = Resources.getRegistry();
+                const def = registry[type];
+                if (def && def.tier > 1) {
+                  const hasAnyResource = (Game.state.resources[type] || 0) >= 0.1;
+                  const hasTierBuilding = window.Buildings && Game.state.buildings.some(b => {
+                    const bDef = Buildings.definitions[b.type];
+                    return bDef && bDef.tier === def.tier;
+                  });
 
-          [2, 3].forEach(tier => {
-            const container = document.getElementById(`tier${tier}-resources`);
-            if (!container) return;
-
-            const tierResources = Resources.getByTier(tier);
-            // 해당 티어 건물이 있거나 자원이 1 이상인 경우 표시
-            const hasTierBuilding = Game.state.buildings.some(b => {
-              const def = Buildings.definitions[b.type];
-              return def && def.tier === tier;
-            });
-            const hasAnyResource = tierResources.some(type => (Game.state.resources[type] || 0) >= 0.1);
-
-            if (!hasTierBuilding && !hasAnyResource) {
-              container.style.display = 'none';
-              return;
+                  if (!hasTierBuilding && !hasAnyResource) {
+                    parentItem.style.display = 'none';
+                  } else {
+                    parentItem.style.display = 'flex';
+                  }
+                }
+              }
             }
+          }
+        });
 
-            container.style.display = '';
-
-            // 기존 자원 항목 제거 (tier-label은 유지)
-            const existingItems = container.querySelectorAll('.resource');
-            existingItems.forEach(item => item.remove());
-
-            tierResources.forEach(type => {
-              const amount = Math.floor(Game.state.resources[type] || 0);
-              const icon = Resources.getIcon(type);
-              const name = Resources.getName(type);
-
-              const div = document.createElement('div');
-              div.className = 'resource';
-
-              const iconSpan = document.createElement('span');
-              iconSpan.className = 'resource-icon';
-              iconSpan.textContent = icon;
-              div.appendChild(iconSpan);
-
-              const nameSpan = document.createElement('span');
-              nameSpan.className = 'resource-name';
-              nameSpan.textContent = name;
-              div.appendChild(nameSpan);
-
-              const rateSpan = document.createElement('span');
-              rateSpan.className = 'resource-rate';
-              rateSpan.id = `${type}-rate`;
-              const net = (production[type] || 0) - (consumption[type] || 0);
-              const sign = net >= 0 ? '+' : '';
-              rateSpan.textContent = `${sign}${net.toFixed(1)}/초`;
-              rateSpan.classList.add(net > 0 ? 'positive' : net < 0 ? 'negative' : 'neutral');
-              div.appendChild(rateSpan);
-
-              const amountSpan = document.createElement('span');
-              amountSpan.className = 'resource-amount';
-              amountSpan.id = `${type}-amount`;
-              amountSpan.textContent = Utils.formatNumber(amount);
-              div.appendChild(amountSpan);
-
-              container.appendChild(div);
-            });
-          });
-        }
       } catch (error) {
         console.error('[UI.updateResources] 자원 UI 업데이트 실패:', error);
       }
