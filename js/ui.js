@@ -202,7 +202,7 @@
         this._tradeControlsInitialized = false;
 
         this.updateAll();
-        
+
       } catch (error) {
         console.error('[UI.init] UI 초기화 실패:', error);
       }
@@ -1042,7 +1042,7 @@
           }, 5000);
         }
 
-        
+
       } catch (error) {
         console.error('[UI.onEventTriggered] 이벤트 배너 표시 실패:', error);
       }
@@ -1061,7 +1061,7 @@
           this._eventBannerInterval = null;
         }
 
-        
+
       } catch (error) {
         console.error('[UI.onEventResolved] 이벤트 배너 숨김 실패:', error);
       }
@@ -1743,7 +1743,7 @@
           nightwatchToggle.addEventListener('change', (e) => {
             if (!window.Game) return;
             const enabled = e.target.checked;
-            const result = Game.toggleNightwatch ? Game.toggleNightwatch(enabled) : { success: false };
+            const result = Game.toggleNightWatch ? Game.toggleNightWatch(enabled) : { success: false };
             if (!result.success) {
               e.target.checked = false;
               this.showMessage('금화가 부족하여 야경대를 고용할 수 없습니다.', 'error');
@@ -1770,7 +1770,7 @@
           this.updateBreadWarning();
         }, 1000);
 
-        
+
       } catch (error) {
         console.error('[UI.initGoldSinkButtons] 금화 소비처 버튼 초기화 실패:', error);
       }
