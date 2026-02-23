@@ -23,14 +23,19 @@
             <button id="menu-btn" aria-label="게임 메뉴">⚙️</button>
         </header>
 
-        <!-- 계절 표시 배너 -->
-        <div id="season-banner" aria-label="현재 계절">
-            <span id="season-name">🌸 봄</span>
-            <div class="season-progress">
-                <div class="season-progress-bar" id="season-progress-bar"></div>
+        <!-- 상태 바 (Status Bar) -->
+        <div id="status-container" class="status-stack">
+            <!-- 계절 정보 (Season) -->
+            <div id="status-bar" class="season-block spring">
+                <span class="season-icon" id="season-icon"></span>
+                <span id="season-name">봄</span>
+            </div>
+
+            <!-- 플레이 타임 (Play Time) -->
+            <div id="time-block" class="time-block">
+                <span>⏱️ <span id="game-time">0일째 00:00</span></span>
             </div>
         </div>
-
         <!-- 이벤트 배너 -->
         <div id="event-banner" class="hidden" aria-live="polite" aria-label="이벤트 알림">
             <div class="event-content">
@@ -51,257 +56,293 @@
             </div>
         </div>
 
-        <!-- 자원 표시 영역 (티어별 그룹) -->
-        <section id="resources-panel" aria-label="자원 현황">
-            <!-- 1차 자원 (원자재) -->
-            <div class="resource-group" data-tier="1">
-                <h3 class="tier-label">⛏️ 원자재</h3>
-                <div class="resource">
-                    <span class="resource-icon">🪵</span>
-                    <span class="resource-name">목재</span>
-                    <span class="resource-rate" id="wood-rate"></span>
-                    <span class="resource-amount" id="wood-amount">0</span>
-                </div>
-                <div class="resource">
-                    <span class="resource-icon">🪨</span>
-                    <span class="resource-name">석재</span>
-                    <span class="resource-rate" id="stone-rate"></span>
-                    <span class="resource-amount" id="stone-amount">0</span>
-                </div>
-                <div class="resource">
-                    <span class="resource-icon">🌾</span>
-                    <span class="resource-name">식량</span>
-                    <span class="resource-rate" id="food-rate"></span>
-                    <span class="resource-amount" id="food-amount">0</span>
-                    <!-- v0.3 AI2 - 긴급 보급 버튼 -->
-                    <button id="btn-emergency-supply" class="action-btn supply-btn" title="금화 50 소모 | 식량 +150 즉시 지급">
-                        🚑 긴급 보급
-                    </button>
-                </div>
-                <div class="resource">
-                    <span class="resource-icon">💰</span>
-                    <span class="resource-name">금화</span>
-                    <span class="resource-rate" id="gold-rate"></span>
-                    <span class="resource-amount" id="gold-amount">0</span>
-                </div>
+        <!-- 자원 표시 영역 (한 줄 압축) -->
+        <div id="resource-bar" aria-label="자원 현황">
+            <div class="res-item">
+                <span class="resource-icon icon-wood"></span>
+                <span class="res-val resource-amount" id="wood-amount">0</span>
+                <span class="res-rate resource-rate" id="wood-rate"></span>
             </div>
-            <!-- 2차 자원 (가공품) - JS 동적 생성 -->
-            <div class="resource-group" data-tier="2" id="tier2-resources" style="display: none;">
-                <h3 class="tier-label">⚙️ 가공품</h3>
-                <!-- 목재(제재소), 빵(제분소), 도구(대장간) 등 -->
+            <div class="res-item">
+                <span class="resource-icon icon-stone"></span>
+                <span class="res-val resource-amount" id="stone-amount">0</span>
+                <span class="res-rate resource-rate" id="stone-rate"></span>
             </div>
-            <!-- 3차 자원 (완제품) - JS 동적 생성 -->
-            <div class="resource-group" data-tier="3" id="tier3-resources" style="display: none;">
-                <h3 class="tier-label">🏷️ 완제품</h3>
-                <!-- 가구, 무기 등 -->
+            <div class="res-item">
+                <span class="resource-icon icon-food"></span>
+                <span class="res-val resource-amount" id="food-amount">0</span>
+                <span class="res-rate resource-rate" id="food-rate"></span>
+                <!-- 긴급 보급 버튼은 일단 제거하거나 모달/단축키로 빼야함. 공간상 여기엔 부적합. 마을 탭 빵경고 옆으로 이동함 -->
             </div>
-        </section>
+            <div class="res-item">
+                <span class="resource-icon icon-gold"></span>
+                <span class="res-val resource-amount" id="gold-amount">0</span>
+                <span class="res-rate resource-rate" id="gold-rate"></span>
+            </div>
+            <div class="res-item">
+                <span class="resource-icon icon-iron"></span>
+                <span class="res-val resource-amount" id="iron-amount">0</span>
+                <span class="res-rate resource-rate" id="iron-rate"></span>
+            </div>
+            <div class="res-item">
+                <span class="resource-icon icon-bread"></span>
+                <span class="res-val resource-amount" id="bread-amount">0</span>
+                <span class="res-rate resource-rate" id="bread-rate"></span>
+            </div>
+            <div class="res-item">
+                <span class="resource-icon icon-tools"></span>
+                <span class="res-val resource-amount" id="tools-amount">0</span>
+                <span class="res-rate resource-rate" id="tools-rate"></span>
+            </div>
+            <div class="res-item">
+                <span class="resource-icon icon-herbs"></span>
+                <span class="res-val resource-amount" id="herbs-amount">0</span>
+                <span class="res-rate resource-rate" id="herbs-rate"></span>
+            </div>
+            <div class="res-item">
+                <span class="resource-icon icon-cloth"></span>
+                <span class="res-val resource-amount" id="cloth-amount">0</span>
+                <span class="res-rate resource-rate" id="cloth-rate"></span>
+            </div>
 
-        <!-- 인구 표시 영역 -->
-        <section id="population-panel">
-            <div class="stat">
-                <span>👥 인구:</span>
-                <span id="current-population">0</span> /
-                <span id="max-population">0</span>
-            </div>
-            <div class="stat">
-                <span>💤 유휴:</span>
-                <span id="idle-population">0</span>
-            </div>
-            <div class="stat">
-                <span>⚒️ 고용:</span>
-                <span id="employed-population">0</span>
-            </div>
-        </section>
+            <div class="res-divider"></div>
 
-        <!-- 행복도 표시 영역 -->
-        <section id="happiness-panel" aria-label="행복도">
-            <div class="happiness-header">
-                <span>😊 행복도</span>
-                <span id="happiness-value">50</span>
+            <div class="res-item population">
+                <span class="resource-icon icon-pop"></span>
+                <span class="res-val" id="current-population">0</span>
+                <span>/</span>
+                <span class="res-val" id="max-population">0</span>
             </div>
-            <div class="happiness-bar-container">
-                <div class="happiness-bar" id="happiness-bar" style="width: 50%"></div>
-            </div>
-            <div class="happiness-factors" id="happiness-factors">
-                <!-- JS로 동적 생성 -->
-            </div>
-            <!-- v0.3 AI2 - 마을 잔치 버튼 -->
-            <div style="margin-top: 12px;">
-                <button id="btn-feast" class="action-btn feast-btn" title="금화 80 소모 | 행복도 +25 (120초 쿨다운)">
-                    🎉 마을 잔치 개최
-                </button>
-            </div>
-            <!-- v0.3 AI2 - 빵 부족 경고 메시지 -->
-            <div class="warning-message" id="bread-warning" style="display:none">
-                🍞 빵 부족 — 인구 성장 속도 감소 중
-            </div>
-        </section>
+        </div>
 
-        <!-- 건물 건설 버튼 영역 -->
-        <section id="buildings-panel">
-            <h2 class="panel-toggle" data-target="building-buttons" aria-expanded="true">
-                건물 건설 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="building-buttons" class="collapsible-content">
-                <!-- JavaScript로 동적 생성 -->
-            </div>
-        </section>
+        <!-- 탭 네비게이션 -->
+        <nav id="tab-nav">
+            <button class="tab-btn active" data-tab="build">
+                <span class="tab-icon">🏗️</span>
+                <span class="tab-label">건설</span>
+            </button>
+            <button class="tab-btn" data-tab="village">
+                <span class="tab-icon">🏘️</span>
+                <span class="tab-label">마을</span>
+            </button>
+            <button class="tab-btn" data-tab="economy">
+                <span class="tab-icon">💰</span>
+                <span class="tab-label">경제</span>
+            </button>
+            <button class="tab-btn" data-tab="research">
+                <span class="tab-icon">📚</span>
+                <span class="tab-label">연구</span>
+            </button>
+            <button class="tab-btn" data-tab="records">
+                <span class="tab-icon">🏆</span>
+                <span class="tab-label">기록</span>
+            </button>
+        </nav>
 
-        <!-- 건설된 건물 목록 -->
-        <section id="built-buildings-panel">
-            <h2 class="panel-toggle" data-target="built-buildings-list" aria-expanded="true">
-                건설된 건물 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="built-buildings-list" class="collapsible-content">
-                <!-- JavaScript로 동적 생성 -->
-            </div>
-        </section>
+        <!-- 탭 콘텐츠 영역 -->
+        <div id="tab-content-area">
 
-        <!-- 교역 패널 -->
-        <section id="trade-panel" class="hidden" aria-label="교역">
-            <h2 class="panel-toggle" data-target="trade-controls" aria-expanded="true">
-                🔄 교역 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="trade-controls" class="collapsible-content">
-                <div class="trade-row">
-                    <label>판매 자원:</label>
-                    <select id="trade-sell-type">
+            <!-- 탭 1: 건설 -->
+            <div id="tab-build" class="tab-content active">
+                <div class="tab-section" id="buildings-panel">
+                    <h3>🏗️ 건물 건설</h3>
+                    <div id="building-categories" class="achievement-tabs">
+                        <button class="ach-tab active" data-category="resource">자원</button>
+                        <button class="ach-tab" data-category="housing">주거</button>
+                        <button class="ach-tab" data-category="economy">경제</button>
+                        <button class="ach-tab" data-category="civic">공공/군사</button>
+                    </div>
+                    <div id="building-buttons">
                         <!-- JavaScript로 동적 생성 -->
-                    </select>
-                    <input type="number" id="trade-sell-amount" value="10" min="1" max="1000">
-                    <div class="trade-quick-btns">
-                        <button class="trade-quick-btn" data-amount="10">10</button>
-                        <button class="trade-quick-btn" data-amount="50">50</button>
-                        <button class="trade-quick-btn" data-amount="100">100</button>
                     </div>
                 </div>
-                <div class="trade-row">
-                    <label>구매 자원:</label>
-                    <select id="trade-buy-type">
+                <div class="tab-section" id="built-buildings-panel">
+                    <h3>🏡 건설된 건물</h3>
+                    <div id="built-buildings-list">
                         <!-- JavaScript로 동적 생성 -->
-                    </select>
-                </div>
-                <div class="trade-info">
-                    <div class="trade-rate" id="trade-rate">교환 비율: 1:1</div>
-                    <div class="trade-preview" id="trade-preview">획득: 0</div>
-                </div>
-                <button id="trade-execute-btn" class="trade-btn">교환 실행</button>
-            </div>
-        </section>
-
-        <!-- 연구 패널 -->
-        <section id="research-panel" class="hidden" aria-label="연구">
-            <h2 class="panel-toggle" data-target="research-body" aria-expanded="true">
-                📚 연구소 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="research-body" class="collapsible-content">
-                <div class="research-placeholder" id="research-placeholder">
-                    <span>🏫</span>
-                    <p>학교를 건설하면 연구가 가능합니다</p>
-                </div>
-                <div id="research-tree" class="research-grid">
-                    <!-- JavaScript로 동적 생성 -->
-                </div>
-                <div id="research-progress-bar" class="progress-bar hidden">
-                    <div class="progress-fill" id="research-progress-fill"></div>
-                    <span class="progress-label" id="research-progress-label"></span>
-                </div>
-            </div>
-        </section>
-
-        <!-- 업적 패널 -->
-        <section id="achievements-panel" aria-label="업적">
-            <h2 class="panel-toggle" data-target="achievements-list" aria-expanded="true">
-                🏆 업적 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="achievements-list" class="collapsible-content">
-                <!-- JavaScript로 동적 생성 -->
-            </div>
-        </section>
-
-        <section id="leaderboard-panel" aria-label="리더보드">
-            <h2 class="panel-toggle" data-target="leaderboard-body" aria-expanded="true">
-                🏆 리더보드 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="leaderboard-body" class="collapsible-content">
-                <div class="leaderboard-my-info" id="leaderboard-my-info">
-                    <span>내 UUID: <code id="my-uuid-display">로딩 중...</code></span>
-                    <button id="copy-uuid-btn" class="small-btn">📋 복사</button>
-                    <button id="change-uuid-btn" class="small-btn">🔄 UUID 변경</button>
-                </div>
-                <div class="leaderboard-actions">
-                    <input type="text" id="leaderboard-nickname" placeholder="닉네임 입력 (최대 30자)" maxlength="30">
-                    <button id="submit-score-btn" class="leaderboard-submit-btn">📤 점수 등록</button>
-                    <button id="refresh-leaderboard-btn" class="small-btn">🔄 새로고침</button>
-                </div>
-                <div id="leaderboard-table-container">
-                    <p class="leaderboard-placeholder">점수를 등록하거나 새로고침을 눌러보세요!</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- 왕실 조공 패널 -->
-        <section id="tribute-panel" class="hidden" aria-label="왕실 조공">
-            <h2 class="panel-toggle" data-target="tribute-body" aria-expanded="true">
-                👑 왕실 조공 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="tribute-body" class="collapsible-content">
-                <div id="tribute-grid" class="tribute-grid">
-                    <!-- JavaScript로 동적 생성 -->
-                </div>
-            </div>
-        </section>
-
-        <!-- 용병 고용 패널 -->
-        <section id="mercenary-panel" class="hidden" aria-label="용병 고용">
-            <h2 class="panel-toggle" data-target="mercenary-body" aria-expanded="true">
-                ⚔️ 용병 고용 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="mercenary-body" class="collapsible-content">
-                <div class="defense-status">
-                    <span>🛡️ 현재 방어력: <strong id="defense-bonus">0%</strong></span>
-                </div>
-                <!-- v0.3 AI2 - 야경대 토글 -->
-                <div class="toggle-container">
-                    <label class="toggle-label">
-                        <input type="checkbox" id="toggle-nightwatch" />
-                        💂 야경대 고용 (금화 5/초)
-                    </label>
-                    <span id="nightwatch-status" class="status-text"></span>
-                </div>
-                <div id="mercenary-grid" class="mercenary-grid">
-                    <!-- JavaScript로 동적 생성 -->
-                </div>
-            </div>
-        </section>
-
-        <!-- 통계 패널 (Phase 2 준비) -->
-        <section id="stats-panel" class="hidden" aria-label="통계">
-            <h2 class="panel-toggle" data-target="stats-body" aria-expanded="true">
-                📊 마을 통계 <span class="toggle-icon">▲</span>
-            </h2>
-            <div id="stats-body" class="collapsible-content">
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <span class="stat-label">총 플레이 시간</span>
-                        <span class="stat-value" id="stat-playtime">0분</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">건설한 건물</span>
-                        <span class="stat-value" id="stat-buildings-built">0개</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">최대 인구</span>
-                        <span class="stat-value" id="stat-max-population">0명</span>
-                    </div>
-                    <div class="stat-item">
-                        <span class="stat-label">달성 업적</span>
-                        <span class="stat-value" id="stat-achievements">0개</span>
                     </div>
                 </div>
             </div>
-        </section>
+
+            <!-- 탭 2: 마을 -->
+            <div id="tab-village" class="tab-content">
+                <div class="tab-section" id="population-panel">
+                    <h3>👥 인구</h3>
+                    <div class="stat">
+                        <span>💤 유휴:</span>
+                        <span id="idle-population">0</span>
+                    </div>
+                    <div class="stat">
+                        <span>⚒️ 고용:</span>
+                        <span id="employed-population">0</span>
+                    </div>
+                </div>
+
+                <div class="tab-section" id="happiness-panel">
+                    <div class="happiness-header">
+                        <h3>😊 행복도 <span id="happiness-value">50</span></h3>
+                    </div>
+                    <div class="happiness-bar-container">
+                        <div class="happiness-bar" id="happiness-bar" style="width: 50%"></div>
+                    </div>
+                    <div class="happiness-factors" id="happiness-factors">
+                        <!-- JS로 동적 생성 -->
+                    </div>
+                    <div style="margin-top: 12px; display: flex; gap: 8px;">
+                        <button id="btn-feast" class="action-btn feast-btn" title="금화 80 소모 | 행복도 +25 (120초 쿨다운)">
+                            🎉 마을 잔치 개최
+                        </button>
+                        <button id="btn-emergency-supply" class="action-btn supply-btn"
+                            title="금화 50 소모 | 식량 +150 즉시 지급">
+                            🚑 긴급 보급
+                        </button>
+                    </div>
+                    <div class="warning-message" id="bread-warning" style="display:none">
+                        🍞 빵 부족 — 인구 성장 속도 감소 중
+                    </div>
+                </div>
+
+                <div class="tab-section" id="tribute-panel">
+                    <h3>👑 왕실 조공</h3>
+                    <div id="tribute-body">
+                        <div id="tribute-grid" class="tribute-grid">
+                            <!-- JavaScript로 동적 생성 -->
+                        </div>
+                    </div>
+                </div>
+
+                <div class="tab-section" id="mercenary-panel">
+                    <h3>⚔️ 용병 고용</h3>
+                    <div id="mercenary-body">
+                        <div class="defense-status">
+                            <span>🛡️ 현재 방어력: <strong id="defense-bonus">0%</strong></span>
+                        </div>
+                        <div class="toggle-container">
+                            <label class="toggle-label">
+                                <input type="checkbox" id="toggle-nightwatch" />
+                                💂 야경대 고용 (금화 5/초)
+                            </label>
+                            <span id="nightwatch-status" class="status-text"></span>
+                        </div>
+                        <div id="mercenary-grid" class="mercenary-grid">
+                            <!-- JavaScript로 동적 생성 -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탭 3: 경제 -->
+            <div id="tab-economy" class="tab-content">
+                <div class="tab-section" id="trade-panel">
+                    <h3>🔄 교역</h3>
+                    <div id="trade-controls">
+                        <div class="trade-row">
+                            <label>판매 자원:</label>
+                            <select id="trade-sell-type">
+                                <!-- JavaScript로 동적 생성 -->
+                            </select>
+                            <input type="number" id="trade-sell-amount" value="10" min="1" max="1000">
+                            <div class="trade-quick-btns">
+                                <button class="trade-quick-btn" data-amount="10">10</button>
+                                <button class="trade-quick-btn" data-amount="50">50</button>
+                                <button class="trade-quick-btn" data-amount="100">100</button>
+                            </div>
+                        </div>
+                        <div class="trade-row">
+                            <label>구매 자원:</label>
+                            <select id="trade-buy-type">
+                                <!-- JavaScript로 동적 생성 -->
+                            </select>
+                        </div>
+                        <div class="trade-info">
+                            <div class="trade-rate" id="trade-rate">교환 비율: 1:1</div>
+                            <div class="trade-preview" id="trade-preview">획득: 0</div>
+                        </div>
+                        <button id="trade-execute-btn" class="trade-btn">교환 실행</button>
+                    </div>
+                </div>
+
+                <div class="tab-section" id="stats-panel">
+                    <h3>📊 마을 통계</h3>
+                    <div id="stats-body">
+                        <div class="stats-grid">
+                            <div class="stat-item">
+                                <span class="stat-label">총 플레이 시간</span>
+                                <span class="stat-value" id="stat-playtime">0분</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">건설한 건물</span>
+                                <span class="stat-value" id="stat-buildings-built">0개</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">최대 인구</span>
+                                <span class="stat-value" id="stat-max-population">0명</span>
+                            </div>
+                            <div class="stat-item">
+                                <span class="stat-label">달성 업적</span>
+                                <span class="stat-value" id="stat-achievements">0개</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탭 4: 연구 -->
+            <div id="tab-research" class="tab-content">
+                <div class="tab-section" id="research-panel">
+                    <h3>🔬 연구소</h3>
+                    <div id="research-body">
+                        <div class="research-placeholder" id="research-placeholder">
+                            <span>🏫</span>
+                            <p>학교를 건설하면 연구가 가능합니다</p>
+                        </div>
+                        <div id="research-tree" class="research-grid">
+                            <!-- JavaScript로 동적 생성 -->
+                        </div>
+                        <div id="research-progress-bar" class="progress-bar hidden">
+                            <div class="progress-fill" id="research-progress-fill"></div>
+                            <span class="progress-label" id="research-progress-label"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 탭 5: 기록 -->
+            <div id="tab-records" class="tab-content">
+                <div class="tab-section" id="achievements-panel">
+                    <h3>🏆 업적</h3>
+                    <div id="achievements-list">
+                        <!-- JavaScript로 동적 생성 -->
+                    </div>
+                </div>
+
+                <div class="tab-section" id="leaderboard-panel">
+                    <h3>🏆 리더보드</h3>
+                    <div id="leaderboard-body">
+                        <div class="leaderboard-my-info" id="leaderboard-my-info">
+                            <span>내 UUID: <code id="my-uuid-display">로딩 중...</code></span>
+                            <button id="copy-uuid-btn" class="small-btn">📋 복사</button>
+                            <button id="change-uuid-btn" class="small-btn">🔄 UUID 변경</button>
+                        </div>
+                        <div class="leaderboard-actions">
+                            <input type="text" id="leaderboard-nickname" placeholder="닉네임 입력 (최대 30자)" maxlength="30">
+                            <button id="submit-score-btn" class="leaderboard-submit-btn">📤 점수 등록</button>
+                            <button id="refresh-leaderboard-btn" class="small-btn">🔄 새로고침</button>
+                        </div>
+                        <div id="leaderboard-table-container">
+                            <p class="leaderboard-placeholder">점수를 등록하거나 새로고침을 눌러보세요!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 하단 고정 이벤트 로그 -->
+        <div id="event-log">
+            <div id="event-log-messages">
+            </div>
+        </div>
 
         <!-- 하단 정보 -->
         <footer>
@@ -310,7 +351,6 @@
             <button id="sound-toggle-btn" aria-label="사운드 토글">🔊</button>
             <button id="cloud-save-btn">☁️ 클라우드</button>
             <button id="leaderboard-btn">🏆 순위표</button>
-            <span id="game-time">플레이 시간: 0분 0초</span>
         </footer>
     </div>
 

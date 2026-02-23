@@ -48,7 +48,11 @@
           },
           seasonChanged: (e) => {
             if (e.detail && e.detail.season) {
-              this.applySeasonBackground(e.detail.season.id);
+              const banner = document.getElementById('status-bar'); // Now the season block
+              if (banner) {
+                banner.classList.remove('spring', 'summer', 'autumn', 'winter');
+                banner.classList.add(e.detail.season.id);
+              }
             }
           },
           happinessChanged: () => this.updateHappiness(),
@@ -183,8 +187,8 @@
           btn.classList.toggle('muted', !enabled);
         });
 
-        // 패널 접기/펼치기 토글 초기화
-        this.initPanelToggles();
+        // 탭 네비게이션 초기화
+        this.initTabNavigation();
 
         // v0.3 AI2 - 금화 소비처 버튼 이벤트 핸들러
         this.initGoldSinkButtons();
@@ -194,7 +198,11 @@
         if (window.Seasons) {
           const initSeason = Seasons.getCurrentSeason(Game.state.stats.gameTime);
           if (initSeason) {
-            this.applySeasonBackground(initSeason.id);
+            const banner = document.getElementById('status-bar'); // Now the season block
+            if (banner) {
+              banner.classList.remove('spring', 'summer', 'autumn', 'winter');
+              banner.classList.add(initSeason.id);
+            }
           }
         }
 
@@ -208,54 +216,30 @@
       }
     },
 
-    // 패널 접기/펼치기 초기화
-    initPanelToggles() {
-      const STORAGE_KEY = 'panelCollapsed';
-
-      // 저장된 접힘 상태 불러오기
-      let collapsed = {};
+    // 탭 네비게이션 초기화
+    initTabNavigation() {
       try {
-        collapsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || '{}');
-      } catch (e) {
-        collapsed = {};
-      }
+        const tabBtns = document.querySelectorAll('.tab-btn');
+        const tabContents = document.querySelectorAll('.tab-content');
 
-      // 저장 헬퍼
-      const saveState = () => {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(collapsed));
-        } catch (e) { }
-      };
+        tabBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            // 다른 탭 비활성화
+            tabBtns.forEach(b => b.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
 
-      // 토글 적용 함수
-      const applyToggle = (header, content, isCollapsed) => {
-        if (isCollapsed) {
-          content.classList.add('collapsed');
-          header.setAttribute('aria-expanded', 'false');
-        } else {
-          content.classList.remove('collapsed');
-          header.setAttribute('aria-expanded', 'true');
-        }
-      };
-
-      // 모든 .panel-toggle 헤더에 이벤트 부착
-      document.querySelectorAll('.panel-toggle').forEach((header) => {
-        const targetId = header.dataset.target;
-        const content = document.getElementById(targetId);
-        if (!content) return;
-
-        // 저장된 상태 복원
-        if (collapsed[targetId]) {
-          applyToggle(header, content, true);
-        }
-
-        header.addEventListener('click', () => {
-          const isNowCollapsed = !content.classList.contains('collapsed');
-          applyToggle(header, content, isNowCollapsed);
-          collapsed[targetId] = isNowCollapsed;
-          saveState();
+            // 클릭된 탭 활성화
+            btn.classList.add('active');
+            const tabId = btn.getAttribute('data-tab');
+            const targetContent = document.getElementById(`tab-${tabId}`);
+            if (targetContent) {
+              targetContent.classList.add('active');
+            }
+          });
         });
-      });
+      } catch (error) {
+        console.error('[UI.initTabNavigation] 탭 네비게이션 초기화 실패:', error);
+      }
     },
 
     // 메뉴 열기
@@ -287,8 +271,69 @@
         this.updateMercenaryPanel();
         this.updateStatsPanel();
         this.checkTutorialTriggers();
+        this.updateTabBadges();
       } catch (error) {
         console.error('[UI.updateAll] UI 업데이트 실패:', error);
+      }
+    },
+
+    // 탭 배지 업데이트 (새 건물 해금, 새 연구 등)
+    updateTabBadges() {
+      try {
+        if (!window.Game || !Game.state) return;
+
+        // 건설 탭 배지 (해금되었지만 아직 하나도 안 지은 건물이 있는지)
+        let newBuildings = 0;
+        if (window.Buildings && window.Buildings.definitions) {
+          for (const type of Object.keys(Buildings.definitions)) {
+            if (Buildings.isUnlocked(type) && Game.getBuildingCount(type) === 0) {
+              newBuildings++;
+            }
+          }
+        }
+
+        // 마을 탭 배지 (여유 일꾼이 있는지)
+        const idleWorkers = Game.state.population.idle > 0 ? 1 : 0;
+
+        // 연구소 탭 배지 (새로 연구 가능한 항목이 있는지)
+        let availableResearch = 0;
+        if (window.Research && typeof Research.getTree === 'function') {
+          const tree = Research.getTree();
+          const completed = Game.state.research?.completed || [];
+          const current = Game.state.research?.current;
+          for (const [id, tech] of Object.entries(tree)) {
+            const isCompleted = completed.includes(id);
+            const isAvailable = !isCompleted && (tech.requires || []).every(r => completed.includes(r));
+            if (isAvailable && current !== id) {
+              availableResearch++;
+            }
+          }
+        }
+
+        // DOM 업데이트 헬퍼 함수
+        const updateBadge = (tabId, count) => {
+          const btn = document.querySelector(`.tab-btn[data-tab="${tabId}"]`);
+          if (!btn) return;
+
+          let badge = btn.querySelector('.tab-badge');
+          if (count > 0) {
+            if (!badge) {
+              badge = document.createElement('span');
+              badge.className = 'tab-badge';
+              btn.appendChild(badge);
+            }
+            badge.textContent = count > 9 ? '9+' : count;
+          } else if (badge) {
+            badge.remove();
+          }
+        };
+
+        updateBadge('build', newBuildings);
+        updateBadge('village', idleWorkers);
+        updateBadge('research', availableResearch);
+
+      } catch (error) {
+        console.error('[UI.updateTabBadges] 탭 배지 업데이트 실패:', error);
       }
     },
 
@@ -504,23 +549,39 @@
         const gameTime = Game.state.stats.gameTime;
         const season = Seasons.getCurrentSeason(gameTime);
         const index = Seasons.getCurrentSeasonIndex(gameTime);
-        const banner = document.getElementById('season-banner');
+        const banner = document.getElementById('status-bar'); // Now the season block
         const nameEl = document.getElementById('season-name');
-        const progressBar = document.getElementById('season-progress-bar');
+        const iconEl = document.getElementById('season-icon');
 
-        if (!season) return;
+        if (!season || !banner || !nameEl) return;
 
         nameEl.textContent = season.name;
-        banner.className = season.id;
+        iconEl.textContent = this.getSeasonIcon(season.id);
+
+        // Remove existing season classes and add current
+        banner.classList.remove('spring', 'summer', 'autumn', 'winter');
+        banner.classList.add(season.id);
 
         // 현재 계절 내 진행률
         const cycleTime = gameTime % (Seasons.SEASON_DURATION * 4);
         const seasonStart = index * Seasons.SEASON_DURATION;
         const progress = ((cycleTime - seasonStart) / Seasons.SEASON_DURATION) * 100;
-        progressBar.style.width = `${Math.min(100, Math.max(0, progress))}%`;
+
+        banner.style.setProperty('--season-progress', `${Math.min(100, Math.max(0, progress))}%`);
       } catch (error) {
         console.error('[UI.updateSeason] 계절 UI 업데이트 실패:', error);
       }
+    },
+
+    // Helper to get season icon since it's removed from text directly
+    getSeasonIcon(seasonId) {
+      const icons = {
+        'spring': '🌸',
+        'summer': '☀️',
+        'autumn': '🍂',
+        'winter': '❄️'
+      };
+      return icons[seasonId] || '🌸';
     },
 
     // 건물 버튼 생성
@@ -530,6 +591,8 @@
         container.innerHTML = '';
 
         // Buildings.definitions 순회
+        let anyUnlockedAndAffordable = false;
+
         for (const [type, building] of Object.entries(Buildings.definitions)) {
           const isUnlocked = Buildings.isUnlocked(type);
           const button = document.createElement('button');
@@ -538,6 +601,8 @@
           // 해금 상태에 따른 클래스 추가
           if (!isUnlocked) {
             button.classList.add('locked');
+          } else {
+            anyUnlockedAndAffordable = true;
           }
 
           button.setAttribute('data-building-type', type);
@@ -554,8 +619,8 @@
           costDiv.className = 'building-cost';
           const costEntries = Object.entries(building.cost).filter(([, v]) => v > 0);
           if (costEntries.length > 0) {
-            const costs = costEntries.map(([type, amount]) =>
-              `${Utils.getResourceIcon(type)} ${amount}`
+            const costs = costEntries.map(([resType, amount]) =>
+              `${Utils.getResourceIcon(resType)} ${amount}`
             );
             costDiv.textContent = `비용: ${costs.join(', ')}`;
           } else {
@@ -602,6 +667,15 @@
           // 초기 해금 상태 캐시 저장
           this._unlockedCache[type] = isUnlocked;
         }
+
+        // 비어있다면 메시지
+        if (Object.keys(Buildings.definitions).length === 0) {
+          const emptyMsg = document.createElement('div');
+          emptyMsg.className = 'empty-state-message';
+          emptyMsg.textContent = '건설 가능한 건물이 없습니다.';
+          container.appendChild(emptyMsg);
+        }
+
       } catch (error) {
         console.error('[UI.createBuildingButtons] 건물 버튼 생성 실패:', error);
       }
@@ -698,6 +772,8 @@
             button.disabled = !canBuild;
           }
         });
+
+        this.updateTabBadges();
       } catch (error) {
         console.error('[UI.updateBuildingButtons] 건물 버튼 상태 업데이트 실패:', error);
       }
@@ -955,8 +1031,42 @@
         this.messageTimer = setTimeout(() => {
           messageBox.className = 'hidden';
         }, 3000);
+
+        // 이벤트 로그 패널에도 메시지 추가 (Phase 1-2 신규 기능)
+        this.addLogMessage(text, type);
       } catch (error) {
         console.error('[UI.showMessage] 메시지 표시 실패:', error);
+      }
+    },
+
+    // 하단 고정 이벤트 로그 갱신 (Phase 1-2 신규 기능)
+    addLogMessage(text, type) {
+      try {
+        const logContainer = document.getElementById('event-log-messages');
+        if (!logContainer) return;
+
+        const p = document.createElement('p');
+        p.textContent = `[${new Date().toLocaleTimeString()}] ${text}`;
+
+        // 타입별 클래스 부여
+        if (type === 'success') p.className = 'log-positive';
+        else if (type === 'error') p.className = 'log-negative';
+        else if (type === 'warning') p.className = 'log-warning';
+
+        logContainer.appendChild(p);
+
+        // 스크롤 최하단으로 유지
+        const eventLog = document.getElementById('event-log');
+        if (eventLog) {
+          eventLog.scrollTop = eventLog.scrollHeight;
+        }
+
+        // 최대 50개 유지 (메모리 제한)
+        while (logContainer.children.length > 50) {
+          logContainer.removeChild(logContainer.firstChild);
+        }
+      } catch (error) {
+        console.error('[UI.addLogMessage] 이벤트 로그 추가 실패:', error);
       }
     },
 

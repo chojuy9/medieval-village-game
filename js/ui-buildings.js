@@ -3,6 +3,9 @@
 
     // UI 객체에 건물 관련 메서드 추가
     Object.assign(UI, {
+        _buildingCatInit: false,
+        _currentBuildingCategory: 'resource',
+
         // 건물 버튼 생성
         createBuildingButtons() {
             try {
@@ -21,7 +24,14 @@
                     }
 
                     button.setAttribute('data-building-type', type);
+                    button.setAttribute('data-category', building.category || 'resource');
                     button.setAttribute('aria-label', `${building.name} 건설하기`);
+
+                    // 현재 카테고리와 다르면 숨기기
+                    if (building.category !== this._currentBuildingCategory &&
+                        !(building.category === undefined && this._currentBuildingCategory === 'resource')) {
+                        button.style.display = 'none';
+                    }
 
                     // 건물 이름
                     const nameDiv = document.createElement('div');
@@ -82,8 +92,60 @@
                     // 초기 해금 상태 캐시 저장
                     this._unlockedCache[type] = isUnlocked;
                 }
+
+                this.initBuildingCategoryTabs();
+                this.filterBuildingButtons(this._currentBuildingCategory);
             } catch (error) {
                 console.error('[UI.createBuildingButtons] 건물 버튼 생성 실패:', error);
+            }
+        },
+
+        initBuildingCategoryTabs() {
+            if (this._buildingCatInit) return;
+            this._buildingCatInit = true;
+
+            const tabs = document.querySelectorAll('#building-categories .ach-tab');
+            if (tabs.length === 0) return;
+
+            tabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    tabs.forEach(t => t.classList.remove('active'));
+                    e.target.classList.add('active');
+                    this.filterBuildingButtons(e.target.dataset.category);
+                });
+            });
+        },
+
+        filterBuildingButtons(category) {
+            this._currentBuildingCategory = category;
+            const container = document.getElementById('building-buttons');
+            let visibleCount = 0;
+
+            // 기존 빈 상태 메시지 제거
+            const emptyMsg = container.querySelector('.empty-state-message');
+            if (emptyMsg) {
+                emptyMsg.remove();
+            }
+
+            const buttons = container.querySelectorAll('.building-btn');
+            buttons.forEach(button => {
+                const type = button.getAttribute('data-building-type');
+                const def = Buildings.definitions[type];
+                const itemCat = (def && def.category) ? def.category : 'resource';
+
+                if (itemCat === category) {
+                    button.style.display = 'flex';
+                    visibleCount++;
+                } else {
+                    button.style.display = 'none';
+                }
+            });
+
+            if (visibleCount === 0) {
+                const emptyMsg = document.createElement('div');
+                emptyMsg.className = 'empty-state-message';
+                emptyMsg.textContent = '해당 카테고리에 건설 가능한 건물이 없습니다.';
+                container.appendChild(emptyMsg);
             }
         },
 
@@ -120,6 +182,7 @@
         updateBuildingButtons() {
             try {
                 const buttons = document.querySelectorAll('.building-btn');
+                let visibleCount = 0;
                 buttons.forEach(button => {
                     const buildingType = button.getAttribute('data-building-type');
                     const isUnlocked = Buildings.isUnlocked(buildingType);
@@ -171,6 +234,16 @@
                     // 건설 가능 여부에 따른 버튼 상태
                     const canBuild = Game.canBuild(buildingType);
 
+                    // 탭 카테고리에 맞게 버튼 숨기기/보이기
+                    const def = Buildings.definitions[buildingType];
+                    const itemCat = (def && def.category) ? def.category : 'resource';
+                    if (itemCat === this._currentBuildingCategory) {
+                        button.style.display = 'flex';
+                        visibleCount++;
+                    } else {
+                        button.style.display = 'none';
+                    }
+
                     // 잠긴 건물은 항상 비활성화
                     if (!isUnlocked) {
                         button.disabled = true;
@@ -178,6 +251,21 @@
                         button.disabled = !canBuild;
                     }
                 });
+
+                const container = document.getElementById('building-buttons');
+                const emptyMsg = container.querySelector('.empty-state-message');
+                if (visibleCount === 0) {
+                    if (!emptyMsg) {
+                        const newMsg = document.createElement('div');
+                        newMsg.className = 'empty-state-message';
+                        newMsg.textContent = '해당 카테고리에 건설 가능한 건물이 없습니다.';
+                        container.appendChild(newMsg);
+                    }
+                } else if (emptyMsg) {
+                    emptyMsg.remove();
+                }
+
+                this.updateTabBadges();
             } catch (error) {
                 console.error('[UI.updateBuildingButtons] 건물 버튼 상태 업데이트 실패:', error);
             }
@@ -224,7 +312,7 @@
 
                     const infoDiv = document.createElement('div');
                     infoDiv.className = 'building-info';
-                    
+
                     // 건물 이름과 별 표시 (가장 높은 강화 레벨 기준)
                     const maxLevel = data.maxUpgradeLevel;
                     const stars = '★'.repeat(maxLevel) + '☆'.repeat(5 - maxLevel);

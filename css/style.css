@@ -52,17 +52,34 @@ body {
     font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
     background: #5c3a1e;
     background-image:
-        repeating-linear-gradient(
-            0deg,
+        repeating-linear-gradient(0deg,
             transparent,
             transparent 3px,
-            rgba(0,0,0,0.02) 3px,
-            rgba(0,0,0,0.02) 4px
-        );
+            rgba(0, 0, 0, 0.02) 3px,
+            rgba(0, 0, 0, 0.02) 4px);
     min-height: 100vh;
     padding: 20px;
     color: var(--primary-dark);
     transition: background-color 1.5s ease-in-out;
+}
+
+/* 커스텀 스크롤바 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-parchment);
+    border-left: 1px solid var(--primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 1px solid var(--bg-parchment);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light);
 }
 
 /* 게임 컨테이너 */
@@ -74,7 +91,7 @@ body {
     border: 4px solid #3a2210;
     box-shadow:
         0 0 0 1px #8b6914,
-        4px 4px 0 rgba(0,0,0,0.4);
+        4px 4px 0 rgba(0, 0, 0, 0.4);
     overflow: hidden;
 }
 
@@ -89,52 +106,70 @@ header {
     border-bottom: 3px solid #2a1a0a;
 }
 
-/* 계절 배너 */
-#season-banner {
+/* 상태 바 (Status Bar) 컨테이너 */
+#status-container {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid #8b6914;
+}
+
+/* 개별 블록 (계절, 시간) */
+.season-block,
+.time-block {
+    padding: 10px 20px;
+    font-weight: bold;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 8px 20px;
-    background: #d5dcc0;
-    border-bottom: 2px solid #8b6914;
-    font-weight: bold;
-    color: #4a6a3a;
-    transition: background 0.5s ease, color 0.5s ease;
 }
 
-#season-banner.spring {
-    background: #d5dcc0;
+/* 시간 블록 */
+.time-block {
+    background: #e8d5a3;
+    border-top: 1px solid rgba(139, 105, 20, 0.3);
+    font-size: 0.9em;
+}
+
+/* 계절 블록 기본 속성 */
+.season-block {
+    transition: color 0.5s ease;
+    /* CSS 변수를 활용한 선형 그라디언트로 게이지 표현 */
+    background: linear-gradient(to right,
+            var(--season-fill) 0%,
+            var(--season-fill) var(--season-progress, 0%),
+            var(--season-bg) var(--season-progress, 0%),
+            var(--season-bg) 100%);
+}
+
+/* 계절별 색상 변수 설정 */
+.season-block.spring {
+    --season-bg: #d5dcc0;
+    --season-fill: #b5c490;
     color: #4a6a3a;
 }
 
-#season-banner.summer {
-    background: #dcd4a0;
+.season-block.summer {
+    --season-bg: #dcd4a0;
+    --season-fill: #ceb86c;
     color: #8b7020;
 }
 
-#season-banner.autumn {
-    background: #dcc8a0;
+.season-block.autumn {
+    --season-bg: #dcc8a0;
+    --season-fill: #c6a26b;
     color: #8b5a20;
 }
 
-#season-banner.winter {
-    background: #c8c4b8;
+.season-block.winter {
+    --season-bg: #c8c4b8;
+    --season-fill: #a6a08e;
     color: #5a5a50;
 }
 
-.season-progress {
-    flex: 1;
-    height: 6px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 3px;
-    overflow: hidden;
-}
-
-.season-progress-bar {
-    height: 100%;
-    border-radius: 3px;
-    background: currentColor;
-    transition: width 0.5s ease;
+#game-time {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    color: inherit;
 }
 
 header h1 {
@@ -255,7 +290,118 @@ header h1 {
     justify-content: center;
 }
 
-/* 섹션 공통 스타일 */
+/* ============================================
+   탭 네비게이션 & 콘텐츠 (Phase 1-2)
+   ============================================ */
+
+#tab-nav {
+    display: flex;
+    gap: 5px;
+    margin-top: 15px;
+    border-bottom: 3px solid #8b6914;
+    padding: 0 10px;
+    overflow-x: auto;
+    /* 모바일에서 탭이 많을 때 대비 */
+    white-space: nowrap;
+}
+
+#tab-nav::-webkit-scrollbar {
+    display: none;
+    /* 탭바의 스크롤바는 숨김 */
+}
+
+.tab-btn {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: 10px 20px;
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #4a3520;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.7;
+    /* 비활성 탭은 약간 투명하게 */
+    min-height: 44px;
+    /* 터치 타겟 사이즈 최소화 */
+}
+
+.tab-btn:hover {
+    background: #e1cf9f;
+    opacity: 0.9;
+}
+
+.tab-btn.active {
+    background: #e8d5a3;
+    /* 배경색상(game-container)과 동일하게 연결 */
+    color: #2a1a0a;
+    opacity: 1;
+    border-color: #8b6914;
+    padding-bottom: 12px;
+    /* 아래 선 덮기 위함 */
+    margin-bottom: -3px;
+    /* border-bottom 만큼 내림 */
+    box-shadow: inset 0 2px 0 #c8a43a;
+    /* 위쪽 하이라이트 */
+}
+
+.tab-icon {
+    font-size: 1.2em;
+}
+
+/* 탭 콘텐츠 영역 */
+#tab-content-area {
+    padding: 15px 0;
+    min-height: 400px;
+    /* 레이아웃 점프 방지용 최소 높이 */
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-section {
+    background: #dcc89a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-md);
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-section h3 {
+    font-size: 1.2em;
+    color: #4a3520;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #c8a43a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 텅 빈 상태 메시지 표시 */
+.empty-state-message {
+    text-align: center;
+    padding: 30px;
+    color: #8b6914;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    border: 1px dashed #c8a43a;
+}
+
+/* 기존 section 스타일은 제거하거나, 탭 스타일로 흡수되었으므로 주석/삭제 처리 가능 */
+/*
 section {
     padding: 20px;
     border-bottom: 2px solid #8b6914;
@@ -268,80 +414,186 @@ section h2 {
     padding-bottom: 10px;
     border-bottom: 2px solid #c8a43a;
 }
+*/
 
-/* 자원 패널 */
-#resources-panel {
-    background: #dcc89a;
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-.resource {
+/* 자원 바 (가로 1줄 배치) */
+#resource-bar {
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px 15px;
-    background: #d9c49a;
-    border-radius: var(--radius-sm);
-    border: 2px solid #8b6914;
-    transition: all 0.3s ease;
+    justify-content: center;
+    /* 중앙 정렬 */
+    gap: 15px;
+    /* 약간 간격 넓힘 */
+    padding: 12px 20px;
+    background: #e1cf9f;
+    /* 살짝 밝은 양피지 색상 */
+    border-bottom: 2px solid #8b6914;
+    overflow-x: auto;
+    /* 내용물이 많으면 가로 스크롤 허용 */
+    white-space: nowrap;
+    /* 줄바꿈 방지 */
 }
 
-.resource:hover {
-    transform: none;
-    box-shadow: var(--shadow-sm);
-    border-color: #c8a43a;
+/* 스크롤바 숨기기 (모바일 환경 등 고려) */
+#resource-bar::-webkit-scrollbar {
+    height: 4px;
+}
+
+#resource-bar::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 2px;
+}
+
+.res-item {
+    display: flex;
+    align-items: baseline;
+    /* 숫자와 텍스트 베이스라인 맞춤 */
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    /* 은은한 배경 */
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+    /* 약간 들어간 느낌 */
 }
 
 .resource-icon {
-    font-size: 1.8em;
-    margin-right: 10px;
-}
-
-.resource-name {
-    flex: 1;
-    font-weight: bold;
     font-size: 1.1em;
+    /* CSS 블럭 형태로 변경 예정 */
 }
 
-.resource-amount {
-    font-family: 'Press Start 2P', 'Noto Sans KR', monospace;
+/* 리소스 아이콘 텍스트 기반 블럭 스타일 (Phase 1-2) */
+.icon-wood {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.icon-wood::before {
+    content: 'W';
+}
+
+.icon-stone {
+    color: #A9A9A9;
+    font-weight: bold;
+}
+
+.icon-stone::before {
+    content: 'S';
+}
+
+.icon-food {
+    color: #32CD32;
+    font-weight: bold;
+}
+
+.icon-food::before {
+    content: 'F';
+}
+
+.icon-gold {
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.icon-gold::before {
+    content: 'G';
+    text-shadow: 1px 1px 0 #B8860B;
+}
+
+.icon-iron {
+    color: #708090;
+    font-weight: bold;
+}
+
+.icon-iron::before {
+    content: 'I';
+}
+
+.icon-bread {
+    color: #DEB887;
+    font-weight: bold;
+}
+
+.icon-bread::before {
+    content: 'B';
+}
+
+.icon-tools {
+    color: #696969;
+    font-weight: bold;
+}
+
+.icon-tools::before {
+    content: 'T';
+}
+
+.icon-herbs {
+    color: #228B22;
+    font-weight: bold;
+}
+
+.icon-herbs::before {
+    content: 'H';
+}
+
+.icon-cloth {
+    color: #F5F5DC;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #ccc;
+}
+
+.icon-cloth::before {
+    content: 'C';
+}
+
+.icon-pop {
+    color: #4169E1;
+    font-weight: bold;
+}
+
+.icon-pop::before {
+    content: 'P';
+}
+
+.res-val {
+    font-family: 'Press Start 2P', monospace;
     font-size: 0.85em;
     font-weight: bold;
     color: #4a3520;
-    min-width: 80px;
-    text-align: right;
-    animation: pulse 0.5s ease-in-out;
 }
 
-.resource-rate {
-    font-size: 0.8em;
+.res-rate {
+    font-size: 0.75em;
     font-weight: bold;
-    padding: 2px 6px;
-    border-radius: var(--radius-sm);
-    min-width: 60px;
-    text-align: center;
 }
 
-.resource-rate.positive {
+.res-rate.positive {
     color: #4a7a2e;
-    background: rgba(74, 122, 46, 0.1);
 }
 
-.resource-rate.negative {
+.res-rate.negative {
     color: #8b2020;
-    background: rgba(139, 32, 32, 0.1);
 }
 
-.resource-rate.neutral {
-    color: #6b4423;
+.res-rate.neutral {
+    color: transparent;
+    /* 0일 땐 안보이게 처리하거나 회색 */
 }
 
-/* 인구 패널 */
-#population-panel {
-    background: #dcc89a;
+.res-divider {
+    width: 2px;
+    height: 24px;
+    background: #c8a43a;
+    border-radius: 1px;
 }
+
+.res-item.population {
+    background: rgba(65, 105, 225, 0.1);
+    /* 인구는 특별하게 강조 */
+}
+
+/* 인구 패널 (이제 .tab-section) */
+
 
 .stat {
     display: flex;
@@ -366,12 +618,8 @@ section h2 {
     color: #6b4423;
 }
 
-/* 행복도 패널 */
-#happiness-panel {
-    background: #dcc89a;
-    padding: 15px 20px;
-    border-bottom: 2px solid #8b6914;
-}
+/* 행복도 패널 (이제 .tab-section) */
+
 
 .happiness-header {
     display: flex;
@@ -435,10 +683,11 @@ section h2 {
     color: #8b2020;
 }
 
-/* 건물 건설 버튼 패널 */
-#buildings-panel {
-    background: #dcc89a;
-}
+/* 
+  건물 건설 버튼 패널 
+  (이제 #buildings-panel은 .tab-section 의 자식이므로 배경색/보더 재정의 불필요)
+*/
+
 
 #building-buttons {
     display: grid;
@@ -581,10 +830,10 @@ section h2 {
     animation: unlockBuilding 0.5s ease-out forwards;
 }
 
-/* 건설된 건물 패널 */
-#built-buildings-panel {
-    background: #dcc89a;
-}
+/* 
+  건설된 건물 패널 
+*/
+
 
 #built-buildings-list {
     display: grid;
@@ -711,7 +960,7 @@ section h2 {
     text-align: center;
 }
 
-/* 푸터 */
+/* 푸터 영역 정리 */
 footer {
     background: #4a3520;
     padding: 15px 20px;
@@ -719,7 +968,8 @@ footer {
     flex-wrap: wrap;
     gap: 15px;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
+    /* 가운데 정렬로 변경 */
     border-top: 3px solid #2a1a0a;
 }
 
@@ -745,12 +995,6 @@ footer button:hover {
 
 footer button:active {
     transform: translateY(0);
-}
-
-#game-time {
-    color: #e8d5a3;
-    font-weight: bold;
-    font-size: 1em;
 }
 
 /* 메시지 박스 */
@@ -937,13 +1181,12 @@ footer button:active {
     transform: translateY(-1px);
 }
 
-/* 교역 패널 */
-#trade-panel {
-    background: #dcc89a;
-}
+/* 교역 패널 (이제 .tab-section) */
+
 
 #trade-panel.hidden {
     display: none;
+    /* 여전히 필요할 수 있음 */
 }
 
 #trade-controls {
@@ -1047,10 +1290,8 @@ footer button:active {
     transform: none;
 }
 
-/* 업적 패널 */
-#achievements-panel {
-    background: #dcc89a;
-}
+/* 업적 패널 (이제 .tab-section) */
+
 
 #achievements-list {
     display: block;
@@ -1174,15 +1415,15 @@ body {
     }
 }
 
-@keyframes slideIn {
+@keyframes fadeIn {
     from {
         opacity: 0;
-        transform: translateX(-20px);
+        transform: translateY(5px);
     }
 
     to {
         opacity: 1;
-        transform: translateX(0);
+        transform: translateY(0);
     }
 }
 
@@ -1353,9 +1594,17 @@ body {
 }
 
 @keyframes valueHighlight {
-    0%   { color: inherit; }
-    50%  { color: #c8a43a; }
-    100% { color: inherit; }
+    0% {
+        color: inherit;
+    }
+
+    50% {
+        color: #c8a43a;
+    }
+
+    100% {
+        color: inherit;
+    }
 }
 
 /* 업적 알림 */
@@ -1447,10 +1696,8 @@ body {
     margin-bottom: 10px;
 }
 
-/* 연구 패널 */
-#research-panel {
-    background: #dcc89a;
-}
+/* 연구 패널 (이제 .tab-section) */
+
 
 #research-panel.hidden {
     display: none;
@@ -1742,49 +1989,7 @@ footer button:hover {
     overscroll-behavior: contain;
 }
 
-/* ============================================
-   패널 접기/펼치기 토글
-   ============================================ */
 
-.panel-toggle {
-    cursor: pointer;
-    user-select: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding-right: 4px;
-    transition: color var(--transition-fast);
-}
-
-.panel-toggle:hover {
-    color: var(--accent-gold);
-}
-
-.toggle-icon {
-    font-size: 0.75em;
-    transition: transform var(--transition-normal);
-    display: inline-block;
-    line-height: 1;
-    color: var(--primary-light);
-}
-
-.panel-toggle[aria-expanded="false"] .toggle-icon {
-    transform: rotate(180deg);
-}
-
-/* 접히는 콘텐츠 영역 */
-.collapsible-content {
-    overflow: hidden;
-    max-height: 2000px;
-    transition: max-height 0.4s ease, opacity 0.3s ease, margin 0.3s ease;
-    opacity: 1;
-}
-
-.collapsible-content.collapsed {
-    max-height: 0;
-    opacity: 0;
-    margin-top: 0 !important;
-}
 
 /* ============================================
    v0.3 신규 패널 스타일
@@ -1852,10 +2057,8 @@ footer button:hover {
     background: #5a8a3e !important;
 }
 
-/* 왕실 조공 패널 */
-#tribute-panel {
-    background: #dcc89a;
-}
+/* 왕실 조공 패널 (이제 .tab-section) */
+
 
 #tribute-panel.hidden {
     display: none;
@@ -1935,10 +2138,8 @@ footer button:hover {
     border-color: #8b7850;
 }
 
-/* 용병 고용 패널 */
-#mercenary-panel {
-    background: #dcc89a;
-}
+/* 용병 고용 패널 (이제 .tab-section) */
+
 
 #mercenary-panel.hidden {
     display: none;
@@ -2026,10 +2227,8 @@ footer button:hover {
     color: #8b2020;
 }
 
-/* 통계 패널 */
-#stats-panel {
-    background: #dcc89a;
-}
+/* 통계 패널 (이제 .tab-section) */
+
 
 #stats-panel.hidden {
     display: none;
@@ -2326,7 +2525,68 @@ footer button:hover {
 }
 
 /* ============================================
-   v0.3 AI2 - 비주얼 노벨 오버레이
+   하단 고정 이벤트 로그 (Phase 1-2)
+   ============================================ */
+
+#event-log {
+    background: rgba(42, 26, 10, 0.85);
+    /* 약간 투명한 어두운 갈색 */
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    color: #e8d5a3;
+    padding: 8px 12px;
+    height: 100px;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    /* game-container 최대 너비와 동일 */
+    z-index: 1000;
+    /* 오버레이보다 낮고 본문보다 높게 */
+    overflow-y: auto;
+    font-size: 0.9em;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#event-log::-webkit-scrollbar {
+    width: 6px;
+}
+
+#event-log::-webkit-scrollbar-thumb {
+    background-color: var(--primary-light);
+    border-radius: 3px;
+}
+
+#event-log-messages p {
+    margin-bottom: 4px;
+    line-height: 1.4;
+    border-bottom: 1px dashed rgba(232, 213, 163, 0.2);
+    padding-bottom: 4px;
+}
+
+#event-log-messages p:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* 메시지 타입별 색상 (optional) */
+#event-log-messages .log-positive {
+    color: #a8c4a0;
+}
+
+#event-log-messages .log-negative {
+    color: #d4a0a0;
+}
+
+#event-log-messages .log-warning {
+    color: #dcd4a0;
+}
+
+
+/* ============================================
+   비주얼 노벨 오버레이 등 기타
    ============================================ */
 
 #vn-overlay {
@@ -2480,6 +2740,7 @@ footer button:hover {
     align-items: center;
     justify-content: center;
 }
+
 #manual-modal.hidden {
     display: none;
 }
@@ -2507,11 +2768,13 @@ footer button:hover {
     background: #4a3520;
     flex-shrink: 0;
 }
+
 .manual-header h2 {
     color: #e8d5a3;
     margin: 0;
     font-size: 1.3em;
 }
+
 .manual-close-btn {
     background: rgba(255, 255, 255, 0.15);
     border: 2px solid rgba(240, 228, 200, 0.5);
@@ -2526,6 +2789,7 @@ footer button:hover {
     justify-content: center;
     transition: background 0.2s;
 }
+
 .manual-close-btn:hover {
     background: rgba(139, 32, 32, 0.4);
 }
@@ -2539,6 +2803,7 @@ footer button:hover {
     background: rgba(107, 68, 35, 0.08);
     flex-shrink: 0;
 }
+
 .manual-tab {
     padding: 6px 12px;
     border: 2px solid #8b6914;
@@ -2552,9 +2817,11 @@ footer button:hover {
     color: #2a1a0a;
     font-weight: bold;
 }
+
 .manual-tab:hover {
     background: #c8a43a;
 }
+
 .manual-tab.active {
     background: #6b4423;
     color: #e8d5a3;
@@ -2577,9 +2844,11 @@ footer button:hover {
     margin: 20px 0 12px 0;
     font-size: 1.15em;
 }
+
 .manual-content h3:first-child {
     margin-top: 0;
 }
+
 .manual-content h4 {
     color: #6b4423;
     margin: 14px 0 8px 0;
@@ -2592,6 +2861,7 @@ footer button:hover {
     margin: 10px 0;
     font-size: 0.88em;
 }
+
 .manual-content th {
     background: #6b4423;
     color: #f0e4c8;
@@ -2600,22 +2870,27 @@ footer button:hover {
     font-weight: bold;
     border: 1px solid #4a3520;
 }
+
 .manual-content td {
     padding: 6px 10px;
     border: 1px solid #8b6914;
     background: rgba(255, 255, 255, 0.3);
 }
+
 .manual-content tr:nth-child(even) td {
     background: rgba(107, 68, 35, 0.06);
 }
 
-.manual-content ul, .manual-content ol {
+.manual-content ul,
+.manual-content ol {
     padding-left: 20px;
     margin: 6px 0;
 }
+
 .manual-content li {
     margin: 4px 0;
 }
+
 .manual-content p {
     margin: 6px 0;
 }
@@ -2627,6 +2902,7 @@ footer button:hover {
     padding: 12px 16px;
     margin: 10px 0;
 }
+
 .manual-tip-box {
     background: rgba(74, 122, 46, 0.1);
     border: 2px solid #4a7a2e;
@@ -2634,6 +2910,7 @@ footer button:hover {
     padding: 12px 16px;
     margin: 10px 0;
 }
+
 .manual-warning-box {
     background: rgba(184, 134, 11, 0.12);
     border: 2px solid #b8860b;
@@ -2650,23 +2927,115 @@ footer button:hover {
         max-height: 100vh;
         border-radius: 0;
     }
+
     .manual-tabs {
         gap: 4px;
         padding: 8px 10px;
     }
+
     .manual-tab {
         font-size: 0.72em;
         padding: 4px 8px;
         min-height: 32px;
     }
+
     .manual-content {
         padding: 14px;
         font-size: 0.9em;
     }
+
     .manual-content table {
         font-size: 0.8em;
     }
-    .manual-content th, .manual-content td {
+
+    .manual-content th,
+    .manual-content td {
         padding: 4px 6px;
+    }
+}
+
+/* ============================================
+   PC (가로 모드) 반응형 2단 레이아웃
+   ============================================ */
+@media (min-width: 850px) {
+    #game-container {
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        grid-template-rows: auto auto auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "status nav"
+            "banner banner"
+            "resource content"
+            "eventlog content"
+            "footer footer";
+        align-items: start;
+    }
+
+    header {
+        grid-area: header;
+    }
+
+    #status-container {
+        grid-area: status;
+    }
+
+    #event-banner {
+        grid-area: banner;
+    }
+
+    #resource-bar {
+        grid-area: resource;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+        overflow-y: auto;
+        white-space: normal;
+        gap: 10px;
+        border-bottom: none;
+        border-right: 2px solid #8b6914;
+        height: 100%;
+        background: transparent;
+    }
+
+    #resource-bar .res-item {
+        justify-content: space-between;
+    }
+
+    #resource-bar .res-divider {
+        width: 100%;
+        height: 2px;
+        margin: 5px 0;
+    }
+
+    #tab-nav {
+        grid-area: nav;
+        margin-top: 0;
+    }
+
+    #tab-content-area {
+        grid-area: content;
+        padding: 15px 20px;
+        height: 100%;
+    }
+
+    #event-log {
+        grid-area: eventlog;
+        position: static;
+        width: auto;
+        max-width: none;
+        transform: none;
+        border-radius: 0;
+        margin: 0;
+        border-top: 2px solid #8b6914;
+        border-right: 2px solid #8b6914;
+        border-left: none;
+        border-bottom: none;
+        height: 180px;
+    }
+
+    footer {
+        grid-area: footer;
     }
 }

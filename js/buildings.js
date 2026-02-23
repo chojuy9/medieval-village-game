@@ -5,6 +5,7 @@
     lumbermill: {
       id: 'lumbermill',
       name: '벌목소',
+      category: 'resource',
       tier: 1,
       cost: { wood: 10, stone: 0 },
       consumption: {},
@@ -16,6 +17,7 @@
     quarry: {
       id: 'quarry',
       name: '채석장',
+      category: 'resource',
       tier: 1,
       cost: { wood: 30, stone: 0 },
       consumption: {},
@@ -27,6 +29,7 @@
     farm: {
       id: 'farm',
       name: '농장',
+      category: 'resource',
       tier: 1,
       cost: { wood: 20, stone: 10 },
       consumption: {},
@@ -38,6 +41,7 @@
     house: {
       id: 'house',
       name: '집',
+      category: 'housing',
       tier: 1,
       cost: { wood: 50, stone: 30 },
       consumption: {},
@@ -50,6 +54,7 @@
     market: {
       id: 'market',
       name: '시장',
+      category: 'economy',
       tier: 1,
       cost: { wood: 100, stone: 50 },
       consumption: {},
@@ -62,6 +67,7 @@
     blacksmith: {
       id: 'blacksmith',
       name: '대장간',
+      category: 'resource',
       tier: 2,
       cost: { wood: 80, stone: 60 },
       consumption: { wood: 1, stone: 1 },
@@ -75,6 +81,7 @@
     sawmill: {
       id: 'sawmill',
       name: '제재소',
+      category: 'resource',
       tier: 2,
       cost: { wood: 60, stone: 40 },
       consumption: { wood: 2 },
@@ -86,6 +93,7 @@
     bakery: {
       id: 'bakery',
       name: '제빵소',
+      category: 'resource',
       tier: 2,
       cost: { wood: 30, stone: 20, lumber: 10 },  // 기존: { wood: 50, stone: 30 }
       consumption: { food: 3 },
@@ -97,6 +105,7 @@
     stonemason: {
       id: 'stonemason',
       name: '석공소',
+      category: 'resource',
       tier: 2,
       cost: { wood: 50, stone: 60, lumber: 15, gold: 40 },  // 기존: { wood: 90, stone: 70, gold: 40 }
       consumption: { stone: 2, tools: 0.5 },
@@ -108,6 +117,7 @@
     church: {
       id: 'church',
       name: '교회',
+      category: 'civic',
       tier: 1,
       cost: { wood: 120, stone: 80 },
       consumption: {},
@@ -122,6 +132,7 @@
     tavern: {
       id: 'tavern',
       name: '주점',
+      category: 'economy',
       tier: 1,
       cost: { wood: 30, stone: 20, lumber: 20 },  // 기존: { wood: 60, stone: 30 }
       consumption: {},
@@ -135,6 +146,7 @@
     wall: {
       id: 'wall',
       name: '성벽',
+      category: 'civic',
       tier: 1,
       cost: { stone: 400, gold: 100 },  // 기존: { wood: 100, stone: 200, gold: 50 }
       consumption: {},
@@ -149,6 +161,7 @@
     school: {
       id: 'school',
       name: '학교',
+      category: 'civic',
       tier: 1,
       cost: { wood: 80, stone: 80, lumber: 30, gold: 80 },  // 기존: { wood: 150, stone: 100, gold: 80 }
       consumption: {},
@@ -163,6 +176,7 @@
     manor: {
       id: 'manor',
       name: '영주관',
+      category: 'housing',
       tier: 1,
       cost: { wood: 300, stone: 200, gold: 150 },
       consumption: {},
@@ -177,6 +191,7 @@
     treasury: {
       id: 'treasury',
       name: '보물창고',
+      category: 'economy',
       tier: 1,
       cost: { wood: 200, stone: 150, gold: 100 },
       consumption: {},
@@ -191,6 +206,7 @@
     furnitureShop: {
       id: 'furnitureShop',
       name: '가구공방',
+      category: 'resource',
       tier: 3,
       cost: { wood: 100, stone: 60, gold: 50 },
       consumption: { lumber: 2, tools: 1 },
@@ -202,6 +218,7 @@
     weaponShop: {
       id: 'weaponShop',
       name: '무기공방',
+      category: 'resource',
       tier: 3,
       cost: { wood: 120, stone: 80, gold: 80 },
       consumption: { lumber: 1, tools: 2 },
@@ -213,6 +230,7 @@
     mint: {
       id: 'mint',
       name: '왕립 조폐소',
+      category: 'economy',
       tier: 4,
       cost: { wood: 300, stone: 200, gold: 2000 },
       consumption: { gold: 1 },
@@ -224,6 +242,7 @@
     cathedral: {
       id: 'cathedral',
       name: '대성당',
+      category: 'civic',
       tier: 4,
       cost: { wood: 500, stone: 400, gold: 1500 },
       consumption: {},
