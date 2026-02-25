@@ -1,44 +1,8 @@
 (function () {
   'use strict';
 
-  const TRIBUTE_DEFS = {
-    small: {
-      id: 'small',
-      name: '소 헌상',
-      cost: 500,
-      reward: { type: 'random_resources', min: 50, max: 100 },
-      cooldown: 120
-    },
-    large: {
-      id: 'large',
-      name: '대 헌상',
-      cost: 2000,
-      reward: { type: 'permanent_bonus', bonus: 0.05 },
-      cooldown: 300
-    },
-    royal: {
-      id: 'royal',
-      name: '왕실 인가',
-      cost: 5000,
-      reward: { type: 'unlock_building', target: 'mint' },
-      cooldown: 0,
-      oneTime: true
-    },
-    title: {
-      id: 'title',
-      name: '작위 수여',
-      cost: 10000,
-      reward: {
-        type: 'multi',
-        effects: [
-          { type: 'max_population', bonus: 20 },
-          { type: 'permanent_bonus', bonus: 0.10 }
-        ]
-      },
-      cooldown: 0,
-      oneTime: true
-    }
-  };
+  // XML(GameData.tribute)에서 조공 정의를 읽어옵니다.
+  const TRIBUTE_DEFS = (window.GameData && window.GameData.tribute) ? window.GameData.tribute : {};
 
   /**
    * 현재 게임 상태를 반환합니다.

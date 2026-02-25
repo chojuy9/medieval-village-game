@@ -1,78 +1,10 @@
 (function () {
   'use strict';
 
-  const RESEARCH_TREE = {
-    woodworking: {
-      id: 'woodworking', name: '목공술', icon: '🪓',
-      cost: { wood: 100, gold: 20 },
-      researchTime: 120,
-      effect: { type: 'production_bonus', target: 'lumbermill', bonus: 0.2 },
-      requires: [],
-      description: '벌목소 생산량 +20%'
-    },
-    advanced_woodworking: {
-      id: 'advanced_woodworking', name: '고급 목공', icon: '🪚',
-      cost: { wood: 200, stone: 100, gold: 50 },
-      researchTime: 240,
-      effect: { type: 'unlock_building', target: 'sawmill' },
-      requires: ['woodworking'],
-      description: '제재소 해금'
-    },
-    mining: {
-      id: 'mining', name: '채굴술', icon: '⛏️',
-      cost: { stone: 100, gold: 20 },
-      researchTime: 120,
-      effect: { type: 'production_bonus', target: 'quarry', bonus: 0.2 },
-      requires: [],
-      description: '채석장 생산량 +20%'
-    },
-    masonry: {
-      id: 'masonry', name: '석공술', icon: '🧱',
-      cost: { stone: 200, wood: 100, gold: 50 },
-      researchTime: 240,
-      effect: { type: 'unlock_building', target: 'stonemason' },
-      requires: ['mining'],
-      description: '석공소 해금'
-    },
-    agriculture: {
-      id: 'agriculture', name: '농업혁신', icon: '🌾',
-      cost: { food: 150, gold: 30 },
-      researchTime: 150,
-      effect: { type: 'production_bonus', target: 'farm', bonus: 0.3 },
-      requires: [],
-      description: '농장 생산량 +30%'
-    },
-    baking: {
-      id: 'baking', name: '제빵 기술', icon: '🍞',
-      cost: { food: 300, wood: 100, gold: 60 },
-      researchTime: 240,
-      effect: { type: 'unlock_building', target: 'bakery' },
-      requires: ['agriculture'],
-      description: '제빵소 해금'
-    },
-    economics: {
-      id: 'economics', name: '경제학', icon: '💰',
-      cost: { gold: 100 },
-      researchTime: 180,
-      effect: { type: 'trade_bonus', bonus: 0.05 },
-      requires: [],
-      description: '시장 보너스 +5%p'
-    },
-    finance: {
-      id: 'finance', name: '금융학', icon: '🏦',
-      cost: { gold: 200 },
-      researchTime: 300,
-      effect: { type: 'building_bonus', target: 'treasury', bonus: 0.1 },
-      requires: ['economics'],
-      description: '보물창고 보너스 +10%p'
-    }
-  };
-
-  const RESEARCH_BUILDING_REQUIREMENTS = {
-    sawmill: ['advanced_woodworking'],
-    bakery: ['baking'],
-    stonemason: ['masonry']
-  };
+  // XML(GameData.research)에서 연구 트리를 읽어옵니다.
+  const _researchData = (window.GameData && window.GameData.research) ? window.GameData.research : { tree: {}, requirements: {} };
+  const RESEARCH_TREE = _researchData.tree;
+  const RESEARCH_BUILDING_REQUIREMENTS = _researchData.requirements;
 
   function getState() {
     return window.Utils && typeof window.Utils.getState === 'function'

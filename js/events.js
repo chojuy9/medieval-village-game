@@ -15,7 +15,8 @@
     return Math.max(0, Math.min(1, chance));
   }
 
-  const eventDefinitions = [
+  // XML(GameData.events)에서 이벤트 정의를 읽어옵니다.
+  const eventDefinitions = (window.GameData && Array.isArray(window.GameData.events)) ? window.GameData.events : [
     {
       id: 'bumper_harvest',
       name: '🌾 풍년',

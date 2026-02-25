@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  seasons.xml — 계절 정의
+  각 계절의 생산/소비/성장 배율을 조정할 수 있습니다.
+-->
+<seasons>
+  <season id="spring" name="🌸 봄" growthMultiplier="1.1" consumptionMultiplier="1.0">
+    <productionMultiplier food="1.2" bread="1.1"/>
+  </season>
+
+  <season id="summer" name="☀️ 여름" growthMultiplier="1.0" consumptionMultiplier="1.0">
+    <productionMultiplier wood="1.1" stone="1.1" lumber="1.08"/>
+  </season>
+
+  <season id="autumn" name="🍂 가을" growthMultiplier="1.0" consumptionMultiplier="1.0">
+    <productionMultiplier food="1.3" gold="1.15" furniture="1.08"/>
+  </season>
+
+  <season id="winter" name="❄️ 겨울" growthMultiplier="0.8" consumptionMultiplier="1.2">
+    <productionMultiplier food="0.6" bread="0.9" weapons="1.05"/>
+  </season>
+</seasons>

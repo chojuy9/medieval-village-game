@@ -9,7 +9,8 @@
   const Seasons = {
     SEASON_DURATION: 180,
 
-    definitions: [
+    // XML(GameData.seasons)에서 계절 정의를 읽어옵니다.
+    definitions: (window.GameData && Array.isArray(window.GameData.seasons)) ? window.GameData.seasons : [
       {
         id: 'spring', name: '🌸 봄',
         productionMultiplier: { food: 1.2, bread: 1.1 },

@@ -30,8 +30,55 @@
     });
   }
 
+  // custom conditionType 업적 후크 등록—이 함수들은 config-loader의 makeConditionFn에서 호출됨
+  window._AchievementCustomConditions = {
+    fortified: function () {
+      if (!window.Game || typeof window.Game.getBuildingCount !== 'function') return false;
+      return window.Game.getBuildingCount('wall') >= 1;
+    },
+    master_architect: function () {
+      if (!window.Game || typeof window.Game.getBuildingCount !== 'function' || !window.Buildings) return false;
+      return Object.keys(window.Buildings.definitions || {}).every(function (type) {
+        return window.Game.getBuildingCount(type) >= 1;
+      });
+    },
+    production_chain_complete: function () {
+      if (!window.Game || typeof window.Game.getBuildingCount !== 'function') return false;
+      return ['sawmill', 'bakery', 'blacksmith', 'furnitureShop', 'weaponShop'].every(function (type) {
+        return window.Game.getBuildingCount(type) >= 1;
+      });
+    },
+    first_processed: function (state) {
+      return (Number(state.stats && state.stats.producedByTier && state.stats.producedByTier[2]) || 0) > 0;
+    },
+    master_craftsman: function (state) {
+      return (Number(state.stats && state.stats.producedByTier && state.stats.producedByTier[3]) || 0) > 0;
+    },
+    bandit_base_conqueror: function (state) {
+      return Boolean(state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success);
+    },
+    bandit_slayer: function (state) {
+      return Boolean(state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success);
+    },
+    mercenary_commander: function (state) {
+      return Boolean(state.raids && state.raids.banditBaseSiege && state.raids.banditBaseSiege.success && state.raids.banditBaseSiege.usedMercenaries);
+    },
+    scholar: function (state) {
+      if (!window.Research || typeof window.Research.getTree !== 'function') return false;
+      const totalResearch = Object.keys(window.Research.getTree()).length;
+      const completed = Array.isArray(state.research && state.research.completed) ? state.research.completed.length : 0;
+      return totalResearch > 0 && completed >= totalResearch;
+    },
+    perfectionist: function (state) {
+      const achievedCount = Array.isArray(state.achievements) ? state.achievements.length : 0;
+      const total = window.Achievements && Array.isArray(window.Achievements.definitions) ? window.Achievements.definitions.length : 0;
+      return total > 0 && achievedCount >= (total - 1);
+    }
+  };
+
   const Achievements = {
-    definitions: [
+    // XML(GameData.achievements)에서 업적 정의를 읽어옵니다.
+    definitions: (window.GameData && Array.isArray(window.GameData.achievements)) ? window.GameData.achievements : [
       {
         id: 'first_building',
         name: '🏠 첫 발걸음',

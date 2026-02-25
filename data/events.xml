@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  events.xml — 랜덤 이벤트 정의
+  weight(가중치), duration(지속시간), minGameTime(최소 발생 게임시간)을 조정해 이벤트 빈도를 바꿀 수 있습니다.
+-->
+<events>
+
+  <!-- ===== 긍정 이벤트 ===== -->
+  <event id="bumper_harvest" name="🌾 풍년" type="positive">
+    <duration>60</duration>
+    <weight>20</weight>
+    <minGameTime>120</minGameTime>
+    <description>올해 수확이 풍성합니다! 식량 생산이 크게 증가합니다.</description>
+    <effect type="productionMultiplier">
+      <resource name="food" value="1.5"/>
+    </effect>
+  </event>
+
+  <event id="wandering_merchant" name="🧳 떠돌이 상인" type="positive">
+    <duration>60</duration>
+    <weight>15</weight>
+    <minGameTime>90</minGameTime>
+    <description>상단이 마을에 들러 금화 거래를 남겼습니다.</description>
+    <effect type="immediate" action="merchant_trade" tradeDiscountMultiplier="0.7"/>
+  </event>
+
+  <event id="migrant_arrival" name="👥 이주민 유입" type="positive">
+    <duration>0</duration>
+    <weight>10</weight>
+    <minGameTime>90</minGameTime>
+    <description>새로운 주민들이 마을에 정착했습니다.</description>
+    <effect type="immediate" action="population_gain"/>
+  </event>
+
+  <event id="festival" name="🎪 축제" type="positive">
+    <duration>60</duration>
+    <weight>12</weight>
+    <minGameTime>300</minGameTime>
+    <description>마을에 축제가 열립니다! 행복도가 크게 상승합니다.</description>
+    <effect type="immediate" action="festival_boost"/>
+  </event>
+
+  <event id="supply_convoy" name="📦 보급 행렬" type="positive">
+    <duration>90</duration>
+    <weight>10</weight>
+    <minGameTime>240</minGameTime>
+    <description>왕실에서 보급품이 도착했습니다.</description>
+    <effect type="productionMultiplier">
+      <resource name="wood"  value="1.3"/>
+      <resource name="stone" value="1.3"/>
+      <resource name="food"  value="1.3"/>
+    </effect>
+  </event>
+
+  <event id="royal_reward" name="🏅 왕의 포상" type="positive">
+    <duration>0</duration>
+    <weight>8</weight>
+    <minGameTime>600</minGameTime>
+    <description>마을의 번영에 감명받은 왕이 금화를 하사합니다.</description>
+    <effect type="immediate" action="royal_gold"/>
+  </event>
+
+  <event id="master_craftsman_visit" name="👨‍🌾 명장인 방문" type="positive">
+    <duration>120</duration>
+    <weight>10</weight>
+    <minGameTime>360</minGameTime>
+    <description>명장인이 기술을 전수합니다.</description>
+    <effect type="immediate" action="craftsman_boost"/>
+  </event>
+
+  <event id="bountiful_season" name="🌟 풍요의 계절" type="positive">
+    <duration>90</duration>
+    <weight>10</weight>
+    <minGameTime>180</minGameTime>
+    <description>풍요가 넘칩니다. 식량 소비가 줄어듭니다.</description>
+    <effect type="foodConsumptionMultiplier" value="0.5"/>
+  </event>
+
+  <!-- ===== 중립 이벤트 ===== -->
+  <event id="traveling_peddler" name="🛒 지나가는 행상" type="neutral">
+    <duration>0</duration>
+    <weight>20</weight>
+    <minGameTime>60</minGameTime>
+    <description>행상이 자원 꾸러미를 두고 갔습니다.</description>
+    <effect type="immediate" action="small_resource_gain"/>
+  </event>
+
+  <event id="royal_decree" name="📜 왕의 칙령" type="neutral">
+    <duration>90</duration>
+    <weight>10</weight>
+    <minGameTime>180</minGameTime>
+    <description>특정 건물 건설비가 일시적으로 감소합니다.</description>
+    <effect type="targetBuildingDiscount" value="0.8"/>
+  </event>
+
+  <event id="diplomat" name="⚖️ 외교 사절" type="neutral">
+    <duration>0</duration>
+    <weight>10</weight>
+    <minGameTime>300</minGameTime>
+    <description>외교 사절이 거래를 제안합니다.</description>
+    <effect type="immediate" action="diplomat_offer"/>
+  </event>
+
+  <event id="fortune_teller" name="🔮 점술사" type="neutral">
+    <duration>0</duration>
+    <weight>8</weight>
+    <minGameTime>240</minGameTime>
+    <description>점술사가 앞으로의 운명을 예언합니다.</description>
+    <effect type="immediate" action="fortune_tell"/>
+  </event>
+
+  <event id="traveling_troupe" name="🎭 유랑극단" type="neutral">
+    <duration>60</duration>
+    <weight>12</weight>
+    <minGameTime>180</minGameTime>
+    <description>유랑극단이 공연을 펼칩니다.</description>
+    <effect type="immediate" action="troupe_show"/>
+  </event>
+
+  <!-- ===== 부정 이벤트 ===== -->
+  <event id="bandit_raid" name="⚔️ 도적 습격" type="negative">
+    <duration>0</duration>
+    <weight>20</weight>
+    <minGameTime>150</minGameTime>
+    <description>도적들이 자원을 약탈했습니다.</description>
+    <effect type="immediate" action="resource_raid"/>
+  </event>
+
+  <event id="bandit_base_siege" name="🏹 도적기지 침공" type="neutral">
+    <duration>0</duration>
+    <weight>1</weight>
+    <minGameTime>900</minGameTime>
+    <description>도적들의 근거지를 소탕할 기회입니다. 결단을 내려야 합니다.</description>
+    <effect type="immediate" action="bandit_base_siege"/>
+  </event>
+
+  <event id="famine" name="🥀 흉년" type="negative">
+    <duration>60</duration>
+    <weight>10</weight>
+    <minGameTime>180</minGameTime>
+    <description>작황이 나빠 식량 생산이 감소합니다.</description>
+    <effect type="productionMultiplier">
+      <resource name="food" value="0.7"/>
+    </effect>
+  </event>
+
+  <event id="plague" name="☠️ 역병" type="negative">
+    <duration>60</duration>
+    <weight>5</weight>
+    <minGameTime>300</minGameTime>
+    <description>역병이 퍼져 인구가 감소했습니다.</description>
+    <effect type="immediate" action="plague_damage"/>
+  </event>
+
+  <event id="fire" name="🔥 화재" type="negative">
+    <duration>0</duration>
+    <weight>8</weight>
+    <minGameTime>480</minGameTime>
+    <description>화재가 발생하여 건물이 손상되었습니다.</description>
+    <effect type="immediate" action="fire_damage"/>
+  </event>
+
+  <event id="rat_infestation" name="🐀 쥐떼" type="negative">
+    <duration>0</duration>
+    <weight>12</weight>
+    <minGameTime>300</minGameTime>
+    <description>쥐떼가 식량 창고를 습격했습니다.</description>
+    <effect type="immediate" action="food_loss"/>
+  </event>
+
+  <event id="tax_collection" name="💸 세금 징수" type="negative">
+    <duration>0</duration>
+    <weight>10</weight>
+    <minGameTime>360</minGameTime>
+    <description>왕실에서 세금을 거둬갑니다.</description>
+    <effect type="immediate" action="tax_loss"/>
+  </event>
+
+  <event id="flood" name="🌊 홍수" type="negative">
+    <duration>60</duration>
+    <weight>8</weight>
+    <minGameTime>420</minGameTime>
+    <description>홍수로 농장과 벌목소가 침수되었습니다.</description>
+    <effect type="productionMultiplier">
+      <resource name="food" value="0"/>
+      <resource name="wood" value="0"/>
+    </effect>
+  </event>
+
+</events>

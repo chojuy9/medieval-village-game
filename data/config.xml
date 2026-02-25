@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  config.xml — 게임 전역 상수 설정
+  이 파일만 수정해도 게임 밸런스를 조정할 수 있습니다.
+-->
+<gameConfig>
+  <!-- 식량 소비 -->
+  <param key="FOOD_CONSUMPTION_PER_PERSON"         value="0.1"/>
+  <param key="FOOD_SCALING_THRESHOLD"              value="25"/>
+  <param key="FOOD_CONSUMPTION_SCALED"             value="0.12"/>
+  <param key="BREAD_CONSUMPTION_PER_PERSON"        value="0.03"/>
+  <param key="BREAD_GROWTH_THRESHOLD_PER_PERSON"   value="0.5"/>
+  <param key="BREAD_GROWTH_BONUS_MULTIPLIER"       value="1.5"/>
+
+  <!-- 도구 유지보수 -->
+  <param key="TOOLS_MAINTENANCE_PER_TIER2_BUILDING"      value="0.008"/>
+  <param key="TOOLS_MAINTENANCE_PRODUCTION_MULTIPLIER"   value="0.7"/>
+
+  <!-- 금화 소비 이벤트 (마을 잔치) -->
+  <param key="GOLD_SINK_FEAST_COST"             value="80"/>
+  <param key="GOLD_SINK_FEAST_HAPPINESS_BONUS"  value="25"/>
+  <param key="GOLD_SINK_FEAST_DURATION"         value="120"/>
+  <param key="GOLD_SINK_FEAST_COOLDOWN"         value="300"/>
+
+  <!-- 야경대 -->
+  <param key="GOLD_SINK_NIGHTWATCH_GOLD_PER_SEC"   value="5"/>
+  <param key="GOLD_SINK_NIGHTWATCH_DEFENSE_BONUS"  value="15"/>
+  <param key="GOLD_SINK_NIGHTWATCH_RAID_REDUCTION" value="0.3"/>
+
+  <!-- 긴급 보급 -->
+  <param key="GOLD_SINK_EMERGENCY_SUPPLY_COST"     value="50"/>
+  <param key="GOLD_SINK_EMERGENCY_SUPPLY_FOOD"     value="150"/>
+  <param key="GOLD_SINK_EMERGENCY_SUPPLY_COOLDOWN" value="180"/>
+
+  <!-- 도적기지 침공 -->
+  <param key="BANDIT_BASE_SIEGE_TRIGGER_TIME"    value="900"/>
+  <param key="BANDIT_BASE_SIEGE_REQUIRED_RAIDS"  value="3"/>
+
+  <!-- 비주얼 노벨 -->
+  <param key="VN_TYPEWRITER_INTERVAL"   value="16"/>
+  <param key="VN_INTRO_TRIGGER_SECONDS" value="5"/>
+
+  <!-- 인구 -->
+  <param key="POPULATION_GROWTH_TIME"  value="45"/>
+  <param key="POPULATION_DECLINE_TIME" value="30"/>
+
+  <!-- 건물 제한 수 -->
+  <param key="MARKET_MAX_COUNT"   value="3"/>
+  <param key="SCHOOL_MAX_COUNT"   value="3"/>
+  <param key="TREASURY_MAX_COUNT" value="2"/>
+
+  <!-- 게임 시스템 -->
+  <param key="UPDATE_INTERVAL"    value="1000"/>
+  <param key="SAVE_KEY"           value="medievalVillageGameSave"/>
+  <param key="CURRENT_SAVE_VERSION" value="4"/>
+  <param key="MAX_OFFLINE_SECONDS" value="28800"/>
+
+  <!-- 이벤트 -->
+  <param key="EVENT_CHECK_INTERVAL" value="90"/>
+  <param key="EVENT_CHANCE"         value="0.4"/>
+
+  <!-- 계절 -->
+  <param key="SEASON_DURATION" value="180"/>
+
+  <!-- 행복도 -->
+  <param key="HAPPINESS_BASE"         value="50"/>
+  <param key="HAPPINESS_CHURCH_BONUS" value="10"/>
+  <param key="HAPPINESS_TAVERN_BONUS" value="5"/>
+
+  <!-- 건물 강화 -->
+  <upgradeConfig
+    maxLevel="5"
+    costs="100,300,700,1500,3000"
+    bonuses="0.10,0.25,0.45,0.70,1.00"
+  />
+
+  <!-- 용병 종류별 설정 -->
+  <mercenaryConfig>
+    <type id="patrol"  cost="300"  duration="120" defenseBonus="0.30"/>
+    <type id="knight"  cost="1200" charges="3"/>
+    <type id="fortify" cost="800"  defenseBonus="0.10"/>
+  </mercenaryConfig>
+</gameConfig>

@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  trade.xml — 교역 기본 비율 정의
+  from/to 쌍의 rate 값을 수정해 교역 가치를 조정할 수 있습니다.
+  rate = "내가 'from' 자원 1개를 팔 때 받는 'to' 자원의 양"
+-->
+<tradeRates>
+
+  <from resource="wood">
+    <to resource="stone"     rate="0.6"/>
+    <to resource="food"      rate="0.8"/>
+    <to resource="lumber"    rate="0.45"/>
+    <to resource="bread"     rate="0.35"/>
+    <to resource="tools"     rate="0.2"/>
+    <to resource="furniture" rate="0.12"/>
+    <to resource="weapons"   rate="0.08"/>
+    <to resource="gold"      rate="0.05"/>
+  </from>
+
+  <from resource="stone">
+    <to resource="wood"      rate="1.5"/>
+    <to resource="food"      rate="1.2"/>
+    <to resource="lumber"    rate="0.4"/>
+    <to resource="bread"     rate="0.3"/>
+    <to resource="tools"     rate="0.22"/>
+    <to resource="furniture" rate="0.1"/>
+    <to resource="weapons"   rate="0.08"/>
+    <to resource="gold"      rate="0.08"/>
+  </from>
+
+  <from resource="food">
+    <to resource="wood"      rate="1.2"/>
+    <to resource="stone"     rate="0.8"/>
+    <to resource="lumber"    rate="0.35"/>
+    <to resource="bread"     rate="0.5"/>
+    <to resource="tools"     rate="0.18"/>
+    <to resource="furniture" rate="0.1"/>
+    <to resource="weapons"   rate="0.06"/>
+    <to resource="gold"      rate="0.04"/>
+  </from>
+
+  <from resource="lumber">
+    <to resource="wood"      rate="1.8"/>
+    <to resource="stone"     rate="1.7"/>
+    <to resource="food"      rate="1.4"/>
+    <to resource="bread"     rate="0.8"/>
+    <to resource="tools"     rate="0.55"/>
+    <to resource="furniture" rate="0.25"/>
+    <to resource="weapons"   rate="0.22"/>
+    <to resource="gold"      rate="0.18"/>
+  </from>
+
+  <from resource="bread">
+    <to resource="wood"      rate="2.1"/>
+    <to resource="stone"     rate="1.9"/>
+    <to resource="food"      rate="2.3"/>
+    <to resource="lumber"    rate="1.1"/>
+    <to resource="tools"     rate="0.6"/>
+    <to resource="furniture" rate="0.2"/>
+    <to resource="weapons"   rate="0.16"/>
+    <to resource="gold"      rate="0.2"/>
+  </from>
+
+  <from resource="tools">
+    <to resource="wood"      rate="3.5"/>
+    <to resource="stone"     rate="3.2"/>
+    <to resource="food"      rate="2.8"/>
+    <to resource="lumber"    rate="1.8"/>
+    <to resource="bread"     rate="1.6"/>
+    <to resource="furniture" rate="0.45"/>
+    <to resource="weapons"   rate="0.35"/>
+    <to resource="gold"      rate="0.35"/>
+  </from>
+
+  <from resource="furniture">
+    <to resource="wood"      rate="6.5"/>
+    <to resource="stone"     rate="6.2"/>
+    <to resource="food"      rate="5.2"/>
+    <to resource="lumber"    rate="3.2"/>
+    <to resource="bread"     rate="3.0"/>
+    <to resource="tools"     rate="2.2"/>
+    <to resource="weapons"   rate="0.75"/>
+    <to resource="gold"      rate="0.95"/>
+  </from>
+
+  <from resource="weapons">
+    <to resource="wood"      rate="7.2"/>
+    <to resource="stone"     rate="7.0"/>
+    <to resource="food"      rate="5.8"/>
+    <to resource="lumber"    rate="3.8"/>
+    <to resource="bread"     rate="3.4"/>
+    <to resource="tools"     rate="2.6"/>
+    <to resource="furniture" rate="1.2"/>
+    <to resource="gold"      rate="1.2"/>
+  </from>
+
+  <from resource="gold">
+    <to resource="wood"      rate="20"/>
+    <to resource="stone"     rate="15"/>
+    <to resource="food"      rate="25"/>
+    <to resource="lumber"    rate="10"/>
+    <to resource="bread"     rate="12"/>
+    <to resource="tools"     rate="8"/>
+    <to resource="furniture" rate="4"/>
+    <to resource="weapons"   rate="3"/>
+  </from>
+
+</tradeRates>

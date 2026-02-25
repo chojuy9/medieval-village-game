@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  research.xml — 연구 트리 정의
+  연구 비용(cost), 연구 시간(researchTime), 효과(effect)를 조정할 수 있습니다.
+-->
+<researchTree>
+
+  <!-- ===== 목공 계열 ===== -->
+  <research id="woodworking" name="목공술" icon="🪓">
+    <cost wood="100" gold="20"/>
+    <researchTime>120</researchTime>
+    <description>벌목소 생산량 +20%</description>
+    <effect type="production_bonus" target="lumbermill" bonus="0.2"/>
+    <requires/>
+  </research>
+
+  <research id="advanced_woodworking" name="고급 목공" icon="🪚">
+    <cost wood="200" stone="100" gold="50"/>
+    <researchTime>240</researchTime>
+    <description>제재소 해금</description>
+    <effect type="unlock_building" target="sawmill"/>
+    <requires id="woodworking"/>
+  </research>
+
+  <!-- ===== 채굴 계열 ===== -->
+  <research id="mining" name="채굴술" icon="⛏️">
+    <cost stone="100" gold="20"/>
+    <researchTime>120</researchTime>
+    <description>채석장 생산량 +20%</description>
+    <effect type="production_bonus" target="quarry" bonus="0.2"/>
+    <requires/>
+  </research>
+
+  <research id="masonry" name="석공술" icon="🧱">
+    <cost stone="200" wood="100" gold="50"/>
+    <researchTime>240</researchTime>
+    <description>석공소 해금</description>
+    <effect type="unlock_building" target="stonemason"/>
+    <requires id="mining"/>
+  </research>
+
+  <!-- ===== 농업 계열 ===== -->
+  <research id="agriculture" name="농업혁신" icon="🌾">
+    <cost food="150" gold="30"/>
+    <researchTime>150</researchTime>
+    <description>농장 생산량 +30%</description>
+    <effect type="production_bonus" target="farm" bonus="0.3"/>
+    <requires/>
+  </research>
+
+  <research id="baking" name="제빵 기술" icon="🍞">
+    <cost food="300" wood="100" gold="60"/>
+    <researchTime>240</researchTime>
+    <description>제빵소 해금</description>
+    <effect type="unlock_building" target="bakery"/>
+    <requires id="agriculture"/>
+  </research>
+
+  <!-- ===== 경제 계열 ===== -->
+  <research id="economics" name="경제학" icon="💰">
+    <cost gold="100"/>
+    <researchTime>180</researchTime>
+    <description>시장 보너스 +5%p</description>
+    <effect type="trade_bonus" bonus="0.05"/>
+    <requires/>
+  </research>
+
+  <research id="finance" name="금융학" icon="🏦">
+    <cost gold="200"/>
+    <researchTime>300</researchTime>
+    <description>보물창고 보너스 +10%p</description>
+    <effect type="building_bonus" target="treasury" bonus="0.1"/>
+    <requires id="economics"/>
+  </research>
+
+</researchTree>

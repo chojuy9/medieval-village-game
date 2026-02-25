@@ -458,6 +458,11 @@
         </div>
     </div>
 
+    <script src="js/config-loader.js?v=0.5.0"></script>
+    <script>
+        // 다른 스크립트 로드 전 동기 XML 로드 — window.GameData를 먼저 채웁니다.
+        ConfigLoader.loadAllSync();
+    </script>
     <script src="js/utils.js?v=0.3.3"></script>
     <script src="js/resources.js?v=0.3.3"></script>
     <script src="js/population.js?v=0.3.3"></script>
@@ -471,7 +476,7 @@
     <script src="js/research.js?v=0.3.3"></script>
     <script src="js/tribute.js?v=0.3.3"></script> <!-- 신규: game.js 전에 로드 -->
     <script src="js/mercenary.js?v=0.3.3"></script> <!-- 신규: game.js 전에 로드 -->
-    <script src="js/config.js?v=0.3.3"></script>
+    <script src="js/config.js?v=0.5.0"></script>
     <script src="js/production.js?v=0.3.3"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
     <script src="js/cloud-save.js?v=0.3.3"></script>
@@ -488,7 +493,7 @@
     <script src="js/ui-leaderboard.js?v=0.3.3"></script>
     <script src="js/ui-manual.js?v=0.3.3"></script>
     <script>
-        // 게임 시작
+        // 게임 시작 (XML은 위에서 이미 동기 로드 완료됨)
         document.addEventListener('DOMContentLoaded', function () {
             Game.init();
             UI.init();

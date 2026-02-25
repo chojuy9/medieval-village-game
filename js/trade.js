@@ -2,18 +2,8 @@
   'use strict';
 
   const Trade = {
-    // 교환 비율 기본값
-    baseRates: {
-      wood: { stone: 0.6, food: 0.8, lumber: 0.45, bread: 0.35, tools: 0.2, furniture: 0.12, weapons: 0.08, gold: 0.05 },
-      stone: { wood: 1.5, food: 1.2, lumber: 0.4, bread: 0.3, tools: 0.22, furniture: 0.1, weapons: 0.08, gold: 0.08 },
-      food: { wood: 1.2, stone: 0.8, lumber: 0.35, bread: 0.5, tools: 0.18, furniture: 0.1, weapons: 0.06, gold: 0.04 },
-      lumber: { wood: 1.8, stone: 1.7, food: 1.4, bread: 0.8, tools: 0.55, furniture: 0.25, weapons: 0.22, gold: 0.18 },
-      bread: { wood: 2.1, stone: 1.9, food: 2.3, lumber: 1.1, tools: 0.6, furniture: 0.2, weapons: 0.16, gold: 0.2 },
-      tools: { wood: 3.5, stone: 3.2, food: 2.8, lumber: 1.8, bread: 1.6, furniture: 0.45, weapons: 0.35, gold: 0.35 },
-      furniture: { wood: 6.5, stone: 6.2, food: 5.2, lumber: 3.2, bread: 3.0, tools: 2.2, weapons: 0.75, gold: 0.95 },
-      weapons: { wood: 7.2, stone: 7.0, food: 5.8, lumber: 3.8, bread: 3.4, tools: 2.6, furniture: 1.2, gold: 1.2 },
-      gold: { wood: 20, stone: 15, food: 25, lumber: 10, bread: 12, tools: 8, furniture: 4, weapons: 3 }
-    },
+    // XML(GameData.trade)에서 교역 비율을 읽어옵니다.
+    baseRates: (window.GameData && window.GameData.trade) ? window.GameData.trade : {},
 
     /**
      * 교역 가능한 자원 목록(금화 제외)을 반환합니다.

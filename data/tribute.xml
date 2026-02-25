@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  tribute.xml — 왕실 조공 정의
+  조공 비용(cost)과 쿨다운(cooldown)을 조정할 수 있습니다.
+-->
+<tributes>
+
+  <tribute id="small" name="소 헌상" cost="500" cooldown="120">
+    <reward type="random_resources" min="50" max="100"/>
+  </tribute>
+
+  <tribute id="large" name="대 헌상" cost="2000" cooldown="300">
+    <reward type="permanent_bonus" bonus="0.05"/>
+  </tribute>
+
+  <tribute id="royal" name="왕실 인가" cost="5000" cooldown="0" oneTime="true">
+    <reward type="unlock_building" target="mint"/>
+  </tribute>
+
+  <tribute id="title" name="작위 수여" cost="10000" cooldown="0" oneTime="true">
+    <reward type="multi">
+      <effect type="max_population" bonus="20"/>
+      <effect type="permanent_bonus" bonus="0.10"/>
+    </reward>
+  </tribute>
+
+</tributes>
