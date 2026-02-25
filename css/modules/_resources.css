@@ -1,0 +1,210 @@
+/* 자원 바 (가로 1줄 배치) */
+#resource-bar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 12px 20px;
+    background: #e1cf9f;
+    border-bottom: 2px solid #8b6914;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+/* 스크롤바 숨기기 (모바일 환경 등 고려) */
+#resource-bar::-webkit-scrollbar {
+    height: 4px;
+}
+
+#resource-bar::-webkit-scrollbar-thumb {
+    background-color: var(--primary);
+    border-radius: 2px;
+}
+
+.res-item {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.2);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.resource-icon {
+    font-size: 1.1em;
+}
+
+/* 리소스 아이콘 텍스트 기반 블럭 스타일 */
+.icon-wood {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.icon-wood::before {
+    content: '🪵';
+}
+
+.icon-stone {
+    color: #A9A9A9;
+    font-weight: bold;
+}
+
+.icon-stone::before {
+    content: '🪨';
+}
+
+.icon-food {
+    color: #32CD32;
+    font-weight: bold;
+}
+
+.icon-food::before {
+    content: '🌾';
+}
+
+.icon-gold {
+    color: #FFD700;
+    font-weight: bold;
+    text-shadow: 1px 1px 0 #B8860B;
+}
+
+.icon-gold::before {
+    content: '💰';
+}
+
+.icon-lumber {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.icon-lumber::before {
+    content: '🪓';
+}
+
+.icon-bread {
+    color: #DEB887;
+    font-weight: bold;
+}
+
+.icon-bread::before {
+    content: '🍞';
+}
+
+.icon-tools {
+    color: #696969;
+    font-weight: bold;
+}
+
+.icon-tools::before {
+    content: '⚒️';
+}
+
+.icon-furniture {
+    color: #8B4513;
+    font-weight: bold;
+}
+
+.icon-furniture::before {
+    content: '🪑';
+}
+
+.icon-weapons {
+    color: #696969;
+    font-weight: bold;
+}
+
+.icon-weapons::before {
+    content: '⚔️';
+}
+
+.icon-pop {
+    color: #4169E1;
+    font-weight: bold;
+}
+
+.icon-pop::before {
+    content: 'P';
+}
+
+.res-val {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #4a3520;
+}
+
+.res-rate {
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.res-rate.positive {
+    color: #4a7a2e;
+}
+
+.res-rate.negative {
+    color: #8b2020;
+}
+
+.res-rate.neutral {
+    color: transparent;
+}
+
+.res-divider {
+    width: 2px;
+    height: 24px;
+    background: #c8a43a;
+    border-radius: 1px;
+}
+
+.res-item.population {
+    background: rgba(65, 105, 225, 0.1);
+}
+
+/* 자원 패널 - 양피지 단색 */
+#resources-panel {
+    background: #dcc89a;
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-sm);
+}
+
+/* 자원 그룹 (티어별) */
+.resource-group {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: var(--radius-md);
+}
+
+.resource-group[data-tier="1"] {
+    border-left: 3px solid var(--tier1-color);
+}
+
+.resource-group[data-tier="2"] {
+    border-left: 3px solid var(--tier2-color);
+}
+
+.resource-group[data-tier="3"] {
+    border-left: 3px solid var(--tier3-color);
+}
+
+.tier-label {
+    font-size: 0.85em;
+    color: var(--primary-light);
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+/* 건물 비용 색상 분기 */
+.cost-sufficient {
+    color: var(--positive);
+    font-weight: bold;
+}
+
+.cost-insufficient {
+    color: var(--negative);
+    font-weight: bold;
+}

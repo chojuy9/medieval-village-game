@@ -1,0 +1,119 @@
+/* 용병 고용 패널 */
+
+#mercenary-panel.hidden {
+    display: none;
+}
+
+.mercenary-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 12px;
+}
+
+.mercenary-card {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    text-align: center;
+}
+
+.mercenary-icon {
+    font-size: 2em;
+    margin-bottom: 8px;
+}
+
+.mercenary-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2a1a0a;
+    margin-bottom: 5px;
+}
+
+.mercenary-desc {
+    font-size: 0.85em;
+    color: #4a3520;
+    margin-bottom: 8px;
+}
+
+.mercenary-effect {
+    font-size: 0.9em;
+    color: #8b2020;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.mercenary-cost {
+    font-size: 1em;
+    font-weight: bold;
+    color: #8b6914;
+    margin-bottom: 10px;
+}
+
+.mercenary-btn {
+    background: #c8a43a;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 8px 20px;
+    font-weight: bold;
+    color: #2a1a0a;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 36px;
+    min-width: 44px;
+}
+
+.mercenary-btn:hover:not(:disabled) {
+    background: #d4b044;
+    transform: translateY(-1px);
+}
+
+.mercenary-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.defense-status {
+    background: rgba(107, 68, 35, 0.1);
+    padding: 10px 15px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 12px;
+    font-size: 1.1em;
+    text-align: center;
+}
+
+.defense-status strong {
+    color: #8b2020;
+}
+
+/* 야경대 토글 컨테이너 */
+.toggle-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 15px;
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    margin-bottom: 10px;
+}
+
+.toggle-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #2a1a0a;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.toggle-label input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+}
+
+.status-text {
+    font-size: 0.9em;
+    color: #8b6914;
+}

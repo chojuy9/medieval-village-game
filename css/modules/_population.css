@@ -1,0 +1,24 @@
+/* 인구 통계 표시 */
+
+.stat {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 15px;
+    margin-bottom: 10px;
+    background: #d9c49a;
+    border-radius: var(--radius-sm);
+    border: 2px solid #8b6914;
+    font-size: 1.1em;
+}
+
+.stat span:first-child {
+    font-weight: bold;
+    color: #4a3520;
+}
+
+.stat span:last-child {
+    font-family: 'Press Start 2P', 'Noto Sans KR', monospace;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #6b4423;
+}

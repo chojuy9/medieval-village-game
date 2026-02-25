@@ -1,0 +1,113 @@
+/* 이벤트 배너 */
+#event-banner {
+    background: #e0d0a8;
+    border-bottom: 3px solid #6b4423;
+    padding: 15px 20px;
+    transition: all 0.3s ease;
+}
+
+#event-banner.hidden {
+    display: none;
+}
+
+#event-banner.show {
+    animation: slideDown 0.3s ease-out;
+}
+
+#event-banner .event-content {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+#event-banner .event-icon {
+    font-size: 2em;
+    min-width: 40px;
+    text-align: center;
+}
+
+#event-banner .event-info {
+    flex: 1;
+}
+
+#event-banner .event-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2a1a0a;
+    margin-bottom: 5px;
+}
+
+#event-banner .event-description {
+    font-size: 0.95em;
+    color: #4a3520;
+}
+
+#event-banner .event-progress {
+    height: 6px;
+    background: #c4a872;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+}
+
+#event-banner .progress-bar {
+    height: 100%;
+    background: #8b6914;
+    border-radius: var(--radius-sm);
+    transition: width 0.3s ease;
+}
+
+/* 이벤트 타입별 색상 */
+#event-banner.event-positive {
+    border-left: 4px solid #4a7a2e;
+}
+
+#event-banner.event-positive .progress-bar {
+    background: #4a7a2e;
+}
+
+#event-banner.event-neutral {
+    border-left: 4px solid #b8860b;
+}
+
+#event-banner.event-neutral .progress-bar {
+    background: #b8860b;
+}
+
+#event-banner.event-negative {
+    border-left: 4px solid #8b2020;
+}
+
+#event-banner.event-negative .progress-bar {
+    background: #8b2020;
+}
+
+/* 이벤트 선택 버튼 */
+.event-choices {
+    display: flex;
+    gap: 10px;
+    padding: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.event-choices.hidden {
+    display: none;
+}
+
+.event-choice-btn {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 10px 20px;
+    font-weight: bold;
+    color: #4a3520;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 44px;
+}
+
+.event-choice-btn:hover {
+    background: #e8d5a3;
+    box-shadow: var(--shadow-sm);
+}

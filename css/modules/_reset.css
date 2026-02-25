@@ -1,0 +1,40 @@
+/* 전체 초기화 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    background: #5c3a1e;
+    background-image:
+        repeating-linear-gradient(0deg,
+            transparent,
+            transparent 3px,
+            rgba(0, 0, 0, 0.02) 3px,
+            rgba(0, 0, 0, 0.02) 4px);
+    min-height: 100vh;
+    padding: 20px;
+    color: var(--primary-dark);
+    transition: background-color 1.5s ease-in-out;
+}
+
+/* 커스텀 스크롤바 */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-parchment);
+    border-left: 1px solid var(--primary);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary);
+    border: 1px solid var(--bg-parchment);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-light);
+}

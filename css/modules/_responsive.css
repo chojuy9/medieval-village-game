@@ -1,0 +1,275 @@
+/* ============================================
+   반응형 디자인 - 글로벌 레이아웃
+   ============================================ */
+
+/* 반응형 - 모바일 */
+@media (max-width: 600px) {
+    body {
+        padding: 10px;
+    }
+
+    header h1 {
+        font-size: 0.9em;
+    }
+
+    section {
+        padding: 15px;
+    }
+
+    #building-buttons {
+        grid-template-columns: 1fr;
+    }
+
+    footer {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    footer button {
+        width: 100%;
+    }
+
+    #game-time {
+        text-align: center;
+    }
+
+    .tribute-grid,
+    .mercenary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .achievement-tabs {
+        justify-content: center;
+    }
+
+    .ach-tab {
+        padding: 4px 10px;
+        font-size: 0.8em;
+    }
+}
+
+@media (max-width: 480px) {
+    #resources-panel {
+        grid-template-columns: 1fr;
+    }
+
+    #built-buildings-list {
+        grid-template-columns: 1fr;
+    }
+
+    .resource-amount {
+        min-width: 60px;
+    }
+
+    .event-choices {
+        flex-direction: column;
+    }
+
+    .event-choice-btn {
+        width: 100%;
+    }
+
+    .upgrade-btn {
+        font-size: 0.75em;
+        padding: 4px 8px;
+    }
+
+    .upgrade-stars {
+        font-size: 0.75em;
+    }
+}
+
+@media (max-width: 320px) {
+    header h1 {
+        font-size: 0.75em;
+    }
+
+    .resource {
+        padding: 10px;
+    }
+
+    .resource-icon {
+        font-size: 1.5em;
+    }
+
+    .resource-name {
+        font-size: 1em;
+    }
+
+    .building-btn {
+        padding: 12px;
+        min-height: 90px;
+    }
+}
+
+/* 태블릿 */
+@media (max-width: 768px) {
+    .building-grid {
+        grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+
+    .resource {
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .trade-row {
+        flex-direction: column;
+    }
+}
+
+/* 모바일 최적화 */
+@media (max-width: 480px) {
+    .building-grid {
+        grid-template-columns: 1fr;
+    }
+
+    header h1 {
+        font-size: 0.75em;
+    }
+
+    section {
+        padding: 12px;
+    }
+
+    .building-btn {
+        padding: 12px;
+    }
+
+    /* 터치 타겟 최소 44px */
+    button,
+    select,
+    input {
+        min-height: 44px;
+        min-width: 44px;
+    }
+
+    .demolish-btn {
+        min-height: 44px;
+        padding: 10px;
+    }
+
+    /* 자원 패널 2열 */
+    #resources-panel {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+    }
+
+    /* 교역 패널 세로 배치 */
+    .trade-row {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .trade-row select {
+        width: 100%;
+    }
+
+    /* 연구 그리드 단일 열 */
+    .research-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* 터치 환경 호버 효과 제거 */
+@media (hover: none) {
+    .building-btn:hover {
+        transform: none;
+        box-shadow: none;
+    }
+
+    .building-btn:active {
+        transform: scale(0.97);
+    }
+}
+
+/* ============================================
+   PC (가로 모드) 반응형 2단 레이아웃
+   ============================================ */
+@media (min-width: 850px) {
+    #game-container {
+        max-width: 1100px;
+        display: grid;
+        grid-template-columns: 320px 1fr;
+        grid-template-rows: auto auto auto 1fr auto;
+        grid-template-areas:
+            "header header"
+            "status nav"
+            "banner banner"
+            "resource content"
+            "eventlog content"
+            "footer footer";
+        align-items: start;
+    }
+
+    header {
+        grid-area: header;
+    }
+
+    #status-container {
+        grid-area: status;
+    }
+
+    #event-banner {
+        grid-area: banner;
+    }
+
+    #resource-bar {
+        grid-area: resource;
+        flex-direction: column;
+        align-items: stretch;
+        padding: 15px;
+        overflow-y: auto;
+        white-space: normal;
+        gap: 10px;
+        border-bottom: none;
+        border-right: 2px solid #8b6914;
+        height: 100%;
+        background: transparent;
+    }
+
+    #resource-bar .res-item {
+        justify-content: space-between;
+    }
+
+    #resource-bar .res-divider {
+        width: 100%;
+        height: 2px;
+        margin: 5px 0;
+    }
+
+    #tab-nav {
+        grid-area: nav;
+        margin-top: 0;
+    }
+
+    #tab-content-area {
+        grid-area: content;
+        padding: 15px 20px;
+        height: 100%;
+    }
+
+    #event-log {
+        grid-area: eventlog;
+        position: static;
+        width: auto;
+        max-width: none;
+        transform: none;
+        border-radius: 0;
+        margin: 0;
+        border-top: 2px solid #8b6914;
+        border-right: 2px solid #8b6914;
+        border-left: none;
+        border-bottom: none;
+        height: 180px;
+    }
+
+    footer {
+        grid-area: footer;
+    }
+}

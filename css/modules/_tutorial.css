@@ -1,0 +1,56 @@
+/* 튜토리얼 오버레이 */
+#tutorial-overlay {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1500;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+#tutorial-overlay.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(20px);
+    pointer-events: none;
+}
+
+.tutorial-bubble {
+    background: #e8d5a3;
+    border: 3px solid #c8a43a;
+    border-radius: var(--radius-md);
+    padding: 15px 20px;
+    max-width: 90vw;
+    box-shadow: var(--shadow-lg);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.tutorial-icon {
+    font-size: 2em;
+}
+
+.tutorial-text {
+    color: #4a3520;
+    font-size: 1em;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.tutorial-dismiss {
+    background: #c8a43a;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 8px 20px;
+    font-weight: bold;
+    color: #2a1a0a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.tutorial-dismiss:hover {
+    background: #d4b044;
+    transform: translateY(-1px);
+}

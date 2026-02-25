@@ -1,0 +1,39 @@
+/* ============================================
+   CSS 변수 - 색상 팔레트 및 디자인 토큰
+   ============================================ */
+:root {
+    /* ── 기본 갈색 톤 ── */
+    --primary-dark: #2a1a0a;
+    --primary: #6b4423;
+    --primary-light: #8b6914;
+    --accent-gold: #c8a43a;
+    --accent-cream: #f0e4c8;
+    --bg-parchment: #e8d5a3;
+    --bg-section: #dcc89a;
+
+    /* ── 상태 색상 (채도 낮춤) ── */
+    --positive: #4a7a2e;
+    --negative: #8b2020;
+    --warning: #b8860b;
+    --info: #4a6a3a;
+
+    /* ── 생산 체인 티어 (채도 낮춤) ── */
+    --tier1-color: #6b4423;
+    --tier2-color: #4a6a3a;
+    --tier3-color: #7a5a30;
+
+    /* ── 그림자 (blur 없는 하드셰도우) ── */
+    --shadow-sm: 2px 2px 0 rgba(42, 26, 10, 0.3);
+    --shadow-md: 3px 3px 0 rgba(42, 26, 10, 0.4);
+    --shadow-lg: 4px 4px 0 rgba(42, 26, 10, 0.5);
+
+    /* ── 둥글기 (대폭 축소) ── */
+    --radius-sm: 3px;
+    --radius-md: 4px;
+    --radius-lg: 5px;
+
+    /* ── 트랜지션 ── */
+    --transition-fast: 0.15s ease;
+    --transition-normal: 0.25s ease;
+    --transition-slow: 0.4s ease;
+}

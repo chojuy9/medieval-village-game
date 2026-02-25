@@ -1,0 +1,119 @@
+/* 교역 패널 */
+
+#trade-panel.hidden {
+    display: none;
+}
+
+#trade-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.trade-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.trade-row label {
+    font-weight: bold;
+    color: #4a3520;
+    min-width: 80px;
+}
+
+.trade-row select,
+.trade-row input {
+    padding: 8px 12px;
+    border: 2px solid #c8a43a;
+    border-radius: var(--radius-sm);
+    background: #f0e4c8;
+    font-size: 1em;
+    min-height: 44px;
+}
+
+.trade-row select:focus,
+.trade-row input:focus {
+    outline: none;
+    border-color: #8b6914;
+}
+
+.trade-quick-btns {
+    display: flex;
+    gap: 5px;
+}
+
+.trade-quick-btn {
+    padding: 6px 12px;
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-weight: bold;
+    color: #4a3520;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.trade-quick-btn:hover {
+    background: #c8a43a;
+}
+
+.trade-info {
+    background: rgba(200, 164, 58, 0.15);
+    padding: 12px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.trade-rate {
+    font-weight: bold;
+    color: #6b4423;
+}
+
+.trade-preview {
+    font-weight: bold;
+    color: #4a7a2e;
+}
+
+.trade-btn {
+    background: #c8a43a;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2a1a0a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.trade-btn:hover {
+    background: #d4b044;
+    transform: translateY(-1px);
+}
+
+.trade-btn:disabled {
+    background: #a09070;
+    border-color: #6b6050;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 교역 안내 문구 (시장 건설 전) */
+.trade-placeholder {
+    text-align: center;
+    padding: 20px;
+    color: #6b4423;
+}
+
+.trade-placeholder span {
+    font-size: 2em;
+    display: block;
+    margin-bottom: 10px;
+}

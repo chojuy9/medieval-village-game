@@ -1,0 +1,71 @@
+/* 금화 소비처 버튼 스타일 */
+
+.action-btn {
+    padding: 8px 16px;
+    border: 1px solid rgba(200, 164, 58, 0.4);
+    border-radius: var(--radius-sm);
+    background: #2a1a0a;
+    color: #c8a43a;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 44px;
+}
+
+.action-btn:hover {
+    background: #3d2810;
+}
+
+.action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(50%);
+}
+
+/* 마을 잔치 버튼 */
+.feast-btn {
+    background: #2a1a0a;
+    border: 2px solid rgba(200, 164, 58, 0.5);
+    color: #c8a43a;
+    font-weight: bold;
+}
+
+.feast-btn:hover:not(:disabled) {
+    background: #3d2810;
+    box-shadow: var(--shadow-sm);
+}
+
+/* 긴급 보급 버튼 */
+.supply-btn {
+    background: #1a2a1a;
+    border: 2px solid rgba(74, 122, 46, 0.5);
+    color: #a8c4a0;
+    font-weight: bold;
+}
+
+.supply-btn:hover:not(:disabled) {
+    background: #2d3d2d;
+    box-shadow: var(--shadow-sm);
+}
+
+/* 사운드 토글 버튼 */
+#sound-toggle-btn {
+    background: #d9c49a;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 8px 12px;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    min-width: 44px;
+    min-height: 44px;
+}
+
+#sound-toggle-btn:hover {
+    background: #e8d5a3;
+    transform: translateY(-1px);
+}
+
+#sound-toggle-btn.muted {
+    opacity: 0.6;
+}

@@ -1,0 +1,54 @@
+/* 하단 고정 이벤트 로그 */
+
+#event-log {
+    background: rgba(42, 26, 10, 0.85);
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    color: #e8d5a3;
+    padding: 8px 12px;
+    height: 100px;
+    position: fixed;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 800px;
+    z-index: 1000;
+    overflow-y: auto;
+    font-size: 0.9em;
+    box-shadow: 0 -4px 10px rgba(0, 0, 0, 0.3);
+}
+
+#event-log::-webkit-scrollbar {
+    width: 6px;
+}
+
+#event-log::-webkit-scrollbar-thumb {
+    background-color: var(--primary-light);
+    border-radius: 3px;
+}
+
+#event-log-messages p {
+    margin-bottom: 4px;
+    line-height: 1.4;
+    border-bottom: 1px dashed rgba(232, 213, 163, 0.2);
+    padding-bottom: 4px;
+}
+
+#event-log-messages p:last-child {
+    border-bottom: none;
+    margin-bottom: 0;
+}
+
+/* 메시지 타입별 색상 */
+#event-log-messages .log-positive {
+    color: #a8c4a0;
+}
+
+#event-log-messages .log-negative {
+    color: #d4a0a0;
+}
+
+#event-log-messages .log-warning {
+    color: #dcd4a0;
+}

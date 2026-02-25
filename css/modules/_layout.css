@@ -1,0 +1,151 @@
+/* 게임 컨테이너 */
+#game-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #e8d5a3;
+    border-radius: 4px;
+    border: 4px solid #3a2210;
+    box-shadow:
+        0 0 0 1px #8b6914,
+        4px 4px 0 rgba(0, 0, 0, 0.4);
+    overflow: hidden;
+}
+
+/* 헤더 */
+header {
+    background: #4a3520;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    border-bottom: 3px solid #2a1a0a;
+}
+
+header h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: 1.1em;
+    color: #e8d5a3;
+    text-shadow: 2px 2px 0 #2a1a0a;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+#menu-btn {
+    position: absolute;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid rgba(255, 248, 220, 0.5);
+    border-radius: 4px;
+    color: #e8d5a3;
+    font-size: 1.4em;
+    width: 44px;
+    height: 44px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#menu-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* 상태 바 (Status Bar) 컨테이너 */
+#status-container {
+    display: flex;
+    flex-direction: column;
+    border-bottom: 2px solid #8b6914;
+}
+
+/* 개별 블록 (계절, 시간) */
+.season-block,
+.time-block {
+    padding: 10px 20px;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 시간 블록 */
+.time-block {
+    background: #e8d5a3;
+    border-top: 1px solid rgba(139, 105, 20, 0.3);
+    font-size: 0.9em;
+}
+
+/* 계절 블록 기본 속성 */
+.season-block {
+    transition: color 0.5s ease;
+    /* CSS 변수를 활용한 선형 그라디언트로 게이지 표현 */
+    background: linear-gradient(to right,
+            var(--season-fill) 0%,
+            var(--season-fill) var(--season-progress, 0%),
+            var(--season-bg) var(--season-progress, 0%),
+            var(--season-bg) 100%);
+}
+
+/* 계절별 색상 변수 설정 */
+.season-block.spring {
+    --season-bg: #d5dcc0;
+    --season-fill: #b5c490;
+    color: #4a6a3a;
+}
+
+.season-block.summer {
+    --season-bg: #dcd4a0;
+    --season-fill: #ceb86c;
+    color: #8b7020;
+}
+
+.season-block.autumn {
+    --season-bg: #dcc8a0;
+    --season-fill: #c6a26b;
+    color: #8b5a20;
+}
+
+.season-block.winter {
+    --season-bg: #c8c4b8;
+    --season-fill: #a6a08e;
+    color: #5a5a50;
+}
+
+#game-time {
+    font-family: 'Press Start 2P', monospace;
+    font-size: 0.8em;
+    color: inherit;
+}
+
+/* 계절 전환 배경 */
+body.spring {
+    background: #4a5e32;
+}
+
+body.summer {
+    background: #7a5a2e;
+}
+
+body.autumn {
+    background: #5c3a1e;
+}
+
+body.winter {
+    background: #3a4a5a;
+}
+
+body {
+    transition: background 2s ease;
+}
+
+/* 계절 전환 트랜지션 */
+#season-banner {
+    transition: all 0.8s ease-in-out;
+}
+
+/* 스크롤 최적화 */
+#game-container {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+}

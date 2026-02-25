@@ -1,0 +1,370 @@
+/* 건물 건설 버튼 패널 */
+
+#building-buttons {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+.building-btn {
+    background: #d9c49a;
+    border: 3px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    min-height: 100px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: var(--shadow-sm);
+}
+
+.building-btn:hover:not(:disabled) {
+    background: #e8d5a3;
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.building-btn:active:not(:disabled) {
+    transform: translateY(-1px);
+}
+
+.building-btn:disabled {
+    background: #a09070;
+    border-color: #6b6050;
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.building-btn .building-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #2a1a0a;
+    margin-bottom: 8px;
+}
+
+.building-btn .building-cost {
+    font-size: 0.9em;
+    color: #4a3520;
+    margin-bottom: 5px;
+}
+
+.building-btn .building-workers {
+    font-size: 0.85em;
+    color: #6b4423;
+}
+
+.building-btn .building-description {
+    font-size: 0.8em;
+    color: #6b4423;
+    margin-top: 5px;
+    font-style: italic;
+}
+
+/* 잠금 건물 스타일 */
+.building-btn.locked {
+    opacity: 0.4;
+    filter: grayscale(70%);
+    cursor: default;
+    position: relative;
+}
+
+.building-btn.locked:hover {
+    transform: none;
+    box-shadow: var(--shadow-sm);
+}
+
+.building-btn.locked::before {
+    content: '🔒';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 1.2em;
+}
+
+.building-btn.locked .unlock-tooltip {
+    position: absolute;
+    bottom: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #2a1a0a;
+    color: #f0e4c8;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 0.8em;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.2s ease, visibility 0.2s ease;
+    z-index: 100;
+    pointer-events: none;
+}
+
+.building-btn.locked:hover .unlock-tooltip {
+    opacity: 1;
+    visibility: visible;
+}
+
+.building-btn.locked .unlock-tooltip::after {
+    content: '';
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    border: 6px solid transparent;
+    border-top-color: #2a1a0a;
+}
+
+/* 건물 해금 애니메이션 */
+@keyframes unlockBuilding {
+    0% {
+        opacity: 0.4;
+        filter: grayscale(70%);
+        transform: scale(0.95);
+    }
+
+    50% {
+        opacity: 0.7;
+        filter: grayscale(30%);
+        transform: scale(1.02);
+    }
+
+    100% {
+        opacity: 1;
+        filter: grayscale(0%);
+        transform: scale(1);
+    }
+}
+
+.building-btn.unlocked-animation {
+    animation: unlockBuilding 0.5s ease-out forwards;
+}
+
+/* 호버 마이크로 애니메이션 */
+.building-btn {
+    transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.building-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+/* 건설된 건물 패널 */
+
+#built-buildings-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.built-building {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideIn 0.3s ease-out;
+}
+
+.built-building .building-info {
+    font-weight: bold;
+    color: #4a3520;
+}
+
+.built-building .building-workers {
+    font-size: 0.9em;
+    color: #6b4423;
+}
+
+.built-building .building-count {
+    font-family: 'Press Start 2P', 'Noto Sans KR', monospace;
+    font-size: 0.85em;
+    background: #6b4423;
+    color: #f0e4c8;
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+}
+
+/* 철거 버튼 */
+.demolish-btn {
+    background: rgba(139, 32, 32, 0.15);
+    border: 1px solid #8b2020;
+    border-radius: var(--radius-sm);
+    padding: 4px 8px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: all 0.2s;
+    min-width: 32px;
+    min-height: 32px;
+}
+
+.demolish-btn:hover {
+    background: rgba(139, 32, 32, 0.3);
+    transform: scale(1.05);
+}
+
+.refund-info {
+    color: #4a7a2e;
+    font-weight: bold;
+    font-size: 0.95em;
+    margin-top: 10px;
+}
+
+/* 일꾼 +/- 조절 컨트롤 */
+.worker-control {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: rgba(107, 68, 35, 0.1);
+    border: 1px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 2px 4px;
+}
+
+.worker-ctrl-btn {
+    width: 28px;
+    height: 28px;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    font-size: 1.1em;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    line-height: 1;
+    padding: 0;
+}
+
+.worker-minus {
+    background: #c9a0a0;
+    color: #8b2020;
+    border-color: #8b2020;
+}
+
+.worker-minus:hover:not(:disabled) {
+    background: #b88888;
+    transform: scale(1.05);
+}
+
+.worker-plus {
+    background: #a8c4a0;
+    color: #2a5a1a;
+    border-color: #4a7a2e;
+}
+
+.worker-plus:hover:not(:disabled) {
+    background: #90b088;
+    transform: scale(1.05);
+}
+
+.worker-ctrl-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.worker-display {
+    font-weight: bold;
+    font-size: 0.85em;
+    color: #4a3520;
+    min-width: 36px;
+    text-align: center;
+}
+
+/* 강화 버튼 */
+.upgrade-btn {
+    background: #c8a43a;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #2a1a0a;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 32px;
+    min-width: 44px;
+}
+
+.upgrade-btn:hover:not(:disabled) {
+    background: #d4b044;
+    transform: scale(1.05);
+    box-shadow: var(--shadow-sm);
+}
+
+.upgrade-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 별 등급 표시 */
+.upgrade-stars {
+    color: #c8a43a;
+    font-size: 0.85em;
+    letter-spacing: 1px;
+}
+
+.upgrade-stars .empty-star {
+    color: #8b7850;
+}
+
+/* 강화 확인 모달 */
+.cost-info {
+    color: #8b6914;
+    font-weight: bold;
+    font-size: 1.1em;
+    margin-top: 10px;
+}
+
+.effect-info {
+    color: #4a7a2e;
+    font-weight: bold;
+    font-size: 1em;
+    margin-top: 8px;
+}
+
+.success-btn {
+    background: #4a7a2e !important;
+    border-color: #2a5a1a !important;
+    color: #f0e4c8 !important;
+}
+
+.success-btn:hover {
+    background: #5a8a3e !important;
+}
+
+/* 건물 카테고리 탭 (건설 탭 내) */
+.achievement-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.ach-tab {
+    padding: 6px 14px;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    background: #d9c49a;
+    font-size: 0.85em;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 36px;
+}
+
+.ach-tab:hover {
+    background: #c8a43a;
+}
+
+.ach-tab.active {
+    background: #6b4423;
+    color: #e8d5a3;
+    border-color: #2a1a0a;
+}

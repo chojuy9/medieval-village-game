@@ -1,0 +1,100 @@
+/* ============================================
+   탭 네비게이션 & 콘텐츠
+   ============================================ */
+
+#tab-nav {
+    display: flex;
+    gap: 5px;
+    margin-top: 15px;
+    border-bottom: 3px solid #8b6914;
+    padding: 0 10px;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
+#tab-nav::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-btn {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-bottom: none;
+    border-radius: var(--radius-md) var(--radius-md) 0 0;
+    padding: 10px 20px;
+    font-size: 1.05em;
+    font-weight: bold;
+    color: #4a3520;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 0.7;
+    min-height: 44px;
+}
+
+.tab-btn:hover {
+    background: #e1cf9f;
+    opacity: 0.9;
+}
+
+.tab-btn.active {
+    background: #e8d5a3;
+    color: #2a1a0a;
+    opacity: 1;
+    border-color: #8b6914;
+    padding-bottom: 12px;
+    margin-bottom: -3px;
+    box-shadow: inset 0 2px 0 #c8a43a;
+}
+
+.tab-icon {
+    font-size: 1.2em;
+}
+
+/* 탭 콘텐츠 영역 */
+#tab-content-area {
+    padding: 15px 0;
+    min-height: 400px;
+}
+
+.tab-content {
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.tab-section {
+    background: #dcc89a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-md);
+    padding: 15px;
+    margin-bottom: 15px;
+    box-shadow: var(--shadow-sm);
+}
+
+.tab-section h3 {
+    font-size: 1.2em;
+    color: #4a3520;
+    margin-bottom: 15px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #c8a43a;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 텅 빈 상태 메시지 표시 */
+.empty-state-message {
+    text-align: center;
+    padding: 30px;
+    color: #8b6914;
+    font-style: italic;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: var(--radius-sm);
+    border: 1px dashed #c8a43a;
+}

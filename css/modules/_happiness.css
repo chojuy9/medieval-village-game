@@ -1,0 +1,63 @@
+/* 행복도 패널 */
+
+.happiness-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    color: #4a3520;
+    margin-bottom: 8px;
+    font-size: 1.1em;
+}
+
+.happiness-bar-container {
+    height: 12px;
+    background: #c4a872;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    border: 2px solid #8b6914;
+}
+
+.happiness-bar {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease, background 0.5s ease;
+}
+
+/* 행복도 수치별 색상 */
+.happiness-bar.high {
+    background: #4a7a2e;
+}
+
+.happiness-bar.medium {
+    background: #b8860b;
+}
+
+.happiness-bar.low {
+    background: #8b2020;
+}
+
+/* 행복도 요인 표시 */
+.happiness-factors {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 8px;
+    font-size: 0.8em;
+}
+
+.happiness-factor {
+    padding: 2px 8px;
+    border-radius: var(--radius-sm);
+    font-weight: bold;
+}
+
+.happiness-factor.positive {
+    background: rgba(74, 122, 46, 0.2);
+    color: #4a7a2e;
+}
+
+.happiness-factor.negative {
+    background: rgba(139, 32, 32, 0.2);
+    color: #8b2020;
+}

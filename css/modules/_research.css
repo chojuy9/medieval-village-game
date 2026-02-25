@@ -1,0 +1,111 @@
+/* 연구 패널 */
+
+#research-panel.hidden {
+    display: none;
+}
+
+.research-placeholder {
+    text-align: center;
+    padding: 20px;
+    color: #6b4423;
+}
+
+.research-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.research-btn {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    cursor: pointer;
+    text-align: left;
+    transition: all var(--transition-fast);
+    min-height: 80px;
+}
+
+.research-btn:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.research-btn.completed {
+    opacity: 0.6;
+    border-color: var(--positive);
+}
+
+.research-btn.in-progress {
+    border-color: var(--accent-gold);
+    animation: stalledPulse 2s infinite;
+}
+
+.research-btn.available {
+    border-color: #6b4423;
+    cursor: pointer;
+}
+
+.research-btn.locked {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.research-btn.unaffordable {
+    opacity: 0.7;
+}
+
+.research-icon {
+    font-size: 1.5em;
+    display: block;
+}
+
+.research-name {
+    font-weight: bold;
+    color: var(--primary-dark);
+    display: block;
+}
+
+.research-desc {
+    font-size: 0.8em;
+    color: var(--primary-light);
+}
+
+.research-status {
+    font-size: 0.75em;
+    font-weight: bold;
+    display: block;
+    margin-top: 5px;
+}
+
+/* 진행 바 (연구용) */
+.progress-bar {
+    width: 100%;
+    height: 24px;
+    background: #c4a872;
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+    border: 1px solid #8b6914;
+}
+
+.progress-bar.hidden {
+    display: none;
+}
+
+.progress-fill {
+    height: 100%;
+    background: #c8a43a;
+    transition: width 1s linear;
+}
+
+.progress-label {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.75em;
+    font-weight: bold;
+    color: var(--primary-dark);
+}

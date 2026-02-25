@@ -1,0 +1,33 @@
+/* 통계 패널 */
+
+#stats-panel.hidden {
+    display: none;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+}
+
+.stat-item {
+    background: rgba(255, 255, 255, 0.3);
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.85em;
+    color: #4a3520;
+}
+
+.stat-value {
+    font-family: 'Press Start 2P', 'Noto Sans KR', monospace;
+    font-size: 0.85em;
+    font-weight: bold;
+    color: #4a6a3a;
+}

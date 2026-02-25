@@ -1,0 +1,79 @@
+/* 왕실 조공 패널 */
+
+#tribute-panel.hidden {
+    display: none;
+}
+
+.tribute-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 12px;
+}
+
+.tribute-card {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 15px;
+    text-align: center;
+    transition: all 0.3s;
+}
+
+.tribute-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-sm);
+}
+
+.tribute-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #2a1a0a;
+    margin-bottom: 8px;
+}
+
+.tribute-cost {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #8b6914;
+    margin-bottom: 5px;
+}
+
+.tribute-reward {
+    font-size: 0.9em;
+    color: #4a3520;
+    margin-bottom: 12px;
+}
+
+.tribute-btn {
+    background: #c8a43a;
+    border: 2px solid #6b4423;
+    border-radius: var(--radius-sm);
+    padding: 8px 20px;
+    font-weight: bold;
+    color: #2a1a0a;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-height: 36px;
+    min-width: 44px;
+}
+
+.tribute-btn:hover:not(:disabled) {
+    background: #d4b044;
+    transform: translateY(-1px);
+}
+
+.tribute-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* 완료된 일회성 조공 */
+.tribute-card.completed {
+    opacity: 0.5;
+    border-color: #8b7850;
+}
+
+.tribute-card.completed .tribute-btn {
+    background: #a09070;
+    border-color: #8b7850;
+}

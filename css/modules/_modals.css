@@ -1,0 +1,87 @@
+/* 모달 오버레이 */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-overlay.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #e8d5a3;
+    border: 4px solid #6b4423;
+    border-radius: var(--radius-md);
+    padding: 30px;
+    min-width: 280px;
+    max-width: 90vw;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+}
+
+.modal-content h2 {
+    font-size: 1.5em;
+    color: #4a3520;
+    margin-bottom: 25px;
+}
+
+.modal-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.modal-btn {
+    background: #d9c49a;
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+    padding: 12px 20px;
+    font-size: 1em;
+    font-weight: bold;
+    color: #2a1a0a;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-height: 44px;
+}
+
+.modal-btn:hover {
+    background: #e8d5a3;
+    transform: translateY(-1px);
+}
+
+.danger-btn {
+    background: #8b2020;
+    border-color: #5a1010;
+    color: #f0e4c8;
+}
+
+.danger-btn:hover {
+    background: #a02828;
+}
+
+/* 새 게임 확인 패널 */
+.confirm-panel {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(107, 68, 35, 0.1);
+    border: 2px solid #8b6914;
+    border-radius: var(--radius-sm);
+}
+
+.confirm-panel p {
+    color: #4a3520;
+    font-size: 0.95em;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.confirm-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}

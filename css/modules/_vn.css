@@ -1,0 +1,140 @@
+/* 비주얼 노벨 오버레이 */
+
+#vn-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 2000;
+    display: flex;
+    flex-direction: column;
+    background: rgba(0, 0, 0, 0.85);
+}
+
+#vn-overlay.vn-hidden {
+    display: none;
+}
+
+#vn-background {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0.8;
+}
+
+#vn-characters {
+    position: absolute;
+    bottom: 180px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 10%;
+    pointer-events: none;
+}
+
+.vn-char {
+    max-height: 60vh;
+    max-width: 30%;
+    object-fit: contain;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.vn-char.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+#vn-textbox {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(180deg, rgba(30, 20, 10, 0.95), rgba(20, 15, 5, 0.98));
+    border-top: 3px solid rgba(200, 164, 58, 0.6);
+    padding: 20px 30px;
+    min-height: 150px;
+    cursor: pointer;
+}
+
+#vn-speaker-name {
+    font-size: 1.2em;
+    font-weight: bold;
+    color: #c8a43a;
+    margin-bottom: 10px;
+    padding: 5px 15px;
+    background: rgba(107, 68, 35, 0.8);
+    border-radius: var(--radius-sm);
+    display: inline-block;
+}
+
+#vn-dialogue-text {
+    font-size: 1.1em;
+    line-height: 1.8;
+    color: #f0e4c8;
+    min-height: 60px;
+}
+
+#vn-tap-hint {
+    position: absolute;
+    bottom: 15px;
+    right: 30px;
+    font-size: 0.85em;
+    color: rgba(240, 228, 200, 0.6);
+    animation: tapHintBlink 1.5s infinite;
+}
+
+@keyframes tapHintBlink {
+
+    0%,
+    100% {
+        opacity: 0.6;
+    }
+
+    50% {
+        opacity: 0.3;
+    }
+}
+
+/* VN 오버레이 모바일 대응 */
+@media (max-width: 600px) {
+    #vn-characters {
+        bottom: 140px;
+        padding: 0 5%;
+    }
+
+    .vn-char {
+        max-width: 35%;
+        max-height: 40vh;
+    }
+
+    #vn-textbox {
+        padding: 15px 20px;
+        min-height: 120px;
+    }
+
+    #vn-speaker-name {
+        font-size: 1em;
+    }
+
+    #vn-dialogue-text {
+        font-size: 1em;
+    }
+}
+
+@media (max-width: 480px) {
+    #vn-characters {
+        bottom: 120px;
+    }
+
+    .vn-char {
+        max-width: 40%;
+        max-height: 35vh;
+    }
+
+    #vn-textbox {
+        padding: 12px 15px;
+        min-height: 100px;
+    }
+}

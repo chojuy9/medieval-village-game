@@ -1,0 +1,70 @@
+/* 메시지 박스 */
+#message-box {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #e8d5a3;
+    border: 3px solid #6b4423;
+    border-radius: var(--radius-md);
+    padding: 15px 30px;
+    font-weight: bold;
+    color: #2a1a0a;
+    box-shadow: var(--shadow-lg);
+    z-index: 1000;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    max-width: 90%;
+    text-align: center;
+}
+
+#message-box.hidden {
+    opacity: 0;
+    transform: translateX(-50%) translateY(-20px);
+    pointer-events: none;
+}
+
+#message-box.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+    animation: slideDown 0.3s ease-out;
+}
+
+#message-box.error {
+    background: #d4a0a0;
+    border-color: #8b2020;
+    color: #5a1010;
+}
+
+#message-box.success {
+    background: #b0c8a0;
+    border-color: #4a7a2e;
+    color: #2a4a1a;
+}
+
+/* 빵 부족 경고 메시지 */
+.warning-message {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 15px;
+    background: rgba(184, 134, 11, 0.15);
+    border: 2px solid rgba(184, 134, 11, 0.5);
+    border-radius: var(--radius-sm);
+    color: #b8860b;
+    font-weight: bold;
+    animation: warningPulse 2s infinite;
+}
+
+@keyframes warningPulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        border-color: rgba(184, 134, 11, 0.5);
+    }
+
+    50% {
+        opacity: 0.8;
+        border-color: rgba(184, 134, 11, 0.8);
+    }
+}
