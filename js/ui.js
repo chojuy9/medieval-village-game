@@ -256,20 +256,29 @@
     // 전체 UI 업데이트
     updateAll() {
       try {
-        this.updateResources();
-        this.updatePopulation();
-        this.updateHappiness();
-        this.updateSeason();
+        // 분리된 UI 모듈 호출
+        if (window.UIResources) UIResources.updateResources();
+        if (window.UIPopulation) {
+          UIPopulation.updatePopulation();
+          UIPopulation.updateHappiness();
+        }
+        if (window.UIStatus) {
+          UIStatus.updateSeason();
+          UIStatus.updateGameTime();
+        }
+        if (window.UIGoldSink) {
+          UIGoldSink.updateFeastButton();
+          UIGoldSink.updateNightwatchStatus();
+        }
         this.updateBuildingButtons();
         this.updateBuiltBuildings();
-        this.updateGameTime();
         this.updateTradePanel();
         this.updateResearchPanel();
         this.updateAchievementsPanel();
         // v0.3 신규 패널 업데이트
         this.updateTributePanel();
         this.updateMercenaryPanel();
-        this.updateStatsPanel();
+        if (window.UIStatus) UIStatus.updateStatsPanel();
         this.checkTutorialTriggers();
         this.updateTabBadges();
       } catch (error) {
@@ -337,216 +346,18 @@
       }
     },
 
-    // 자원 정보 업데이트
-    updateResources() {
-      try {
-        const allResources = window.Resources ? Object.keys(Resources.getRegistry()) : ['wood', 'stone', 'food', 'gold', 'lumber', 'bread', 'tools', 'furniture', 'weapons'];
+    // 자원 정보 업데이트 — ui-resources.js의 UIResources에 위임
+    updateResources() { if (window.UIResources) UIResources.updateResources(); },
+    getConsumptionRates() { return window.UIResources ? UIResources.getConsumptionRates() : {}; },
 
-        // 생산량 계산 캐시
-        let production = {};
-        let consumption = {};
-        if (window.Buildings) {
-          production = Buildings.getTotalProduction();
-          consumption = this.getConsumptionRates();
-        }
+    // 인구/행복도 업데이트 — ui-population.js의 UIPopulation에 위임
+    updatePopulation() { if (window.UIPopulation) UIPopulation.updatePopulation(); },
+    updateHappiness() { if (window.UIPopulation) UIPopulation.updateHappiness(); },
+    getHappinessFactorLabel(key) { return window.UIPopulation ? UIPopulation.getHappinessFactorLabel(key) : key; },
 
-        allResources.forEach(type => {
-          // 1. 보유량 업데이트
-          const amountEl = document.getElementById(`${type}-amount`);
-          if (amountEl) {
-            amountEl.textContent = Utils.formatNumber(Math.floor(Game.state.resources[type] || 0));
-          }
-
-          // 2. 생산/소비량(증감률) 업데이트
-          const rateEl = document.getElementById(`${type}-rate`);
-          if (rateEl) {
-            const net = (production[type] || 0) - (consumption[type] || 0);
-            const sign = net >= 0 ? '+' : '';
-            rateEl.textContent = `${sign}${net.toFixed(1)}/초`;
-            rateEl.className = 'res-rate resource-rate ' + (net > 0 ? 'positive' : net < 0 ? 'negative' : 'neutral');
-          }
-
-          // 3. (동적 표시) 자원 컨테이너가 숨겨져 있다면 로직에 따라 표시
-          // Phase 1-2 UI 구조에서는 자원이 항상 표시되도록 템플릿화되어 있으나,
-          // 만약 나중에 특정 조건 하에서만(예: 대장간 해금 후) 엘리먼트를 보이게 처리하고 싶다면 여기에서 parentElement의 display 조작 가능
-          if (amountEl) {
-            const parentItem = amountEl.closest('.res-item');
-            if (parentItem) {
-              // 예시: 티어 2 이상의 자원은 건물이 있거나 자원이 1 이상일 때만 표시
-              if (window.Resources) {
-                const registry = Resources.getRegistry();
-                const def = registry[type];
-                if (def && def.tier > 1) {
-                  const hasAnyResource = (Game.state.resources[type] || 0) >= 0.1;
-                  const hasTierBuilding = window.Buildings && Game.state.buildings.some(b => {
-                    const bDef = Buildings.definitions[b.type];
-                    return bDef && bDef.tier === def.tier;
-                  });
-
-                  if (!hasTierBuilding && !hasAnyResource) {
-                    parentItem.style.display = 'none';
-                  } else {
-                    parentItem.style.display = 'flex';
-                  }
-                }
-              }
-            }
-          }
-        });
-
-      } catch (error) {
-        console.error('[UI.updateResources] 자원 UI 업데이트 실패:', error);
-      }
-    },
-
-    // 자원별 소비량 계산 (건물 소비 + 식량 소비)
-    getConsumptionRates() {
-      const state = Game.state;
-
-      if (Game && typeof Game.getConsumptionRates === 'function') {
-        return Game.getConsumptionRates();
-      }
-
-      const rates = {};
-
-      // 건물 소비량 합산
-      if (window.Buildings && Array.isArray(state.buildings)) {
-        state.buildings.forEach(b => {
-          const def = Buildings.definitions[b.type];
-          if (!def) return;
-          // 일꾼이 필요한 건물인데 일꾼이 없으면 소비 안 함
-          if ((def.workersNeeded || 0) > 0 && (b.workers || 0) <= 0) return;
-          Object.entries(def.consumption || {}).forEach(([type, amount]) => {
-            rates[type] = (rates[type] || 0) + (Number(amount) || 0);
-          });
-        });
-      }
-
-      // 식량 소비 추가
-      const config = window.GAME_CONFIG || {};
-      const threshold = config.FOOD_SCALING_THRESHOLD || 20;
-      const baseCons = config.FOOD_CONSUMPTION_PER_PERSON || 0.1;
-      const scaledCons = config.FOOD_CONSUMPTION_SCALED || 0.15;
-      const perPerson = state.population.current >= threshold ? scaledCons : baseCons;
-      rates.food = (rates.food || 0) + state.population.current * perPerson;
-
-      const breadPerPerson = Number(config.BREAD_CONSUMPTION_PER_PERSON) || 0.03;
-      rates.bread = (rates.bread || 0) + state.population.current * breadPerPerson;
-
-      const tier2PlusCount = Array.isArray(state.buildings)
-        ? state.buildings.filter((building) => {
-          const def = window.Buildings && window.Buildings.definitions
-            ? window.Buildings.definitions[building.type]
-            : null;
-          return def && Number(def.tier) >= 2;
-        }).length
-        : 0;
-      const toolMaintenance = Number(config.TOOLS_MAINTENANCE_PER_TIER2_BUILDING) || 0.008;
-      rates.tools = (rates.tools || 0) + tier2PlusCount * toolMaintenance;
-
-      if (state.mercenaries && state.mercenaries.nightWatch) {
-        rates.gold = (rates.gold || 0) + (Number(config.GOLD_SINK_NIGHTWATCH_GOLD_PER_SEC) || 5);
-      }
-
-      return rates;
-    },
-
-    // 인구 정보 업데이트
-    updatePopulation() {
-      try {
-        document.getElementById('current-population').textContent = Game.state.population.current;
-        document.getElementById('max-population').textContent = Game.state.population.max;
-        document.getElementById('idle-population').textContent = Game.state.population.idle;
-        document.getElementById('employed-population').textContent = Game.state.population.employed;
-      } catch (error) {
-        console.error('[UI.updatePopulation] 인구 UI 업데이트 실패:', error);
-      }
-    },
-
-    // 행복도 정보 업데이트
-    updateHappiness() {
-      try {
-        const h = Game.state.happiness;
-        if (!h) return;
-
-        document.getElementById('happiness-value').textContent = h.current;
-
-        const bar = document.getElementById('happiness-bar');
-        bar.style.width = `${h.current}%`;
-        bar.className = 'happiness-bar ' + (h.current >= 70 ? 'high' : h.current >= 30 ? 'medium' : 'low');
-
-        // 요인 표시
-        const container = document.getElementById('happiness-factors');
-        container.innerHTML = '';
-        if (h.factors) {
-          Object.entries(h.factors).forEach(([key, value]) => {
-            if (value === 0) return;
-            const tag = document.createElement('span');
-            tag.className = 'happiness-factor ' + (value > 0 ? 'positive' : 'negative');
-            tag.textContent = `${this.getHappinessFactorLabel(key)} ${value > 0 ? '+' : ''}${value}`;
-            container.appendChild(tag);
-          });
-        }
-      } catch (error) {
-        console.error('[UI.updateHappiness] 행복도 UI 업데이트 실패:', error);
-      }
-    },
-
-    // 행복도 요인 라벨 반환
-    getHappinessFactorLabel(key) {
-      const labels = {
-        church: '⛪ 교회',
-        tavern: '🍺 주점',
-        crowding: '🏠 과밀',
-        starvation: '🌾 기아',
-        negativeEvent: '⚠️ 이벤트',
-        feast: '🎉 잔치'
-      };
-      return labels[key] || key;
-    },
-
-    // 계절 정보 업데이트
-    updateSeason() {
-      try {
-        if (!window.Seasons) return;
-
-        const gameTime = Game.state.stats.gameTime;
-        const season = Seasons.getCurrentSeason(gameTime);
-        const index = Seasons.getCurrentSeasonIndex(gameTime);
-        const banner = document.getElementById('status-bar'); // Now the season block
-        const nameEl = document.getElementById('season-name');
-        const iconEl = document.getElementById('season-icon');
-
-        if (!season || !banner || !nameEl) return;
-
-        nameEl.textContent = season.name;
-        iconEl.textContent = this.getSeasonIcon(season.id);
-
-        // Remove existing season classes and add current
-        banner.classList.remove('spring', 'summer', 'autumn', 'winter');
-        banner.classList.add(season.id);
-
-        // 현재 계절 내 진행률
-        const cycleTime = gameTime % (Seasons.SEASON_DURATION * 4);
-        const seasonStart = index * Seasons.SEASON_DURATION;
-        const progress = ((cycleTime - seasonStart) / Seasons.SEASON_DURATION) * 100;
-
-        banner.style.setProperty('--season-progress', `${Math.min(100, Math.max(0, progress))}%`);
-      } catch (error) {
-        console.error('[UI.updateSeason] 계절 UI 업데이트 실패:', error);
-      }
-    },
-
-    // Helper to get season icon since it's removed from text directly
-    getSeasonIcon(seasonId) {
-      const icons = {
-        'spring': '🌸',
-        'summer': '☀️',
-        'autumn': '🍂',
-        'winter': '❄️'
-      };
-      return icons[seasonId] || '🌸';
-    },
+    // 계절/시간/통계 업데이트 — ui-status.js의 UIStatus에 위임
+    updateSeason() { if (window.UIStatus) UIStatus.updateSeason(); },
+    getSeasonIcon(seasonId) { return window.UIStatus ? UIStatus.getSeasonIcon(seasonId) : '🌸'; },
 
     // 건물 버튼 생성
     createBuildingButtons() {
@@ -933,15 +744,7 @@
       }
     },
 
-    // 게임 시간 업데이트
-    updateGameTime() {
-      try {
-        const seconds = Math.floor(Game.state.stats.gameTime);
-        document.getElementById('game-time').textContent = `플레이 시간: ${Utils.formatTime(seconds)}`;
-      } catch (error) {
-        console.error('[UI.updateGameTime] 게임 시간 업데이트 실패:', error);
-      }
-    },
+    updateGameTime() { if (window.UIStatus) UIStatus.updateGameTime(); },
 
     // 건물 철거 완료 시 처리
     onBuildingDemolished(event) {
@@ -1357,18 +1160,7 @@
       }
     },
 
-    // 계절 전환 애니메이션 적용
-    applySeasonBackground(seasonId) {
-      try {
-        // body 클래스 변경으로 배경 전환
-        document.body.classList.remove('spring', 'summer', 'autumn', 'winter');
-        if (seasonId) {
-          document.body.classList.add(seasonId);
-        }
-      } catch (error) {
-        console.error('[UI.applySeasonBackground] 계절 배경 적용 실패:', error);
-      }
-    },
+    applySeasonBackground(seasonId) { if (window.UIStatus) UIStatus.applySeasonBackground(seasonId); },
 
     // 시장 건설 여부에 따른 교역 패널 토글
     checkMarketAvailability() {
@@ -1425,51 +1217,11 @@
     },
 
     // ============================================
-    // v0.3 추가 메서드들
+    // v0.3 추가 메서드들 — ui-resources.js의 UIResources에 위임
     // ============================================
-
-    // 자원 변화 플로팅 숫자 표시
-    showResourceFloat(elementId, amount) {
-      try {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-
-        const float = document.createElement('span');
-        float.className = `resource-float ${amount > 0 ? 'float-positive' : 'float-negative'}`;
-        float.textContent = `${amount > 0 ? '+' : ''}${Utils.formatNumber(amount)}`;
-        el.parentElement.style.position = 'relative';
-        el.parentElement.appendChild(float);
-
-        setTimeout(() => float.remove(), 1000);
-      } catch (error) {
-        console.error('[UI.showResourceFloat] 플로팅 숫자 표시 실패:', error);
-      }
-    },
-
-    // 값 변경 하이라이트 (조건부)
-    highlightValueChange(elementId, newValue) {
-      try {
-        const el = document.getElementById(elementId);
-        if (!el) return;
-
-        const prevValue = this._prevResources[elementId];
-        if (prevValue !== undefined && prevValue !== newValue) {
-          el.classList.add('value-changed');
-          setTimeout(() => el.classList.remove('value-changed'), 500);
-        }
-        this._prevResources[elementId] = newValue;
-      } catch (error) {
-        console.error('[UI.highlightValueChange] 값 변경 하이라이트 실패:', error);
-      }
-    },
-
-    // 건물 비용 색상 분기 포맷팅
-    formatCost(resourceType, cost, current) {
-      const icon = Utils.getResourceIcon(resourceType);
-      const isEnough = current >= cost;
-      const colorClass = isEnough ? 'cost-sufficient' : 'cost-insufficient';
-      return `<span class="${colorClass}">${icon} ${cost}</span>`;
-    },
+    showResourceFloat(elementId, amount) { if (window.UIResources) UIResources.showResourceFloat(elementId, amount); },
+    highlightValueChange(elementId, newValue) { if (window.UIResources) UIResources.highlightValueChange(elementId, newValue); },
+    formatCost(resourceType, cost, current) { return window.UIResources ? UIResources.formatCost(resourceType, cost, current) : ''; },
 
     // 생산 중단 표시
     showProductionStalled(buildingType, missingResources) {
@@ -1727,197 +1479,16 @@
       }
     },
 
-    // 통계 패널 업데이트 (Phase 2 준비)
-    updateStatsPanel() {
-      try {
-        const panel = document.getElementById('stats-panel');
-        if (!panel || !window.Game) return;
-
-        // 통계 패널은 항상 표시 (또는 특정 조건에 따라)
-        // Phase 2에서 실제 데이터 바인딩 구현 예정
-
-        // 기본 통계 업데이트
-        const gameTime = Game.state.stats?.gameTime || 0;
-        const playtimeEl = document.getElementById('stat-playtime');
-        if (playtimeEl) {
-          const minutes = Math.floor(gameTime / 60);
-          playtimeEl.textContent = `${minutes}분`;
-        }
-
-        const buildingsEl = document.getElementById('stat-buildings-built');
-        if (buildingsEl) {
-          buildingsEl.textContent = `${Game.state.buildings.length}개`;
-        }
-
-        const maxPopEl = document.getElementById('stat-max-population');
-        if (maxPopEl) {
-          maxPopEl.textContent = `${Game.state.population.max}명`;
-        }
-
-        const achievementsEl = document.getElementById('stat-achievements');
-        if (achievementsEl && window.Achievements) {
-          const unlocked = Achievements.getAll().filter(a => a.achieved).length;
-          achievementsEl.textContent = `${unlocked}개`;
-        }
-      } catch (error) {
-        console.error('[UI.updateStatsPanel] 통계 패널 업데이트 실패:', error);
-      }
-    },
+    // 통계 패널 업데이트 — ui-status.js의 UIStatus에 위임
+    updateStatsPanel() { if (window.UIStatus) UIStatus.updateStatsPanel(); },
 
     // ============================================
-    // v0.3 AI2 - 금화 소비처 버튼 이벤트 핸들러
+    // v0.3 AI2 - 금화 소비처 버튼 이벤트 핸들러 — ui-goldsink.js의 UIGoldSink에 위임
     // ============================================
-
-    initGoldSinkButtons() {
-      try {
-        // 마을 잔치 버튼
-        const feastBtn = document.getElementById('btn-feast');
-        if (feastBtn) {
-          feastBtn.addEventListener('click', () => {
-            if (!window.Game) return;
-            const result = Game.holdFeast ? Game.holdFeast() : { success: false, reason: 'not_implemented' };
-            if (!result.success) {
-              if (result.reason === 'gold') {
-                this.showMessage('금화가 부족합니다!', 'error');
-              } else if (result.reason === 'cooldown') {
-                this.showMessage('재사용 대기 중입니다.', 'warning');
-              } else {
-                this.showMessage('잔치를 개최할 수 없습니다.', 'error');
-              }
-            } else {
-              this.showMessage('🎉 마을 잔치가 시작되었습니다! 행복도 +25', 'success');
-              SoundManager.play('event');
-            }
-            this.updateFeastButton();
-          });
-        }
-
-        // 긴급 보급 버튼
-        const supplyBtn = document.getElementById('btn-emergency-supply');
-        if (supplyBtn) {
-          supplyBtn.addEventListener('click', () => {
-            if (!window.Game) return;
-            const result = Game.emergencySupply ? Game.emergencySupply() : { success: false, reason: 'not_implemented' };
-            if (!result.success) {
-              if (result.reason === 'gold') {
-                this.showMessage('금화가 부족합니다! (50 금화 필요)', 'error');
-              } else {
-                this.showMessage('긴급 보급을 실행할 수 없습니다.', 'error');
-              }
-            } else {
-              this.showMessage('🚑 긴급 보급 완료! 식량 +150', 'success');
-              SoundManager.play('build');
-            }
-          });
-        }
-
-        // 야경대 토글
-        const nightwatchToggle = document.getElementById('toggle-nightwatch');
-        if (nightwatchToggle) {
-          nightwatchToggle.addEventListener('change', (e) => {
-            if (!window.Game) return;
-            const enabled = e.target.checked;
-            const result = Game.toggleNightWatch ? Game.toggleNightWatch(enabled) : { success: false };
-            if (!result.success) {
-              e.target.checked = false;
-              this.showMessage('금화가 부족하여 야경대를 고용할 수 없습니다.', 'error');
-            } else {
-              if (enabled) {
-                this.showMessage('💂 야경대가 고용되었습니다. (금화 5/초 소모)', 'success');
-              } else {
-                this.showMessage('야경대가 해산되었습니다.', 'warning');
-              }
-            }
-            this.updateNightwatchStatus();
-          });
-        }
-
-        // 초기 상태 업데이트
-        this.updateFeastButton();
-        this.updateNightwatchStatus();
-        this.updateBreadWarning();
-
-        // 주기적 상태 업데이트 (쿨다운 표시용)
-        setInterval(() => {
-          this.updateFeastButton();
-          this.updateNightwatchStatus();
-          this.updateBreadWarning();
-        }, 1000);
-
-
-      } catch (error) {
-        console.error('[UI.initGoldSinkButtons] 금화 소비처 버튼 초기화 실패:', error);
-      }
-    },
-
-    // 마을 잔치 버튼 상태 업데이트 (쿨다운 표시)
-    updateFeastButton() {
-      try {
-        const feastBtn = document.getElementById('btn-feast');
-        if (!feastBtn || !window.Game) return;
-
-        const state = Game.state;
-        const cooldown = state.feastCooldown || 0;
-
-        if (cooldown > 0) {
-          feastBtn.disabled = true;
-          const remaining = Math.ceil(cooldown);
-          feastBtn.textContent = `🎉 잔치 준비 중... (${remaining}초)`;
-        } else {
-          const goldCost = 80;
-          const canAfford = (state.resources.gold || 0) >= goldCost;
-          feastBtn.disabled = !canAfford;
-          feastBtn.textContent = '🎉 마을 잔치 개최';
-        }
-      } catch (error) {
-        console.error('[UI.updateFeastButton] 잔치 버튼 업데이트 실패:', error);
-      }
-    },
-
-    // 야경대 상태 표시 업데이트
-    updateNightwatchStatus() {
-      try {
-        const statusEl = document.getElementById('nightwatch-status');
-        const toggleEl = document.getElementById('toggle-nightwatch');
-        if (!statusEl || !toggleEl || !window.Game) return;
-
-        const state = Game.state;
-        const nightWatch = state.mercenaries?.nightWatch;
-
-        if (nightWatch) {
-          statusEl.textContent = '🟢 근무 중';
-          toggleEl.checked = true;
-        } else {
-          statusEl.textContent = '⚫ 해제';
-          toggleEl.checked = false;
-        }
-      } catch (error) {
-        console.error('[UI.updateNightwatchStatus] 야경대 상태 업데이트 실패:', error);
-      }
-    },
-
-    // 빵 부족 경고 표시 업데이트
-    updateBreadWarning() {
-      try {
-        const warningEl = document.getElementById('bread-warning');
-        if (!warningEl || !window.Game) return;
-
-        const state = Game.state;
-        const breadLow = state.warnings?.breadLow || false;
-
-        // 빵이 부족하고 제분소가 있는 경우 표시
-        const hasMill = state.buildings.some(b => b.type === 'mill');
-        const breadAmount = state.resources.bread || 0;
-        const population = state.population.current;
-
-        // 인구 대비 빵이 부족한지 확인
-        const isBreadLow = hasMill && breadAmount < population * 5;
-
-        warningEl.style.display = isBreadLow ? 'flex' : 'none';
-      } catch (error) {
-        console.error('[UI.updateBreadWarning] 빵 부족 경고 업데이트 실패:', error);
-      }
-    }
+    initGoldSinkButtons() { if (window.UIGoldSink) UIGoldSink.initGoldSinkButtons(); },
+    updateFeastButton() { if (window.UIGoldSink) UIGoldSink.updateFeastButton(); },
+    updateNightwatchStatus() { if (window.UIGoldSink) UIGoldSink.updateNightwatchStatus(); },
+    updateBreadWarning() { if (window.UIGoldSink) UIGoldSink.updateBreadWarning(); }
   };
 
   window.UI = UI;
