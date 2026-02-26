@@ -4,79 +4,79 @@
    ============================================ */
 
 /* 1. 디자인 토큰 */
-@import url('modules/_variables.css');
+@import url('modules/variables.css');
 
 /* 2. 전역 초기화 */
-@import url('modules/_reset.css');
+@import url('modules/reset.css');
 
 /* 3. 공통 애니메이션 (다른 모듈에서 참조) */
-@import url('modules/_animations.css');
+@import url('modules/animations.css');
 
 /* 4. 레이아웃 (컨테이너, 헤더, 상태바, 계절) */
-@import url('modules/_layout.css');
+@import url('modules/layout.css');
 
 /* 5. 자원 바 & 아이콘 */
-@import url('modules/_resources.css');
+@import url('modules/resources.css');
 
 /* 6. 탭 네비게이션 */
-@import url('modules/_tabs.css');
+@import url('modules/tabs.css');
 
 /* 7. 모달 (공통) */
-@import url('modules/_modals.css');
+@import url('modules/modals.css');
 
 /* 8. 건물 (건설, 해금, 철거, 강화, 일꾼) */
-@import url('modules/_buildings.css');
+@import url('modules/buildings.css');
 
 /* 9. 인구 통계 */
-@import url('modules/_population.css');
+@import url('modules/population.css');
 
 /* 10. 행복도 */
-@import url('modules/_happiness.css');
+@import url('modules/happiness.css');
 
 /* 11. 교역 */
-@import url('modules/_trade.css');
+@import url('modules/trade.css');
 
 /* 12. 연구 */
-@import url('modules/_research.css');
+@import url('modules/research.css');
 
 /* 13. 업적 */
-@import url('modules/_achievements.css');
+@import url('modules/achievements.css');
 
 /* 14. 왕실 조공 */
-@import url('modules/_tribute.css');
+@import url('modules/tribute.css');
 
 /* 15. 용병 */
-@import url('modules/_mercenary.css');
+@import url('modules/mercenary.css');
 
 /* 16. 통계 */
-@import url('modules/_stats.css');
+@import url('modules/stats.css');
 
 /* 17. 생산 체인 */
-@import url('modules/_production.css');
+@import url('modules/production.css');
 
 /* 18. 금화 소비 / 사운드 토글 */
-@import url('modules/_actions.css');
+@import url('modules/actions.css');
 
 /* 19. 이벤트 배너 */
-@import url('modules/_events.css');
+@import url('modules/events.css');
 
 /* 20. 이벤트 로그 */
-@import url('modules/_event-log.css');
+@import url('modules/event-log.css');
 
 /* 21. 메시지 박스 & 경고 */
-@import url('modules/_messages.css');
+@import url('modules/messages.css');
 
 /* 22. 튜토리얼 */
-@import url('modules/_tutorial.css');
+@import url('modules/tutorial.css');
 
 /* 23. 푸터 */
-@import url('modules/_footer.css');
+@import url('modules/footer.css');
 
 /* 24. 비주얼 노벨 */
-@import url('modules/_vn.css');
+@import url('modules/vn.css');
 
 /* 25. 게임 설명서 */
-@import url('modules/_manual.css');
+@import url('modules/manual.css');
 
 /* 26. 반응형 (맨 마지막 - 오버라이드 보장) */
-@import url('modules/_responsive.css');
+@import url('modules/responsive.css');
